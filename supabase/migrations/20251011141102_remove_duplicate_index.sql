@@ -1,0 +1,43 @@
+-- ============================================================================
+-- Migration: Remove Duplicate Index on shops.user_id
+-- Created: 2025-10-11 14:11:02 UTC
+-- Description: Removes redundant idx_shops_user_id index since the UNIQUE 
+--              constraint on shops.user_id already creates shops_user_id_key
+-- ============================================================================
+-- Affected Objects:
+--   - Index: idx_shops_user_id (DROPPED)
+--   - Index: shops_user_id_key (KEPT - created by UNIQUE constraint)
+-- 
+-- Background:
+--   When a UNIQUE constraint is created on a column, PostgreSQL automatically
+--   creates a unique index to enforce it (shops_user_id_key). The explicit
+--   creation of idx_shops_user_id in the initial migration created a duplicate
+--   index on the same column, wasting storage and update overhead.
+--
+-- Resolution:
+--   Drop the explicit idx_shops_user_id and rely on the constraint's automatic
+--   index (shops_user_id_key) which serves the same purpose.
+-- ============================================================================
+
+-- drop the redundant explicit index
+-- the shops_user_id_key index (created by the UNIQUE constraint) will remain
+drop index if exists idx_shops_user_id;
+
+-- ============================================================================
+-- MIGRATION NOTES
+-- ============================================================================
+-- 
+-- REMAINING INDEX:
+--   shops_user_id_key - Unique B-tree index automatically created by the
+--   UNIQUE constraint on shops(user_id). This index serves both purposes:
+--   1. Enforces uniqueness (one shop per user)
+--   2. Provides fast lookups for user_id queries
+--
+-- PERFORMANCE IMPACT:
+--   Positive - Reduces storage overhead and eliminates duplicate index
+--   maintenance during INSERT/UPDATE/DELETE operations.
+--
+-- BEHAVIORAL CHANGES:
+--   None - The UNIQUE constraint's index provides identical functionality.
+--
+-- ============================================================================
