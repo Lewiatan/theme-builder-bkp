@@ -2,9 +2,24 @@
 
 ## 1. Tables
 
-### 1.1 users
+### 1.1. users
+Stores user authentication and account information.
 
-This table is managed by Supabase Auth
+| Column | Data Type | Constraints | Description |
+|--------|-----------|-------------|-------------|
+| id | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique user identifier |
+| email | VARCHAR(255) | NOT NULL, UNIQUE | User email address |
+| password | VARCHAR(255) | NOT NULL | Hashed password (bcrypt/argon2) |
+| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Account creation timestamp |
+| updated_at | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Last modification timestamp |
+
+**Constraints:**
+- PRIMARY KEY (id)
+- UNIQUE (email)
+
+**Notes:**
+- Password hashing handled by Symfony PasswordHasher
+- Authentication managed via JWT tokens (LexikJWTAuthenticationBundle)
 
 ### 1.2. shops
 Primary organizational entity representing a user's shop.
@@ -12,7 +27,7 @@ Primary organizational entity representing a user's shop.
 | Column | Data Type | Constraints | Description |
 |--------|-----------|-------------|-------------|
 | id | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique shop identifier |
-| user_id | UUID | NOT NULL, UNIQUE, REFERENCES auth.users(id) ON DELETE CASCADE | Owner reference (one shop per user) |
+| user_id | UUID | NOT NULL, UNIQUE, REFERENCES users(id) ON DELETE CASCADE | Owner reference (one shop per user) |
 | name | VARCHAR(60) | NOT NULL | Shop name |
 | theme_settings | JSONB | NOT NULL, DEFAULT '{}' | Theme configuration (colors, fonts) |
 | created_at | TIMESTAMPTZ | NOT NULL, DEFAULT now() | Shop creation timestamp |
@@ -21,7 +36,7 @@ Primary organizational entity representing a user's shop.
 **Constraints:**
 - PRIMARY KEY (id)
 - UNIQUE (user_id)
-- FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+- FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 
 ---
 
@@ -113,8 +128,8 @@ CREATE TYPE page_type_enum AS ENUM ('home', 'catalog', 'product', 'contact');
 
 ### 3.1. User to Shop
 - **Cardinality:** One-to-One
-- **Direction:** auth.users → shops
-- **Implementation:** shops.user_id (UNIQUE) REFERENCES auth.users(id)
+- **Direction:** users → shops
+- **Implementation:** shops.user_id (UNIQUE) REFERENCES users(id)
 - **Cascade:** ON DELETE CASCADE (deleting user deletes shop)
 
 ### 3.2. Shop to Pages
@@ -133,21 +148,28 @@ CREATE TYPE page_type_enum AS ENUM ('home', 'catalog', 'product', 'contact');
 
 ## 4. Indexes
 
-### 4.1. shops table
+### 4.1. users table
+```sql
+CREATE UNIQUE INDEX idx_users_email ON users(email);
+```
+- **Purpose:** Fast email lookup for authentication and enforce uniqueness
+- **Type:** Unique B-tree index
+
+### 4.2. shops table
 ```sql
 CREATE UNIQUE INDEX idx_shops_user_id ON shops(user_id);
 ```
 - **Purpose:** Fast user shop lookup and enforce one shop per user
 - **Type:** Unique B-tree index
 
-### 4.2. pages table
+### 4.3. pages table
 ```sql
 CREATE UNIQUE INDEX idx_pages_shop_type ON pages(shop_id, type);
 ```
 - **Purpose:** Fast page lookups by shop and type, enforce uniqueness constraint
 - **Type:** Unique composite B-tree index
 
-### 4.3. demo_products table
+### 4.4. demo_products table
 ```sql
 CREATE INDEX idx_demo_products_category_id ON demo_products(category_id);
 ```
@@ -156,218 +178,59 @@ CREATE INDEX idx_demo_products_category_id ON demo_products(category_id);
 
 ---
 
-## 5. Row-Level Security (RLS) Policies
+## 5. Design Decisions and Notes
 
-### 5.1. shops table
-**Enable RLS:**
-```sql
-ALTER TABLE shops ENABLE ROW LEVEL SECURITY;
-```
-
-**Policy: shops_select_policy**
-```sql
-CREATE POLICY shops_select_policy ON shops
-  FOR SELECT
-  USING (user_id = auth.uid());
-```
-- **Operation:** SELECT
-- **Rule:** Users can only view their own shop
-
-**Policy: shops_insert_policy**
-```sql
-CREATE POLICY shops_insert_policy ON shops
-  FOR INSERT
-  WITH CHECK (user_id = auth.uid());
-```
-- **Operation:** INSERT
-- **Rule:** Users can only create shops for themselves
-
-**Policy: shops_update_policy**
-```sql
-CREATE POLICY shops_update_policy ON shops
-  FOR UPDATE
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-```
-- **Operation:** UPDATE
-- **Rule:** Users can only update their own shop
-
-**Policy: shops_delete_policy**
-```sql
-CREATE POLICY shops_delete_policy ON shops
-  FOR DELETE
-  USING (user_id = auth.uid());
-```
-- **Operation:** DELETE
-- **Rule:** Users can only delete their own shop
-
----
-
-### 5.2. pages table
-**Enable RLS:**
-```sql
-ALTER TABLE pages ENABLE ROW LEVEL SECURITY;
-```
-
-**Policy: pages_select_policy**
-```sql
-CREATE POLICY pages_select_policy ON pages
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM shops
-      WHERE shops.id = pages.shop_id
-      AND shops.user_id = auth.uid()
-    )
-  );
-```
-- **Operation:** SELECT
-- **Rule:** Users can view pages belonging to their shop
-
-**Policy: pages_insert_policy**
-```sql
-CREATE POLICY pages_insert_policy ON pages
-  FOR INSERT
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM shops
-      WHERE shops.id = pages.shop_id
-      AND shops.user_id = auth.uid()
-    )
-  );
-```
-- **Operation:** INSERT
-- **Rule:** Users can create pages only for their shop
-
-**Policy: pages_update_policy**
-```sql
-CREATE POLICY pages_update_policy ON pages
-  FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM shops
-      WHERE shops.id = pages.shop_id
-      AND shops.user_id = auth.uid()
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM shops
-      WHERE shops.id = pages.shop_id
-      AND shops.user_id = auth.uid()
-    )
-  );
-```
-- **Operation:** UPDATE
-- **Rule:** Users can update pages belonging to their shop
-
-**Policy: pages_delete_policy**
-```sql
-CREATE POLICY pages_delete_policy ON pages
-  FOR DELETE
-  USING (
-    EXISTS (
-      SELECT 1 FROM shops
-      WHERE shops.id = pages.shop_id
-      AND shops.user_id = auth.uid()
-    )
-  );
-```
-- **Operation:** DELETE
-- **Rule:** Users can delete pages belonging to their shop
-
----
-
-### 5.3. demo_categories table
-**No RLS policies** - Shared static data accessible to all authenticated users
-
----
-
-### 5.4. demo_products table
-**No RLS policies** - Shared static data accessible to all authenticated users
-
----
-
-## 6. Triggers
-
-### 6.1. Automatic updated_at timestamp
-Create a reusable function and apply it to all tables with updated_at column.
-
-**Function:**
-```sql
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-**Triggers:**
-```sql
-CREATE TRIGGER update_shops_updated_at
-  BEFORE UPDATE ON shops
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_pages_updated_at
-  BEFORE UPDATE ON pages
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-```
-
----
-
-## 7. Design Decisions and Notes
-
-### 7.1. JSON Storage Strategy
+### 5.1. JSON Storage Strategy
 - **Page layouts** stored as JSONB arrays for flexibility and atomic updates
 - **Theme settings** stored as JSONB for schema evolution without migrations
 - **Component settings** embedded in layout JSON for simplicity
 - No database-level validation of JSON structure (handled in application)
 - No GIN indexes on JSONB for MVP (premature optimization)
 
-### 7.2. Authentication Integration
-- Uses Supabase Auth's built-in `auth.users` table
-- Foreign key from `shops.user_id` to `auth.users.id`
-- RLS policies leverage `auth.uid()` function for access control
+### 5.2. Authentication Integration
+- JWT-based authentication managed by Symfony (LexikJWTAuthenticationBundle)
+- Password hashing handled by Symfony PasswordHasher (bcrypt/argon2)
+- Authorization enforced at API level via Symfony Security component
+- Repository-level filtering ensures users can only access their own data
 
-### 7.3. Data Isolation
-- Complete user data isolation through shop ownership
-- RLS ensures no cross-user data leakage
-- Demo data shared across all shops (no RLS)
+### 5.3. Data Isolation
+- Complete user data isolation through shop ownership validation in API
+- Foreign key constraints ensure referential integrity
+- Demo data shared across all shops (publicly readable via API)
 
-### 7.4. Cascade Behavior
+### 5.4. Timestamp Management
+- `created_at` and `updated_at` timestamps managed by Symfony API layer
+- Doctrine lifecycle callbacks handle automatic timestamp updates
+- No database triggers required
+
+### 5.5. Cascade Behavior
 Two-level cascade deletion:
 1. **User deleted** → Shop deleted (CASCADE)
 2. **Shop deleted** → All pages deleted (CASCADE)
 3. Demo data has no cascades (static reference data)
 
-### 7.5. Constraints Enforcement
+### 5.6. Constraints Enforcement
 - **One shop per user:** UNIQUE constraint on `shops.user_id`
 - **One page of each type per shop:** UNIQUE constraint on `pages(shop_id, type)`
 - **Page type validation:** Enforced via enum `page_type_enum`
 - **Foreign key integrity:** All relationships use FK constraints
 
-### 7.6. Performance Considerations
+### 5.7. Performance Considerations
 - Minimal indexing strategy for MVP
-- Three indexes total: user_id on shops, composite on pages, category_id on demo_products
+- Four indexes total: email on users, user_id on shops, composite on pages, category_id on demo_products
 - JSONB operations expected to be fast enough for MVP workload
 - No materialized views or partitioning needed at this scale
 
-### 7.7. Migration Execution Order
+### 5.8. Migration Execution Order
 Recommended order for creating schema:
 1. Create enum: `page_type_enum`
-2. Create tables: `shops` → `pages`, `demo_categories` → `demo_products`
+2. Create tables: `users` → `shops` → `pages`, `demo_categories` → `demo_products`
 3. Create indexes on all tables
-4. Create trigger function: `update_updated_at_column()`
-5. Create triggers on `shops` and `pages`
-6. Enable RLS on `shops` and `pages`
-7. Create RLS policies for `shops` and `pages`
 
-### 7.8. Application Responsibilities
+### 5.9. Application Responsibilities
 The following are NOT handled at database level:
+- User authentication and password hashing (Symfony Security)
+- Timestamp management (Doctrine lifecycle callbacks)
 - Component template definitions
 - Default page layouts for new users
 - JSONB structure validation
@@ -376,7 +239,7 @@ The following are NOT handled at database level:
 - Image URL format validation
 - Demo data seeding
 
-### 7.9. Future Considerations
+### 5.10. Future Considerations
 - JSON storage allows adding new component types without schema changes
 - Shop-centric model can support multi-shop per user in future
 - Can add media library table later without breaking image URL references
