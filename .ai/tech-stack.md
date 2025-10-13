@@ -1,34 +1,56 @@
-## Tech Stack Description
+# Tech Stack Description
 
-**Frontend - React 19 Single Page Application:**
-- React 19 provides a modern, component-based architecture with improved performance and developer experience
-- TypeScript ensures static type checking, better IDE support, and reduced runtime errors
-- Vite offers lightning-fast development server with Hot Module Replacement (HMR) and optimized production builds
-- Tailwind CSS enables rapid, utility-first styling with excellent developer experience
-- dnd kit provides modern, accessible drag-and-drop functionality with touch support and excellent performance
-- React Router handles client-side routing for seamless page navigation
+## Frontend Applications
 
-**Backend & Database - Supabase as comprehensive backend solution:**
-- Provides PostgreSQL database with built-in real-time capabilities
-- Offers JavaScript/TypeScript SDK that serves as Backend-as-a-Service (BaaS)
-- Open source solution that can be self-hosted or run on Supabase cloud
-- Includes built-in user authentication with Row Level Security (RLS)
-- Eliminates need for custom backend API in MVP phase
+### Theme Builder Application
+- **React 19** with TypeScript
+- **Vite** for build tooling and dev server
+- **Tailwind CSS** for styling
+- **dnd kit** for drag-and-drop functionality
+- **No routing** (single-view SPA)
+- **Fetch API** for REST communication
+- **Purpose:** Visual editor for authenticated users
 
-**Image Storage - Cloudflare R2:**
-- S3-compatible object storage with generous free tier (10GB storage, 1M operations/month)
-- Global CDN distribution for fast image delivery
-- Cost-effective alternative to traditional cloud storage
-- Seamless integration with Cloudflare Workers
+### Demo Shop Application
+- **React 19** with TypeScript
+- **React Router v7** for page routing
+- **Vite** for build tooling
+- **Tailwind CSS** for styling
+- **Fetch API** for REST communication
+- **Purpose:** Public preview of saved shop themes
 
-**Serverless Functions - Cloudflare Workers:**
-- Minimal worker for generating secure presigned upload URLs
-- Edge computing with sub-millisecond response times
-- Validates user authentication via Supabase JWT
-- Keeps R2 credentials secure and never exposed to frontend
+## Backend API
 
-**CI/CD & Hosting:**
-- GitHub Actions for automated testing, linting, and deployment pipelines
-- Cloudflare Pages for frontend hosting with automatic deployments from main branch
-- Cloudflare Workers for serverless function deployment via Wrangler
-- Automated unit testing (Vitest) and integration testing (Playwright) on pull requests
+### Symfony 7.3 REST API
+- **PHP 8.2+**
+- **JWT authentication** (LexikJWTAuthenticationBundle)
+- **Symfony Validator** for input validation
+- **Symfony Serializer** for JSON responses
+- **AWS SDK for PHP** for R2 image uploads
+- **PostgreSQL** as database
+- **Doctrine ORM** for data access
+- **Phinx** for migrations
+- **Purpose:** Stateless REST API for all business logic
+
+## Storage
+
+### Cloudflare R2
+- S3-compatible object storage
+- 10GB free tier
+- Managed via Symfony backend (AWS SDK for PHP)
+- Credentials never exposed to frontend
+
+## Deployment
+
+### Hosting
+- **Theme Builder:** Cloudflare Pages
+- **Demo Shop:** Cloudflare Pages
+- **Backend API:** Render Web Service
+- **Database:** Render PostgreSQL
+- **Images:** Cloudflare R2
+
+### CI/CD
+- **GitHub Actions** for automated testing and deployment
+- **Tests:** Vitest (frontend), PHPUnit (backend), Playwright (E2E)
+- **Linting:** ESLint (frontend), PHP CS Fixer (backend)
+- Auto-deploy to production on merge to `main`
