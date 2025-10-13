@@ -58,12 +58,12 @@ A **minimum viable product (MVP)** for an E-commerce Theme Builder that enables 
 **Unsaved Changes Protection:**
 - Confirmation dialog appears when user attempts to navigate away with unsaved changes (page content, theme settings, or both):
   - Switching to different page via dropdown
-  - Navigating to other routes (logout, settings, etc.)
+  - Logging out from application
   - Closing browser tab/window
   - Opening Demo Store (Demo button)
 - Dialog message clearly specifies what is unsaved:
   - "You have unsaved page changes"
-  - "You have unsaved theme settings"  
+  - "You have unsaved theme settings"
   - "You have unsaved page changes and theme settings"
 - Dialog options: "Stay on page" or "Leave without saving"
 - Choosing "Leave without saving" discards all unsaved changes (page and/or theme)
@@ -74,7 +74,7 @@ A **minimum viable product (MVP)** for an E-commerce Theme Builder that enables 
 - **Default State:** Collapsed (completely hidden)
 - **Toggle:** Via cog icon button in top bar right section
 - **Persistence:** Remains open/closed when switching between pages (does not auto-close)
-- **Content:** 
+- **Content:**
   - Color palette picker (applies globally to all components)
   - Font/typography selection (applies globally to all components)
   - "Save Theme Settings" button at bottom
@@ -104,11 +104,14 @@ Support for building templates for four core E-commerce page types:
 - Updates as user modifies components or theme settings
 - **Optional enhancement:** If live preview proves difficult for MVP scope, add "Preview" button that renders current snapshot of settings for the active page only
 
-**Demo Store (Separate View)**
-- Dedicated view/route for previewing published templates
-- Renders page templates using **SAVED settings only** from database
-- Displays **mocked product data** (static JSON array in application code)
+**Demo Store (Separate Application)**
+- Completely separate React application from Theme Builder
+- Built with React + React Router v7 for routing between shop pages
+- Fetches theme/page templates via REST API using **SAVED settings only**
+- Fetches and displays **mocked product data** from backend API
 - Changes visible in Live Preview are **NOT shown** in Demo Store until saved
+- Accessed via "Demo" button which opens demo shop in new tab/window
+- Independent deployment from Theme Builder application
 
 #### Save & Reset Functionality
 - User must **explicitly confirm** saving changes via appropriate save button:
@@ -138,13 +141,27 @@ Support for building templates for four core E-commerce page types:
 ### Technology Stack
 
 #### Frontend
-- **Framework:** React 19 with TypeScript (Single Page Application - SPA)
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS
-- **Drag & Drop:** dnd kit
-- **Routing:** React Router
-- **HTTP Client:** Fetch API for REST API communication
-- **Package Manager:** npm
+
+**Two Separate Applications:**
+
+1. **Theme Builder Application**
+   - **Framework:** React 19 with TypeScript
+   - **Build Tool:** Vite
+   - **Styling:** Tailwind CSS
+   - **Drag & Drop:** dnd kit
+   - **Routing:** No routing framework (single-view application)
+   - **HTTP Client:** Fetch API for REST API communication
+   - **Package Manager:** npm
+   - **Purpose:** Visual editor for building and customizing shop themes
+
+2. **Demo Shop Application**
+   - **Framework:** React 19 with TypeScript
+   - **Build Tool:** Vite (via React Router v7)
+   - **Styling:** Tailwind CSS
+   - **Routing:** React Router v7
+   - **HTTP Client:** Fetch API for REST API communication
+   - **Package Manager:** npm
+   - **Purpose:** Customer-facing shop preview using saved theme settings
 
 #### Backend API
 - **Framework:** Symfony 7.3
@@ -163,23 +180,43 @@ Support for building templates for four core E-commerce page types:
 - **Image Upload:** Direct upload via Symfony API endpoints using AWS SDK for PHP (S3-compatible)
 
 #### Architecture
-- **Three-Tier Architecture:** Frontend (React SPA) → Backend API (Symfony REST API) → Database (PostgreSQL)
+- **Multi-Application Architecture:** Two frontends (Theme Builder + Demo Shop) → Backend API (Symfony REST API) → Database (PostgreSQL)
 - **API-First Approach:** All data operations flow through REST API endpoints
 - **Stateless Backend:** JWT-based authentication, no server-side sessions
 - **Monorepo Approach:** Preferred for MVP to ensure rapid development and code sharing
+- **Application Separation:**
+  - **Theme Builder:** Standalone React app for authenticated users to edit themes
+  - **Demo Shop:** Standalone React Router v7 app for public preview of saved themes
+  - Both applications communicate with same REST API but serve different purposes
 - **Project Structure:**
   ```
   theme-builder/
-  ├── frontend/                    # React SPA
+  ├── theme-builder-app/           # Theme Builder React Application
   │   ├── src/
-  │   │   ├── components/         # React components
-  │   │   ├── pages/              # Page components
+  │   │   ├── components/         # Theme builder UI components
+  │   │   │   ├── workspace/      # Canvas, sidebar, topbar
+  │   │   │   ├── palette/        # Component library
+  │   │   │   └── theme-components/ # Renderable theme components
   │   │   ├── api/                # API client & HTTP utilities
   │   │   ├── types/              # TypeScript types
-  │   │   └── hooks/              # Custom React hooks
+  │   │   ├── hooks/              # Custom React hooks
+  │   │   └── App.tsx             # Main application (no routing)
   │   ├── public/
   │   └── package.json
-  ├── backend/                     # Symfony API
+  ├── demo-shop-app/               # Demo Shop React Router v7 Application
+  │   ├── app/
+  │   │   ├── routes/             # React Router v7 routes
+  │   │   │   ├── _index.tsx      # Home page route
+  │   │   │   ├── catalog.tsx     # Catalog page route
+  │   │   │   ├── product.$id.tsx # Product detail route
+  │   │   │   └── contact.tsx     # Contact page route
+  │   │   ├── components/         # Shop-specific components
+  │   │   │   └── theme-components/ # Shared theme components
+  │   │   ├── api/                # API client for fetching themes
+  │   │   └── root.tsx            # Root layout
+  │   ├── public/
+  │   └── package.json
+  ├── backend/                     # Symfony REST API
   │   ├── src/
   │   │   ├── Controller/         # API endpoints
   │   │   ├── Entity/             # Doctrine entities
@@ -194,7 +231,8 @@ Support for building templates for four core E-commerce page types:
   └── shared/                      # Shared type definitions (optional)
       └── types/                   # TypeScript/PHP type definitions
   ```
-- **Clear Separation:** Frontend and backend can be developed, tested, and deployed independently
+- **Clear Separation:** All three applications can be developed, tested, and deployed independently
+- **Component Sharing:** Theme-rendering components can be shared between both frontend apps
 
 ### Image Storage & Upload
 - **Storage:** Cloudflare R2 (S3-compatible object storage)
@@ -221,8 +259,12 @@ Support for building templates for four core E-commerce page types:
   5. Frontend includes JWT in Authorization header for subsequent requests
 - **Authorization:** Symfony Security component with custom voters for shop-level access control
 - **Password Security:** Passwords hashed using Symfony's PasswordHasher (bcrypt/argon2)
-- **Data Access Control:** Repository-level filtering ensures users can only access their own shops/themes
+- **Data Access Control:**
+  - Repository-level filtering ensures users can only access their own shops/themes
+  - JWT payload contains user_id for request authorization
+  - All API endpoints validate shop ownership before allowing access
 - **Image Upload Security:** Shop ownership validation before allowing image uploads
+- **Public Access:** Demo Shop app accesses published theme/page data without authentication (read-only)
 
 ### Data Persistence
 - Template settings stored in database as **clean JSON structure** in a JSON column
@@ -233,50 +275,63 @@ Support for building templates for four core E-commerce page types:
 
 ```sql
 -- users
-- id (PRIMARY KEY)
-- email (UNIQUE)
+- id (PRIMARY KEY, UUID)
+- email (UNIQUE, VARCHAR 255)
 - password (hashed)
-- created_at
-- updated_at
+- created_at (TIMESTAMPTZ)
+- updated_at (TIMESTAMPTZ)
 
 -- shops
-- id (PRIMARY KEY)
-- user_id (FOREIGN KEY -> users.id)
-- name
-- created_at
-- updated_at
-
--- themes
-- id (PRIMARY KEY)
-- shop_id (FOREIGN KEY -> shops.id)
-- global_settings (JSONB: colors, fonts)
-- created_at
-- updated_at
+- id (PRIMARY KEY, UUID)
+- user_id (FOREIGN KEY -> users.id, UNIQUE)
+- name (VARCHAR 60)
+- theme_settings (JSONB: colors, fonts, global theme configuration)
+- created_at (TIMESTAMPTZ)
+- updated_at (TIMESTAMPTZ)
 
 -- pages
-- id (PRIMARY KEY)
-- theme_id (FOREIGN KEY -> themes.id)
+- id (PRIMARY KEY, UUID)
+- shop_id (FOREIGN KEY -> shops.id)
 - type (ENUM: home, catalog, product, contact)
-- components (JSONB: array of components with variants and content)
-- published_at
-- created_at
-- updated_at
+- layout (JSONB: array of components with variants and settings)
+- created_at (TIMESTAMPTZ)
+- updated_at (TIMESTAMPTZ)
+- UNIQUE(shop_id, type) - one page of each type per shop
+
+-- demo_categories
+- id (PRIMARY KEY, INTEGER)
+- name (VARCHAR 255)
+
+-- demo_products
+- id (PRIMARY KEY, INTEGER)
+- category_id (FOREIGN KEY -> demo_categories.id)
+- name (VARCHAR 255)
+- description (TEXT)
+- price (INTEGER, in cents)
+- sale_price (INTEGER, nullable)
+- image_thumbnail (VARCHAR 255)
+- image_medium (VARCHAR 255)
+- image_large (VARCHAR 255)
 ```
 
 ### Data Source
-- Mocked product catalog maintained as **static JSON array** within application code
-- No real product database integration in MVP
+- Mocked product catalog stored in **database** and accessed via REST API endpoints
+- Both Theme Builder and Demo Shop apps fetch product data from backend API
+- Seeded with mock product data for MVP (e.g., via database migrations/seeders)
+- No real product database integration in MVP (uses mock data only)
 
 ### Deployment & CI/CD
 - **Hosting:**
-  - Frontend: Cloudflare Pages
+  - Theme Builder App: Cloudflare Pages (separate project/domain)
+  - Demo Shop App: Cloudflare Pages (separate project/domain)
   - Backend API: Render Web Service (PHP/Symfony)
   - Database: Render PostgreSQL
   - Image Storage: Cloudflare R2
 - **CI/CD:** GitHub Actions for:
-  - Automated testing (unit + integration) on Pull Request
+  - Automated testing (unit + integration) on Pull Request for both frontend apps and backend
   - Linting (frontend: ESLint, backend: PHP CS Fixer) on Pull Request
-  - Automatic deployment of frontend to Cloudflare Pages on merge to `main`
+  - Automatic deployment of Theme Builder App to Cloudflare Pages on merge to `main`
+  - Automatic deployment of Demo Shop App to Cloudflare Pages on merge to `main`
   - Automatic deployment of backend API to Render on merge to `main` (via Render's GitHub integration)
 
 ### Testing
@@ -369,13 +424,14 @@ The following components cover all required page types (Home, Catalog, Product, 
 - ✅ Functional drag-and-drop interface with hover controls
 - ✅ All 13 components working with variants and content editing
 - ✅ Save/reset functionality
-- ✅ Demo store with mocked products (static JSON)
+- ✅ Demo store with mocked products from database
 - ✅ Live preview showing unsaved changes
-- ✅ Authentication working with RLS
+- ✅ JWT-based authentication working with shop ownership validation
 - ✅ Global theme settings (colors, fonts)
 - ✅ Automated tests passing
 - ✅ CI/CD pipeline operational
-- ✅ Deployed and accessible application on Cloudflare Pages
+- ✅ Both applications deployed and accessible (Theme Builder + Demo Shop)
+- ✅ API deployed and accessible
 
 ## Project Context
 
