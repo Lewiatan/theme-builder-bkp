@@ -143,51 +143,86 @@ Support for building templates for four core E-commerce page types:
 - **Styling:** Tailwind CSS
 - **Drag & Drop:** dnd kit
 - **Routing:** React Router
-- **Database Communication:** Supabase Client SDK
+- **HTTP Client:** Fetch API for REST API communication
 - **Package Manager:** npm
 
+#### Backend API
+- **Framework:** Symfony 7.3
+- **Language:** PHP 8.2+
+- **API Style:** REST API with JSON responses
+- **Authentication:** JWT tokens (using LexikJWTAuthenticationBundle)
+- **Validation:** Symfony Validator component
+- **Serialization:** Symfony Serializer component
+- **API Documentation:** Nelmio API Doc Bundle (optional for MVP, auto-generates OpenAPI/Swagger docs)
+
 #### Database & Services
-- **Database & Auth:** Supabase (PostgreSQL + Authentication)
+- **Database:** PostgreSQL (standalone, self-hosted or cloud-hosted)
+- **ORM:** Doctrine ORM
+- **Migrations:** Phinx
 - **Image Storage:** Cloudflare R2 (S3-compatible object storage)
-- **Image Upload Handler:** Cloudflare Workers (for generating presigned upload URLs)
+- **Image Upload:** Direct upload via Symfony API endpoints using AWS SDK for PHP (S3-compatible)
 
 #### Architecture
-- **Simplified Architecture:** Frontend communicates directly with Supabase for data and Cloudflare R2 for images
-- **Minimal Serverless Backend:** Single Cloudflare Worker for image upload security (generating presigned R2 URLs)
-- **Monorepo/Single-Application Approach:** Preferred for MVP to ensure rapid development
+- **Three-Tier Architecture:** Frontend (React SPA) → Backend API (Symfony REST API) → Database (PostgreSQL)
+- **API-First Approach:** All data operations flow through REST API endpoints
+- **Stateless Backend:** JWT-based authentication, no server-side sessions
+- **Monorepo Approach:** Preferred for MVP to ensure rapid development and code sharing
 - **Project Structure:**
   ```
   theme-builder/
-  ├── src/
-  │   ├── components/        # React components
-  │   ├── pages/            # Page components
-  │   ├── lib/              # Supabase client & utilities
-  │   ├── types/            # TypeScript types
-  │   └── hooks/            # Custom React hooks
-  ├── workers/
-  │   └── image-upload/     # Cloudflare Worker for R2 presigned URLs
+  ├── frontend/                    # React SPA
+  │   ├── src/
+  │   │   ├── components/         # React components
+  │   │   ├── pages/              # Page components
+  │   │   ├── api/                # API client & HTTP utilities
+  │   │   ├── types/              # TypeScript types
+  │   │   └── hooks/              # Custom React hooks
+  │   ├── public/
+  │   └── package.json
+  ├── backend/                     # Symfony API
+  │   ├── src/
+  │   │   ├── Controller/         # API endpoints
+  │   │   ├── Entity/             # Doctrine entities
+  │   │   ├── Repository/         # Data repositories
+  │   │   ├── Service/            # Business logic services
+  │   │   ├── Security/           # Authentication & authorization
+  │   │   └── EventListener/      # Event subscribers
+  │   ├── config/                 # Symfony configuration
+  │   ├── db/
+  │   │   └── migrations/         # Phinx migrations
+  │   └── composer.json
+  └── shared/                      # Shared type definitions (optional)
+      └── types/                   # TypeScript/PHP type definitions
   ```
-- **Future Migration Path:** Architecture designed to allow easy extraction of full backend layer (e.g., PHP/TypeScript API) when needed
+- **Clear Separation:** Frontend and backend can be developed, tested, and deployed independently
 
 ### Image Storage & Upload
 - **Storage:** Cloudflare R2 (S3-compatible object storage)
 - **Upload Flow:**
-  1. Frontend requests presigned upload URL from Cloudflare Worker with Supabase JWT in Authorization header
-  2. Worker validates JWT with Supabase (verifies signature and checks expiration)
-  3. If valid, Worker generates secure presigned R2 URL with expiration
-  4. Frontend uploads image directly to R2 using presigned URL
-  5. Image URL stored in template JSON configuration
-- **Security:** 
-  - R2 credentials never exposed to frontend
-  - Only authenticated users can upload images (JWT validation)
+  1. Frontend sends POST request to `/api/shops/{shopId}/images` with image file and JWT in Authorization header
+  2. Symfony validates JWT and verifies user has access to the specified shop
+  3. If authorized, Symfony uploads image to R2 using AWS SDK for PHP (configured for R2 endpoint)
+  4. Symfony stores public image URL in database and returns it to frontend
+  5. Frontend uses the returned URL in template JSON configuration
+- **Security:**
+  - R2 credentials never exposed to frontend (stored in Symfony environment variables)
+  - Only authenticated users with shop access can upload images (JWT + shop ownership validation)
+  - File type and size validation performed by Symfony before upload
 - **Cost:** Free tier covers MVP needs (10GB storage, 1M operations/month)
-- **Worker:** Minimal Cloudflare Worker handles only presigned URL generation and JWT validation (~<1ms CPU time per request)
+- **Implementation:** AWS SDK for PHP used for S3-compatible API communication with R2 (R2 implements S3 protocol)
 
 ### Authentication & Security
-- Implement using Supabase Auth with client SDK
-- Architecture must allow easy migration to JWT-based backend in the future
-- Row Level Security (RLS) policies in Supabase to secure data access
-- Image uploads protected by Supabase JWT validation in Cloudflare Worker
+- **Authentication:** JWT-based authentication using LexikJWTAuthenticationBundle
+- **Login Flow:**
+  1. User submits credentials to `/api/auth/login`
+  2. Symfony validates credentials against database
+  3. If valid, Symfony generates JWT token and returns it to frontend
+  4. Frontend stores JWT (e.g., in localStorage or httpOnly cookie)
+  5. Frontend includes JWT in Authorization header for subsequent requests
+- **Authorization:** Symfony Security component with custom voters for shop-level access control
+- **Password Security:** Passwords hashed using Symfony's PasswordHasher (bcrypt/argon2)
+- **Data Access Control:** Repository-level filtering ensures users can only access their own shops/themes
+- **Image Upload Security:** Shop ownership validation before allowing image uploads
 
 ### Data Persistence
 - Template settings stored in database as **clean JSON structure** in a JSON column
@@ -196,28 +231,36 @@ Support for building templates for four core E-commerce page types:
 
 ### Database Schema (Simplified)
 
-```typescript
-// users (Supabase Auth managed)
-
-// shops
-- id
-- user_id
-- name
-- created_at
-
-// themes
-- id
-- shop_id
-- global_settings (JSON: colors, fonts)
+```sql
+-- users
+- id (PRIMARY KEY)
+- email (UNIQUE)
+- password (hashed)
 - created_at
 - updated_at
 
-// pages
-- id
-- theme_id
-- type (home, catalog, product, contact)
-- components (JSON: array of components with variants and content)
+-- shops
+- id (PRIMARY KEY)
+- user_id (FOREIGN KEY -> users.id)
+- name
+- created_at
+- updated_at
+
+-- themes
+- id (PRIMARY KEY)
+- shop_id (FOREIGN KEY -> shops.id)
+- global_settings (JSONB: colors, fonts)
+- created_at
+- updated_at
+
+-- pages
+- id (PRIMARY KEY)
+- theme_id (FOREIGN KEY -> themes.id)
+- type (ENUM: home, catalog, product, contact)
+- components (JSONB: array of components with variants and content)
 - published_at
+- created_at
+- updated_at
 ```
 
 ### Data Source
@@ -225,19 +268,21 @@ Support for building templates for four core E-commerce page types:
 - No real product database integration in MVP
 
 ### Deployment & CI/CD
-- **Hosting:** 
+- **Hosting:**
   - Frontend: Cloudflare Pages
-  - Image Upload Worker: Cloudflare Workers
+  - Backend API: Render Web Service (PHP/Symfony)
+  - Database: Render PostgreSQL
   - Image Storage: Cloudflare R2
 - **CI/CD:** GitHub Actions for:
   - Automated testing (unit + integration) on Pull Request
-  - Linting on Pull Request
+  - Linting (frontend: ESLint, backend: PHP CS Fixer) on Pull Request
   - Automatic deployment of frontend to Cloudflare Pages on merge to `main`
-  - Automatic deployment of Worker on merge to `main` (using Wrangler)
+  - Automatic deployment of backend API to Render on merge to `main` (via Render's GitHub integration)
 
 ### Testing
-- **Unit Tests:** Jest/Vitest
-- **Integration Tests:** Playwright
+- **Frontend Unit Tests:** Vitest
+- **Backend Unit Tests:** PHPUnit
+- **E2E/Integration Tests:** Playwright
 - 100% coverage NOT required
 - Tests must run automatically via GitHub Actions
 
@@ -306,13 +351,12 @@ The following components cover all required page types (Home, Catalog, Product, 
 
 ## Future Considerations
 
-- Full backend layer extraction when needed for:
-  - Advanced image processing (Sharp, automatic thumbnails, format conversion)
+- Advanced image processing:
+  - Image optimization and compression before upload
+  - Automatic thumbnail generation
+  - Format conversion (WebP, AVIF)
   - Cloudflare Images integration for automatic optimization and resizing
-  - MCP (Model Context Protocol) integration for LLM-based template manipulation
-  - Complex business logic
-  - Third-party integrations
-  - API layer (PHP/TypeScript)
+- MCP (Model Context Protocol) integration for LLM-based template manipulation
 - Template versioning and history
 - Component limitations per page type
 - Advanced undo/redo functionality
