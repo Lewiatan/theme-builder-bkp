@@ -3,6 +3,11 @@
 ## 1. Product Overview
 The E-commerce Theme Builder is a Minimum Viable Product (MVP) application that allows non-technical shop owners to create and customize the appearance of their online store through a visual drag-and-drop interface. Users can build pages using a library of predefined, responsive components, customize their content, and change the global look and feel of the theme, such as colors and fonts.
 
+The system consists of three separate applications:
+- **Theme Builder**: A React-based visual editor where authenticated users design and customize their shop pages
+- **Demo Shop**: A separate React Router v7 application where users can preview their published shop as customers would see it
+- **Backend API**: A Symfony REST API that manages data persistence, authentication, and business logic
+
 The primary goal of this project is to create a functional product MVP while also becoming the part for a future E-commerce SaaS platform. The application emphasizes intuitiveness and ease of use, enabling users to quickly achieve their desired results without writing any code.
 
 ## 2. User Problem
@@ -13,11 +18,12 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 ## 3. Functional Requirements
 
 ### 3.1. User Interface and Workspace
-- The application will be a Single Page Application (SPA) consisting of four main sections:
+- The Theme Builder application is a React Single Page Application (SPA) consisting of four main sections:
   - Top Navigation Bar: Contains a page selection menu, an unsaved changes indicator, and action buttons (Reset, Save, Demo, Theme Settings).
   - Left Sidebar: A library of available components that can be dragged into the workspace.
   - Central Workspace (Canvas): The main area where the user arranges and edits components. It functions as a live preview.
   - Right Sidebar: A collapsible panel for managing global theme settings (colors, fonts).
+- All data operations are performed via REST API calls to the backend.
 
 ### 3.2. Component System
 - Users can build pages by dragging components from the left panel onto the workspace.
@@ -54,26 +60,33 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 - If the user attempts to navigate away (e.g., by switching pages, logging out, closing the browser tab) with unsaved changes (to the page, theme, or both), a dialog box will appear with a warning and options to "Stay" or "Leave without saving."
 
 ### 3.8. Preview (Demo Store)
-- The "Demo" button opens a separate view of the store in a new tab, which renders only the saved state of the pages and theme.
-- The Demo Store uses a static, mock product dataset to populate components like product lists.
+- The "Demo" button opens a separate application (Demo Shop) in a new tab, which renders only the saved state of the pages and theme.
+- The Demo Shop is a standalone React Router v7 application, completely separate from the Theme Builder.
+- The Demo Shop fetches saved theme/page data and mock products from the backend API.
+- Mock product catalog is stored in the database and accessed via REST API endpoints.
 
 ### 3.9. Authentication
-- The system requires user registration and login.
+- The system requires user registration and login via JWT-based authentication.
+- Authentication is handled by the backend API (Symfony with LexikJWTAuthenticationBundle).
 - Each user has access only to their own templates and data.
+- Theme Builder requires authentication; Demo Shop is publicly accessible (read-only).
 
 ### 3.10. Image Handling
 - In the MVP, there is no central media library. The user must upload images individually for each component that requires one.
+- Images are uploaded via the backend API to Cloudflare R2 (S3-compatible storage).
+- The API validates user permissions and file types before storing images.
 
 ## 4. Product Boundaries
 
 ### Features Included in MVP:
 - Full drag-and-drop functionality for managing components on a page.
 - All 13 defined components with their variants and content editing options.
-- User authentication system (registration, login).
+- User authentication system (registration, login) via JWT tokens.
 - Separate save mechanisms for page layout and global theme settings.
 - Functionality to reset changes to the last saved state.
 - Protection against losing unsaved changes.
-- A preview of the saved store (Demo Store) with mock data.
+- A separate Demo Shop application for previewing the saved store with mock data from database.
+- REST API backend for all data operations and authentication.
 - Automatic creation of 4 default pages with a predefined layout for new users.
 - All components must be responsive and display correctly on mobile devices, tablets, and desktops.
 
@@ -242,9 +255,10 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 ### Functional Metrics:
 - All 13 defined components are fully functional, including variant selection and content editing.
 - The save and reset mechanisms for pages and the theme work reliably and according to specification.
-- The authentication system correctly manages user sessions and isolates their data.
-- The CI/CD pipeline is fully operational, automating testing and application deployment.
-- The application is deployed and publicly accessible on Cloudflare Pages.
+- The authentication system correctly manages user sessions and isolates their data via JWT tokens.
+- The CI/CD pipeline is fully operational, automating testing and deployment.
+- Both frontend applications (Theme Builder and Demo Shop) are deployed and publicly accessible on Cloudflare Pages.
+- Backend API is deployed and accessible on Render.
 
 ### User-Centric Metrics:
 - Primary Metric: A new, non-technical user is able to create, customize, and save a complete page within 20 minutes of their first registration.
@@ -252,6 +266,7 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 - Positive user feedback regarding ease of use and interface intuitiveness.
 
 ### Technical Metrics:
-- The final appearance of the store in "Demo Store" mode is fully responsive and renders correctly on popular browsers and on mobile, tablet, and desktop devices.
-- The loading time for the editor and Demo Store is acceptable to the user.
+- The final appearance of the store in Demo Shop application is fully responsive and renders correctly on popular browsers and on mobile, tablet, and desktop devices.
+- The loading time for the Theme Builder and Demo Shop is acceptable to the user.
+- API response times are within acceptable limits.
 - No critical errors are reported by the monitoring system.
