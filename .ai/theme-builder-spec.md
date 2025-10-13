@@ -179,6 +179,21 @@ Support for building templates for four core E-commerce page types:
 - **Image Storage:** Cloudflare R2 (S3-compatible object storage)
 - **Image Upload:** Direct upload via Symfony API endpoints using AWS SDK for PHP (S3-compatible)
 
+#### Development Environment
+- **Containerization:** Docker & Docker Compose
+- **Services:**
+  - **Theme Builder App:** Vite dev server in container
+  - **Demo Shop App:** Vite dev server in container
+  - **Backend API:** PHP-FPM + Nginx in container
+  - **Database:** PostgreSQL container
+  - **Optional:** phpMyAdmin/Adminer for database management
+- **Benefits:**
+  - Consistent development environment across all developers
+  - Easy setup and onboarding (single `docker-compose up` command)
+  - Isolated services with networking
+  - No local PHP/Node.js installation required
+  - Production-like environment for development
+
 #### Architecture
 - **Multi-Application Architecture:** Two frontends (Theme Builder + Demo Shop) → Backend API (Symfony REST API) → Database (PostgreSQL)
 - **API-First Approach:** All data operations flow through REST API endpoints
