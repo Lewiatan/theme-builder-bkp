@@ -53,7 +53,6 @@ services:
       DATABASE_URL: ${DATABASE_URL}
     volumes:
       - ./backend:/var/www/html
-      - backend_vendor:/var/www/html/vendor
     networks:
       - theme-builder-network
     depends_on:

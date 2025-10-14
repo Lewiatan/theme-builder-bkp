@@ -26,6 +26,10 @@ RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/memory-limit.ini \
     && echo "post_max_size=20M" > /usr/local/etc/php/conf.d/post-max-size.ini \
     && echo "max_execution_time=300" > /usr/local/etc/php/conf.d/max-execution-time.ini
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Copy application files
 COPY . /var/www/html
 
@@ -33,20 +37,11 @@ COPY . /var/www/html
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Install Symfony dependencies (will be executed when composer.json exists)
-RUN if [ -f composer.json ]; then \
-        composer install --no-dev --optimize-autoloader --no-interaction; \
-    fi
-
-# Create var directory if it doesn't exist and set permissions
-RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var \
-    && chmod -R 775 var
-
 COPY --link \
     --from=ghcr.io/symfony-cli/symfony-cli:latest \
     /usr/local/bin/symfony /usr/local/bin/symfony
 
 EXPOSE 9000
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
