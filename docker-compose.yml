@@ -6,9 +6,9 @@ services:
     image: postgres:16-alpine
     container_name: theme-builder-postgres
     environment:
-      POSTGRES_DB: theme_builder
-      POSTGRES_USER: theme_builder
-      POSTGRES_PASSWORD: theme_builder_password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -26,8 +26,8 @@ services:
     image: dpage/pgadmin4:latest
     container_name: theme-builder-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@themebuilder.local
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
       - pgadmin_data:/var/lib/pgadmin
@@ -46,9 +46,9 @@ services:
     container_name: theme-builder-backend
     working_dir: /var/www/html
     environment:
-      APP_ENV: dev
-      APP_SECRET: change_me_in_production
-      DATABASE_URL: postgresql://theme_builder:theme_builder_password@postgres:5432/theme_builder?serverVersion=16&charset=utf8
+      APP_ENV: ${APP_ENV}
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
     volumes:
       - ./backend:/var/www/html
       - backend_vendor:/var/www/html/vendor
@@ -80,7 +80,7 @@ services:
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     environment:
       NODE_ENV: development
-      VITE_API_URL: http://localhost:8000
+      VITE_API_URL: ${VITE_API_URL}
     volumes:
       - ./theme-builder:/app
       - theme_builder_node_modules:/app/node_modules
@@ -99,7 +99,7 @@ services:
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     environment:
       NODE_ENV: development
-      VITE_API_URL: http://localhost:8000
+      VITE_API_URL: ${VITE_API_URL}
     volumes:
       - ./demo-shop:/app
       - demo_shop_node_modules:/app/node_modules
