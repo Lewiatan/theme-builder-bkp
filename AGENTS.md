@@ -1,6 +1,6 @@
-# AI Rules for {{project-name}}
+# AI Rules for Theme Builder
 
-{{project-description}}
+A **minimum viable product (MVP)** for an E-commerce Theme Builder that enables store owners to customize shop page layouts and appearance through a visual drag-and-drop interface. This application serves as both a **10xDevs certification project** (demonstrating proficiency in AI-Assisted Development techniques) and the foundational element for a future **E-commerce SaaS** platform.
 
 ## CODING_PRACTICES
 
@@ -176,4 +176,3 @@
 - Implement test hooks for setup and teardown
 - Use expect assertions with specific matchers
 - Leverage parallel execution for faster test runs
-
