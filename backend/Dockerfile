@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -27,8 +27,8 @@ RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/memory-limit.ini \
     && echo "max_execution_time=300" > /usr/local/etc/php/conf.d/max-execution-time.ini
 
 # Copy entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Copy application files
 COPY . /var/www/html
@@ -43,5 +43,5 @@ COPY --link \
 
 EXPOSE 9000
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
