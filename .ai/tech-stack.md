@@ -22,7 +22,7 @@
 ## Backend API
 
 ### Symfony 7.3 REST API
-- **PHP 8.2+**
+- **PHP 8.3+**
 - **JWT authentication** (LexikJWTAuthenticationBundle)
 - **Symfony Validator** for input validation
 - **Symfony Serializer** for JSON responses

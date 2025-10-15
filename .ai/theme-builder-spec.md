@@ -165,7 +165,7 @@ Support for building templates for four core E-commerce page types:
 
 #### Backend API
 - **Framework:** Symfony 7.3
-- **Language:** PHP 8.2+
+- **Language:** PHP 8.3+
 - **API Style:** REST API with JSON responses
 - **Authentication:** JWT tokens (using LexikJWTAuthenticationBundle)
 - **Validation:** Symfony Validator component
