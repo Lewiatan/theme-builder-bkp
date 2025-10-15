@@ -116,6 +116,34 @@ A **minimum viable product (MVP)** for an E-commerce Theme Builder that enables 
 - Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
 - Leverage state variants (hover:, focus:, active:, etc.) for interactive elements
 
+## BACKEND
+
+### Guidelines for PHP
+
+#### PHP_CODING_STANDARDS
+
+- Use constructor property promotion to reduce boilerplate code in classes
+- Leverage readonly properties for immutable value objects and entities
+- Always use strict typing with `declare(strict_types=1)` at the top of every file
+- Use typed properties for all class properties (prefer strict types over mixed)
+- Implement named arguments for better readability when calling functions with many parameters
+- Use PHP 8.1+ enums for fixed sets of values instead of class constants
+- Extract validation logic into private methods to avoid duplication
+- Use class constants for configuration values (e.g., MAX_LENGTH) instead of magic numbers
+- Prefer final classes by default to encourage composition over inheritance
+- Use null coalescing operator (??) and nullsafe operator (?->) for concise null handling
+
+#### SYMFONY
+
+- Follow Symfony best practices and conventions for directory structure
+- Use Symfony's dependency injection container for service management
+- Implement custom console commands for administrative tasks
+- Use Symfony's validation component for input validation in controllers
+- Leverage Symfony's security component for authentication and authorization
+- Configure services in YAML files under config/services.yaml
+- Use environment variables for configuration with proper .env files
+- Implement custom event listeners for cross-cutting concerns
+
 ## DATABASE
 
 ### Guidelines for SQL

@@ -88,10 +88,20 @@ The backend is a minimal Symfony 7.3 installation:
 
 The backend structure follows standard Symfony conventions:
 - `src/Controller/` - API controllers
+- `src/Model/` - Application model (Entities, ValueObjects, Enums)
 - `src/Kernel.php` - Application kernel
 - `config/` - Configuration files (services, routes, packages)
 - `bin/console` - Symfony console commands
 - `public/index.php` - Entry point
+
+### PHP Coding Standards
+
+- **PHP Version**: 8.2+ features are encouraged
+- **Constructor Property Promotion**: Use promoted properties in constructors to reduce boilerplate
+- **Readonly Properties**: Use `readonly` keyword for immutable value objects
+- **Typed Properties**: Always use strict typing for class properties and method parameters
+- **Named Arguments**: Use for improved readability in method calls with many parameters
+- **Enums**: Use PHP 8.1+ enums instead of class constants for fixed sets of values
 
 ### Frontend Architecture
 
