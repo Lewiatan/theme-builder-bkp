@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Model\ValueObject;
 
+use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
+#[ORM\Embeddable]
 final readonly class Layout
 {
     /** @var ComponentDefinition[] */
+    #[ORM\Column(name: 'layout', type: 'json', nullable: false, options: ['default' => '[]'])]
     private array $components;
 
     /**

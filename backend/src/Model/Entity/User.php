@@ -6,14 +6,28 @@ namespace App\Model\Entity;
 
 use App\Model\ValueObject\Email;
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'users')]
+#[ORM\Index(columns: ['email'], name: 'idx_users_email')]
 final class User
 {
     public function __construct(
+        #[ORM\Id]
+        #[ORM\Column(type: 'guid', unique: true)]
         private string $id,
+
+        #[ORM\Embedded(class: Email::class, columnPrefix: false)]
         private Email $email,
+
+        #[ORM\Column(type: 'string', length: 255, nullable: false)]
         private string $password,
+
+        #[ORM\Column(type: 'datetime_immutable', nullable: false)]
         private DateTimeImmutable $createdAt,
+
+        #[ORM\Column(type: 'datetime_immutable', nullable: false)]
         private DateTimeImmutable $updatedAt
     ) {}
 

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Model\ValueObject;
 
+use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
+#[ORM\Embeddable]
 final readonly class Email
 {
     private const MAX_LENGTH = 255;
 
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: false)]
     private string $value;
 
     public function __construct(string $email)

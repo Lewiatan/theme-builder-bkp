@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Model\ValueObject;
 
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Embeddable]
 final readonly class ThemeSettings
 {
     /**
      * @param array<int,mixed> $settings
      */
     public function __construct(
+        #[ORM\Column(name: 'theme_settings', type: 'json', nullable: false, options: ['default' => '{}'])]
         private array $settings
     ) {}
 

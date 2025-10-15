@@ -6,18 +6,34 @@ namespace App\Model\Entity;
 
 use App\Model\ValueObject\ThemeSettings;
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'shops')]
+#[ORM\UniqueConstraint(name: 'idx_shops_user_id', columns: ['user_id'])]
 final class Shop
 {
     private const MAX_NAME_LENGTH = 60;
 
     public function __construct(
+        #[ORM\Id]
+        #[ORM\Column(type: 'guid', unique: true)]
         private string $id,
+
+        #[ORM\Column(name: 'user_id', type: 'guid', unique: true, nullable: false)]
         private string $userId,
+
+        #[ORM\Column(type: 'string', length: 60, nullable: false)]
         private string $name,
+
+        #[ORM\Embedded(class: ThemeSettings::class, columnPrefix: false)]
         private ThemeSettings $themeSettings,
+
+        #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]
         private DateTimeImmutable $createdAt,
+
+        #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false)]
         private DateTimeImmutable $updatedAt
     ) {
         $this->validateName($name);
