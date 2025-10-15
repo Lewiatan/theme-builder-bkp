@@ -41,7 +41,7 @@ final readonly class ThemeSettings
 
     public function has(string $key): bool
     {
-        return isset($this->settings[$key]);
+        return array_key_exists($key, $this->settings);
     }
 
     public function with(string $key, mixed $value): self

@@ -35,14 +35,14 @@ final readonly class Email
 
     private function validate(string $email): void
     {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException("Invalid email format: {$email}");
-        }
-
         if (strlen($email) > self::MAX_LENGTH) {
             throw new InvalidArgumentException(
                 sprintf("Email exceeds maximum length of %d characters", self::MAX_LENGTH)
             );
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException("Invalid email format: {$email}");
         }
     }
 }
