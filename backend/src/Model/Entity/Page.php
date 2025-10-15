@@ -19,8 +19,9 @@ final class Page
         #[ORM\Column(type: 'guid', unique: true)]
         private string $id,
 
-        #[ORM\Column(name: 'shop_id', type: 'guid', nullable: false)]
-        private string $shopId,
+        #[ORM\ManyToOne(targetEntity: Shop::class)]
+        #[ORM\JoinColumn(name: 'shop_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+        private Shop $shop,
 
         #[ORM\Column(type: 'string', enumType: PageType::class, nullable: false)]
         private PageType $type,
@@ -37,7 +38,7 @@ final class Page
 
     public static function create(
         string $id,
-        string $shopId,
+        Shop $shop,
         PageType $type,
         Layout $layout
     ): self {
@@ -45,7 +46,7 @@ final class Page
 
         return new self(
             $id,
-            $shopId,
+            $shop,
             $type,
             $layout,
             $now,
@@ -58,9 +59,9 @@ final class Page
         return $this->id;
     }
 
-    public function getShopId(): string
+    public function getShop(): Shop
     {
-        return $this->shopId;
+        return $this->shop;
     }
 
     public function getType(): PageType

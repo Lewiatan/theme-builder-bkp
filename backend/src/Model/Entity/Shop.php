@@ -21,8 +21,9 @@ final class Shop
         #[ORM\Column(type: 'guid', unique: true)]
         private string $id,
 
-        #[ORM\Column(name: 'user_id', type: 'guid', unique: true, nullable: false)]
-        private string $userId,
+        #[ORM\ManyToOne(targetEntity: User::class)]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, unique: true, onDelete: 'CASCADE')]
+        private User $user,
 
         #[ORM\Column(type: 'string', length: 60, nullable: false)]
         private string $name,
@@ -41,14 +42,14 @@ final class Shop
 
     public static function create(
         string $id,
-        string $userId,
+        User $user,
         string $name
     ): self {
         $now = new DateTimeImmutable();
 
         return new self(
             $id,
-            $userId,
+            $user,
             $name,
             ThemeSettings::default(),
             $now,
@@ -61,9 +62,9 @@ final class Shop
         return $this->id;
     }
 
-    public function getUserId(): string
+    public function getUser(): User
     {
-        return $this->userId;
+        return $this->user;
     }
 
     public function getName(): string
