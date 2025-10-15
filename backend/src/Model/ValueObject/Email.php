@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 final readonly class Email
 {
-    private const int MAX_LENGTH = 255;
+    private const MAX_LENGTH = 255;
 
     private string $value;
 

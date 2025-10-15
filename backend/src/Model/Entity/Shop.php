@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 final class Shop
 {
-    private const int MAX_NAME_LENGTH = 60;
+    private const MAX_NAME_LENGTH = 60;
 
     public function __construct(
         private string $id,
