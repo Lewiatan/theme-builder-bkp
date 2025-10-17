@@ -30,7 +30,7 @@ When providing code assistance:
 
 ```bash
 # Start all services with Docker Compose
-docker-compose up
+docker compose up
 
 # Services will be available at:
 # - Theme Builder: http://localhost:5173
@@ -42,19 +42,8 @@ docker-compose up
 
 ### Individual Service Commands
 
-**Backend (Symfony):**
-```bash
-# Run inside backend container or locally with PHP 8.3+
-composer install                    # Install dependencies
-php bin/console cache:clear         # Clear Symfony cache
-php bin/console debug:router        # List all routes
-
-# Database migrations (using Phinx)
-vendor/bin/phinx migrate           # Run migrations
-vendor/bin/phinx create MigrationName  # Create new migration
-```
-
 **Theme Builder:**
+
 ```bash
 cd theme-builder
 npm install
@@ -65,6 +54,7 @@ npm run preview    # Preview production build
 ```
 
 **Demo Shop:**
+
 ```bash
 cd demo-shop
 npm install
@@ -77,6 +67,7 @@ npm run typecheck  # Run TypeScript type checking and generate React Router type
 ### Environment Variables
 
 Copy `.env.example` to `.env` and configure:
+
 - PostgreSQL credentials (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
 - pgAdmin credentials
 - Backend settings (APP_ENV, APP_SECRET, DATABASE_URL)
@@ -85,6 +76,7 @@ Copy `.env.example` to `.env` and configure:
 ### Docker Compose Services
 
 All services are orchestrated via `docker-compose.yml`:
+
 - **postgres**: PostgreSQL 16 database with healthcheck
 - **pgadmin**: Database management UI
 - **backend**: Symfony PHP-FPM application
@@ -107,6 +99,7 @@ The repository follows a monorepo pattern with three independent applications:
 Each application has its own dependencies managed separately. Docker Compose orchestrates all services with shared networking.
 
 **Monorepo Best Practices:**
+
 - Configure workspace-aware tooling to optimize build and test processes
 - Implement clear package boundaries with explicit dependencies between packages
 - Use consistent versioning strategy across all packages (independent or lockstep)
@@ -123,35 +116,17 @@ Each application has its own dependencies managed separately. Docker Compose orc
 - Create use cases that orchestrate entity interactions for specific business operations
 - Implement mappers to transform data between layers to maintain separation of concerns
 
-### Backend Architecture (Symfony)
-
-The backend is a Symfony 7.3 installation with Doctrine ORM:
-
-- **Framework**: Symfony 7.3 with PHP 8.3 (via php:8.3-fpm Docker image)
-- **Database**: PostgreSQL 16 (accessed via Doctrine ORM)
-- **Migrations**: Phinx (robmorgan/phinx) - NOT Doctrine migrations
-- **Server**: Nginx proxying to PHP-FPM
-
-The backend structure follows standard Symfony conventions:
-- `src/Controller/` - API controllers
-- `src/Model/` - Application model
-- `src/Repository/` - Database repositories
-- `src/Service/` - Business logic services
-- `src/Security/` - Authentication & authorization
-- `src/Kernel.php` - Application kernel
-- `config/` - Configuration files (services, routes, packages)
-- `bin/console` - Symfony console commands
-- `public/index.php` - Entry point
-
 ### Frontend Architecture
 
 **Theme Builder:**
+
 - Vanilla React 19 with Vite for HMR
 - No routing library (simple SPA)
 - Expected to have drag-and-drop functionality (dnd kit mentioned in main README)
 - Component-based architecture for 13 predefined components
 
 **Demo Shop:**
+
 - React Router 7 with SSR capabilities
 - Tailwind CSS 4 for styling
 - Uses React Router's file-based routing (`app/routes/`)
@@ -160,11 +135,10 @@ The backend structure follows standard Symfony conventions:
 ### Data Flow
 
 The original architecture planned:
+
 - User authentication via JWT with LexikJWTAuthenticationBundle
 - Image storage via Cloudflare R2
 - Edge functions via Cloudflare Workers
-
-Current state (switch-to-php-api branch):
 - Backend handles API requests via Symfony controllers
 - PostgreSQL stores application data via Doctrine ORM
 - Frontend apps communicate with backend via `VITE_API_URL` environment variable
@@ -174,11 +148,13 @@ Current state (switch-to-php-api branch):
 ### General Practices
 
 **Documentation:**
+
 - Keep README.md in sync with new capabilities
 - Maintain changelog entries in CHANGELOG.md
 - Kepp CLAUDE.md in sync with new capabilities
 
 **Static Analysis:**
+
 - Configure project-specific rules in eslint.config.js to enforce consistent coding standards
 - Use shareable configs like eslint-config-airbnb or eslint-config-standard as a foundation
 - Configure integration with Prettier to avoid rule conflicts for code formatting
@@ -224,44 +200,6 @@ Current state (switch-to-php-api branch):
 - Implement dark mode with the dark: variant
 - Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
 - Leverage state variants (hover:, focus:, active:, etc.) for interactive elements
-
-### Backend Standards
-
-#### PHP
-
-**PHP Version**: 8.3+ features are encouraged
-
-- Use constructor property promotion to reduce boilerplate code in classes
-- Leverage readonly properties for immutable value objects and entities
-- Always use strict typing with `declare(strict_types=1)` at the top of every file
-- Use typed properties for all class properties (prefer strict types over mixed)
-- Implement named arguments for better readability when calling functions with many parameters
-- Use PHP 8.1+ enums for fixed sets of values instead of class constants
-- Extract validation logic into private methods to avoid duplication
-- Use class constants for configuration values (e.g., MAX_LENGTH) instead of magic numbers
-- Prefer final classes by default to encourage composition over inheritance
-- Use null coalescing operator (??) and nullsafe operator (?->) for concise null handling
-
-#### Symfony
-
-- Follow Symfony best practices and conventions for directory structure
-- Use Symfony's dependency injection container for service management
-- Implement custom console commands for administrative tasks
-- Use Symfony's validation component for input validation in controllers
-- Leverage Symfony's security component for authentication and authorization
-- Configure services in YAML files under config/services.yaml
-- Use environment variables for configuration with proper .env files
-- Implement custom event listeners for cross-cutting concerns
-
-### Database Standards
-
-#### PostgreSQL
-
-- Use connection pooling to manage database connections efficiently
-- Implement JSONB columns for semi-structured data instead of creating many tables for flexible data
-- Use materialized views for complex, frequently accessed read-only data
-
-**Migration Tool**: Phinx (NOT Doctrine migrations)
 
 ### Testing Standards
 
@@ -355,8 +293,8 @@ Current state (switch-to-php-api branch):
 
 1. **Node Modules in Docker**: Each frontend service uses Docker volumes for node_modules to avoid platform compatibility issues
 2. **Phinx Location**: Migrations tool is Phinx (robmorgan/phinx), not Doctrine migrations
-3. **No TypeScript in theme-builder**: The main editor uses vanilla JavaScript, while demo-shop uses TypeScript
-4. **Port Confusion**: Demo shop runs on 5174 (not 5173) to avoid conflicts
-5. **Backend Entrypoint**: The entrypoint.sh automatically runs `composer install` on container start
-6. **Docker Files Organization**: Docker-related files are in `backend/docker/` directory (nginx.conf, entrypoint.sh)
-- Use "docker compose" instead of "docker-compose"
+3. **Port Confusion**: Demo shop runs on 5174 (not 5173) to avoid conflicts
+4. **Backend Entrypoint**: The entrypoint.sh automatically runs `composer install` on container start
+5. **Docker Files Organization**: Docker-related files are in `backend/docker/` directory (nginx.conf, entrypoint.sh)
+
+- Use "docker compose" instead of "docker compose"
