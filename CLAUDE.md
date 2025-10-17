@@ -359,3 +359,4 @@ Current state (switch-to-php-api branch):
 4. **Port Confusion**: Demo shop runs on 5174 (not 5173) to avoid conflicts
 5. **Backend Entrypoint**: The entrypoint.sh automatically runs `composer install` on container start
 6. **Docker Files Organization**: Docker-related files are in `backend/docker/` directory (nginx.conf, entrypoint.sh)
+- Use "docker compose" instead of "docker-compose"
