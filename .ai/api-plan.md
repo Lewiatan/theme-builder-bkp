@@ -1350,10 +1350,11 @@ if (isset($themeSettings['colors'])) {
 
 **Steps:**
 1. Validate shopId is valid UUID format
-2. Validate page type is valid enum value
-3. Query page by shop_id and type
-4. Return 404 if shop or page not found
-5. Return page data (type, layout only)
+2. Page type is optional, if not provided defaults to "home"
+3. Validate page type is valid enum value
+4. Query page by shop_id and type
+5. Return 404 if shop or page not found
+6. Return page data (type, layout only)
 
 **No Authentication Required:**
 - These endpoints are intentionally public
@@ -1361,26 +1362,19 @@ if (isset($themeSettings['colors'])) {
 - No sensitive data exposed (email, password hashes not returned)
 - Shop owner's email not exposed
 
-**Rate Limiting:**
-- Apply per-IP rate limiting (30 req/min)
-- Prevents abuse while allowing legitimate demo browsing
-
-#### BL-6: Demo Products with Pagination
+#### BL-6: Demo Products
 
 **Endpoint:** GET /api/demo/products
 
 **Steps:**
 1. Parse query parameters:
    - category_id (optional, integer)
-   - page (default: 1, min: 1)
-   - limit (default: 20, min: 1, max: 100)
 2. Validate parameters
 3. Build SQL query with optional category filter
-4. Apply pagination: OFFSET = (page - 1) * limit, LIMIT = limit
-5. Order by name ASC
-6. Execute query and fetch products
-7. Calculate total count and total_pages
-8. Return products + pagination metadata
+4. Order by name ASC
+5. Execute query and fetch products
+6. Calculate total count and total_pages
+7. Return products + pagination metadata
 
 **SQL Example:**
 ```sql
