@@ -46,6 +46,24 @@ The backend structure follows standard Symfony conventions:
 - Use environment variables for configuration with proper .env files
 - Implement custom event listeners for cross-cutting concerns
 
+#### ReadModel Pattern
+
+- Use ReadModels to decouple API responses from domain entities
+- Create ReadModels in `src/ReadModel/` directory
+- ReadModels should be `final readonly class` for immutability
+- Implement `\JsonSerializable` for automatic JSON conversion
+- Create ReadModels in the repository layer, not in services or controllers
+- Only include fields intended for public API exposure in ReadModels
+- Never include sensitive data (timestamps, IDs, related entities) unless explicitly needed
+- Use ReadModels to prevent accidental exposure of entity data through serialization
+
+**Benefits**:
+- Explicit data contract - only specified fields can be returned
+- Decouples API response structure from domain entity changes
+- Prevents accidental data exposure when entities evolve
+- No risk of serialization misconfiguration exposing sensitive data
+- Repository returns ReadModel directly, eliminating transformation logic in services/controllers
+
 ### Database Standards
 
 #### PostgreSQL
