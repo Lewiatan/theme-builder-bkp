@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
+use App\Controller\PublicShopController;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,12 +20,14 @@ use Symfony\Component\HttpFoundation\Response;
  * - Invalid input cases (500)
  * - Response structure validation
  */
+#[CoversClass(PublicShopController::class)]
 final class PublicShopControllerTest extends WebTestCase
 {
     private const VALID_SHOP_ID = '550e8400-e29b-41d4-a716-446655440000';
     private const NON_EXISTENT_SHOP_ID = '00000000-0000-0000-0000-000000000000';
 
-    public function testGetPageReturnsSuccessResponseWithValidShopAndPageType(): void
+    #[Test]
+    public function it_returns_success_response_with_valid_shop_and_page_type(): void
     {
         // Arrange
         $client = static::createClient();
@@ -42,7 +48,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertIsArray($content['layout']['components']);
     }
 
-    public function testGetPageReturnsNotFoundWhenShopDoesNotExist(): void
+    #[Test]
+    public function it_returns_not_found_when_shop_does_not_exist(): void
     {
         // Arrange
         $client = static::createClient();
@@ -58,7 +65,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertEquals('Page not found for this shop', $content['error']);
     }
 
-    public function testGetPageReturnsNotFoundWhenPageDoesNotExistForShop(): void
+    #[Test]
+    public function it_returns_not_found_when_page_does_not_exist_for_shop(): void
     {
         // Arrange
         $client = static::createClient();
@@ -73,7 +81,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertArrayHasKey('error', $content);
     }
 
-    public function testGetPageReturnsServerErrorWithInvalidUuidFormat(): void
+    #[Test]
+    public function it_returns_server_error_with_invalid_uuid_format(): void
     {
         // Arrange
         $client = static::createClient();
@@ -89,7 +98,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertEquals('An unexpected error occurred', $content['error']);
     }
 
-    public function testGetPageReturnsServerErrorWithInvalidPageType(): void
+    #[Test]
+    public function it_returns_server_error_with_invalid_page_type(): void
     {
         // Arrange
         $client = static::createClient();
@@ -105,7 +115,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertEquals('An unexpected error occurred', $content['error']);
     }
 
-    public function testGetPageDefaultsToHomeWhenTypeNotProvided(): void
+    #[Test]
+    public function it_defaults_to_home_when_type_not_provided(): void
     {
         // Arrange
         $client = static::createClient();
@@ -120,7 +131,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertEquals('home', $content['type']);
     }
 
-    public function testGetPageReturnsCorrectDataForCatalogPage(): void
+    #[Test]
+    public function it_returns_correct_data_for_catalog_page(): void
     {
         // Arrange
         $client = static::createClient();
@@ -137,7 +149,8 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertArrayHasKey('components', $content['layout']);
     }
 
-    public function testGetPageResponseStructureMatchesSpecification(): void
+    #[Test]
+    public function it_response_structure_matches_specification(): void
     {
         // Arrange
         $client = static::createClient();
@@ -169,7 +182,8 @@ final class PublicShopControllerTest extends WebTestCase
         }
     }
 
-    public function testGetPageDoesNotExposesSensitiveData(): void
+    #[Test]
+    public function it_does_not_expose_sensitive_data(): void
     {
         // Arrange
         $client = static::createClient();
@@ -192,23 +206,303 @@ final class PublicShopControllerTest extends WebTestCase
         $this->assertArrayNotHasKey('email', $content);
     }
 
-    public function testGetPageWorksForAllValidPageTypes(): void
+    #[Test]
+    #[TestWith(['home'])]
+    #[TestWith(['catalog'])]
+    public function it_works_for_all_valid_page_types(string $type): void
     {
         // Arrange
         $client = static::createClient();
-        $validTypes = ['home', 'catalog'];
 
-        foreach ($validTypes as $type) {
+        // Act
+        $client->request('GET', '/api/public/shops/' . self::VALID_SHOP_ID . '/pages/' . $type);
+
+        // Assert
+        $this->assertResponseIsSuccessful(
+            sprintf('Failed for page type: %s', $type)
+        );
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals($type, $content['type']);
+    }
+
+    // Demo Products Endpoint Tests
+
+    #[Test]
+    public function it_returns_all_demo_products_successfully(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('products', $content);
+        $this->assertIsArray($content['products']);
+        $this->assertNotEmpty($content['products'], 'Expected demo products to be seeded');
+    }
+
+    #[Test]
+    public function it_returns_demo_products_with_correct_structure(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('products', $content);
+        $this->assertNotEmpty($content['products']);
+
+        $product = $content['products'][0];
+
+        // Verify product structure
+        $expectedKeys = [
+            'id', 'category_id', 'category_name', 'name', 'description',
+            'price', 'sale_price', 'image_thumbnail', 'image_medium', 'image_large'
+        ];
+
+        foreach ($expectedKeys as $key) {
+            $this->assertArrayHasKey($key, $product, "Product should have '{$key}' field");
+        }
+
+        // Verify types
+        $this->assertIsInt($product['id']);
+        $this->assertIsInt($product['category_id']);
+        $this->assertIsString($product['category_name']);
+        $this->assertIsString($product['name']);
+        $this->assertIsString($product['description']);
+        $this->assertIsInt($product['price']);
+        $this->assertTrue(
+            is_int($product['sale_price']) || is_null($product['sale_price']),
+            'sale_price should be int or null'
+        );
+        $this->assertIsString($product['image_thumbnail']);
+        $this->assertIsString($product['image_medium']);
+        $this->assertIsString($product['image_large']);
+    }
+
+    #[Test]
+    public function it_returns_demo_products_ordered_alphabetically(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $products = $content['products'];
+
+        $this->assertGreaterThanOrEqual(2, count($products), 'Need at least 2 products to verify ordering');
+
+        $productNames = array_map(fn($p) => $p['name'], $products);
+        $sortedNames = $productNames;
+        sort($sortedNames);
+
+        $this->assertEquals(
+            $sortedNames,
+            $productNames,
+            'Products should be ordered alphabetically by name'
+        );
+    }
+
+    #[Test]
+    public function it_filters_demo_products_by_category(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // First get all products to find a valid category
+        $client->request('GET', '/api/demo/products');
+        $allContent = json_decode($client->getResponse()->getContent(), true);
+        $this->assertNotEmpty($allContent['products']);
+
+        $categoryId = $allContent['products'][0]['category_id'];
+
+        // Act - filter by category
+        $client->request('GET', '/api/demo/products?category_id=' . $categoryId);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('products', $content);
+        $this->assertNotEmpty($content['products']);
+
+        // Verify all products belong to the requested category
+        foreach ($content['products'] as $product) {
+            $this->assertEquals(
+                $categoryId,
+                $product['category_id'],
+                'All products should belong to the filtered category'
+            );
+        }
+    }
+
+    #[Test]
+    public function it_returns_404_when_category_does_not_exist(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $nonExistentCategoryId = 99999;
+
+        // Act
+        $client->request('GET', '/api/demo/products?category_id=' . $nonExistentCategoryId);
+
+        // Assert
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('error', $content);
+        $this->assertStringContainsString('not found', strtolower($content['error']));
+    }
+
+    #[Test]
+    public function it_returns_422_with_negative_category_id(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products?category_id=-1');
+
+        // Assert - Symfony's MapQueryString returns 422 for validation errors
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    #[Test]
+    public function it_returns_422_with_zero_category_id(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products?category_id=0');
+
+        // Assert - Symfony's MapQueryString returns 422 for validation errors
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    #[Test]
+    public function it_returns_422_with_invalid_category_id_format(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products?category_id=invalid');
+
+        // Assert - Symfony's MapQueryString returns 422 for validation errors
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    #[Test]
+    public function it_demo_products_endpoint_does_not_expose_sensitive_data(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertNotEmpty($content['products']);
+
+        $product = $content['products'][0];
+
+        // Verify no sensitive fields are exposed
+        $this->assertArrayNotHasKey('created_at', $product);
+        $this->assertArrayNotHasKey('updated_at', $product);
+        $this->assertArrayNotHasKey('user', $product);
+        $this->assertArrayNotHasKey('shop', $product);
+        $this->assertArrayNotHasKey('shop_id', $product);
+    }
+
+    #[Test]
+    public function it_demo_products_response_only_contains_products_array(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        // Response should only contain 'products' key
+        $this->assertCount(1, $content, 'Response should only contain products array');
+        $this->assertArrayHasKey('products', $content);
+    }
+
+    #[Test]
+    public function it_handles_category_with_no_products_correctly(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Create a category without products
+        $container = static::getContainer();
+        $connection = $container->get('doctrine')->getConnection();
+        $connection->executeStatement(
+            'INSERT INTO demo_categories (id, name) VALUES (:id, :name) ON CONFLICT (id) DO NOTHING',
+            ['id' => 9999, 'name' => 'Empty Test Category']
+        );
+
+        try {
             // Act
-            $client->request('GET', '/api/public/shops/' . self::VALID_SHOP_ID . '/pages/' . $type);
+            $client->request('GET', '/api/demo/products?category_id=9999');
 
             // Assert
-            $this->assertResponseIsSuccessful(
-                sprintf('Failed for page type: %s', $type)
-            );
+            $this->assertResponseIsSuccessful();
 
             $content = json_decode($client->getResponse()->getContent(), true);
-            $this->assertEquals($type, $content['type']);
+            $this->assertArrayHasKey('products', $content);
+            $this->assertEmpty($content['products'], 'Category with no products should return empty array');
+        } finally {
+            // Cleanup
+            $connection->executeStatement('DELETE FROM demo_categories WHERE id = :id', ['id' => 9999]);
+        }
+    }
+
+    #[Test]
+    public function it_demo_products_include_category_name_from_join(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/api/demo/products');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertNotEmpty($content['products']);
+
+        foreach ($content['products'] as $product) {
+            $this->assertArrayHasKey('category_name', $product);
+            $this->assertNotEmpty($product['category_name']);
+            $this->assertIsString($product['category_name']);
         }
     }
 }

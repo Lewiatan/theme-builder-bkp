@@ -8,6 +8,8 @@ use App\Model\Enum\PageType;
 use App\ReadModel\PageReadModel;
 use App\Repository\PageRepository;
 use App\Service\PageService;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  * - Proper null handling
  * - Correct parameter passing
  */
+#[CoversClass(PageService::class)]
 final class PageServiceTest extends TestCase
 {
     private PageRepository $pageRepository;
@@ -29,7 +32,8 @@ final class PageServiceTest extends TestCase
         $this->pageService = new PageService($this->pageRepository);
     }
 
-    public function testGetPublicPageReturnsPageReadModelWhenPageExists(): void
+    #[Test]
+    public function it_returns_page_read_model_when_page_exists(): void
     {
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';
@@ -51,7 +55,8 @@ final class PageServiceTest extends TestCase
         $this->assertSame($expectedReadModel, $result);
     }
 
-    public function testGetPublicPageReturnsNullWhenPageDoesNotExist(): void
+    #[Test]
+    public function it_returns_null_when_page_does_not_exist(): void
     {
         // Arrange
         $shopId = '00000000-0000-0000-0000-000000000000';
@@ -70,7 +75,8 @@ final class PageServiceTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testGetPublicPagePassesCorrectParametersToRepository(): void
+    #[Test]
+    public function it_passes_correct_parameters_to_repository(): void
     {
         // Arrange
         $shopId = 'test-shop-id';
@@ -91,7 +97,8 @@ final class PageServiceTest extends TestCase
         // Assert - expectations verified by PHPUnit
     }
 
-    public function testGetPublicPageWorksForAllPageTypes(): void
+    #[Test]
+    public function it_works_for_all_page_types(): void
     {
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';

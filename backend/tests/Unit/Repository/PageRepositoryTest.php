@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Repository;
 
 use App\Model\Entity\Page;
-use App\Model\Entity\Shop;
 use App\Model\Enum\PageType;
-use App\Model\ValueObject\Layout;
 use App\ReadModel\PageReadModel;
 use App\Repository\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -22,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  * - Shop doesn't exist
  * - Page doesn't exist for the given type
  */
+#[CoversClass(PageRepository::class)]
 final class PageRepositoryTest extends KernelTestCase
 {
     private EntityManagerInterface $entityManager;
@@ -47,7 +47,8 @@ final class PageRepositoryTest extends KernelTestCase
         $this->entityManager->close();
     }
 
-    public function testFindPublicPageByShopAndTypeReturnsPageReadModelWhenPageExists(): void
+    #[Test]
+    public function it_returns_page_read_model_when_page_exists(): void
     {
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';
@@ -67,7 +68,8 @@ final class PageRepositoryTest extends KernelTestCase
         $this->assertIsArray($serialized['layout']['components']);
     }
 
-    public function testFindPublicPageByShopAndTypeReturnsNullWhenShopDoesNotExist(): void
+    #[Test]
+    public function it_returns_null_when_shop_does_not_exist(): void
     {
         // Arrange
         $nonExistentShopId = '00000000-0000-0000-0000-000000000000';
@@ -80,7 +82,8 @@ final class PageRepositoryTest extends KernelTestCase
         $this->assertNull($result);
     }
 
-    public function testFindPublicPageByShopAndTypeReturnsNullWhenPageTypeDoesNotExist(): void
+    #[Test]
+    public function it_returns_null_when_page_type_does_not_exist(): void
     {
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';
@@ -93,7 +96,8 @@ final class PageRepositoryTest extends KernelTestCase
         $this->assertNull($result);
     }
 
-    public function testPageReadModelStructureIsCorrect(): void
+    #[Test]
+    public function it_page_read_model_structure_is_correct(): void
     {
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';
@@ -121,7 +125,8 @@ final class PageRepositoryTest extends KernelTestCase
         }
     }
 
-    public function testFindPublicPageByShopAndTypeReturnsDifferentPagesForDifferentTypes(): void
+    #[Test]
+    public function it_returns_different_pages_for_different_types(): void
     {
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';
