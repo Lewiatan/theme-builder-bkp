@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Request;
+namespace App\Tests\Unit\Request;
 
 use App\Request\GetDemoProductsRequest;
 use PHPUnit\Framework\Attributes\CoversClass;

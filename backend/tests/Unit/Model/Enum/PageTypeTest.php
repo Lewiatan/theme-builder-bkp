@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Model\Enum;
+namespace App\Tests\Unit\Model\Enum;
 
 use App\Model\Enum\PageType;
 use PHPUnit\Framework\Attributes\CoversClass;

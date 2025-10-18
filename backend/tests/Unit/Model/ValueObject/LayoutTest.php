@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Model\ValueObject;
+namespace App\Tests\Unit\Model\ValueObject;
 
 use App\Model\ValueObject\ComponentDefinition;
 use App\Model\ValueObject\Layout;
