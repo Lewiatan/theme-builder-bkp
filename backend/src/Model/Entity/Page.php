@@ -9,7 +9,7 @@ use App\Model\ValueObject\Layout;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: \App\Repository\PageRepository::class)]
 #[ORM\Table(name: 'pages')]
 #[ORM\UniqueConstraint(name: 'idx_pages_shop_type', columns: ['shop_id', 'type'])]
 final class Page

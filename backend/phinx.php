@@ -28,12 +28,12 @@ return
             'charset' => 'utf8',
         ],
         'testing' => [
-            'adapter' => 'psql',
-            'host' => 'localhost',
-            'name' => 'testing_db',
-            'user' => 'root',
-            'pass' => '',
-            'port' => '3306',
+            'adapter' => 'pgsql',
+            'host' => 'postgres',
+            'name' => 'builder_test',
+            'user' => 'builder',
+            'pass' => 'builder',
+            'port' => '5432',
             'charset' => 'utf8',
         ]
     ],
