@@ -1,6 +1,28 @@
 ---
 name: symfony-implementation
-description: Use this agent when implementing backend features, API endpoints, database entities, repositories, services, or controllers in the Symfony application. This includes tasks like creating new REST endpoints, implementing business logic, designing database schemas with Doctrine entities, writing migrations with Phinx, optimizing PostgreSQL queries, implementing authentication/authorization logic, or refactoring existing Symfony code. Examples:\n\n<example>\nContext: User needs to implement a new API endpoint for saving theme configurations.\nuser: "I need to create an endpoint that accepts theme configuration data and saves it to the database"\nassistant: "I'll use the symfony-implementation agent to design and implement this API endpoint with proper validation, error handling, and database persistence."\n<uses Task tool to launch symfony-implementation agent>\n</example>\n\n<example>\nContext: User is working on database schema design for the theme builder.\nuser: "Can you help me design the entities for storing page layouts and component configurations?"\nassistant: "Let me use the symfony-implementation agent to design a robust entity structure with proper relationships and constraints."\n<uses Task tool to launch symfony-implementation agent>\n</example>\n\n<example>\nContext: User has just finished planning a feature and needs implementation.\nuser: "Now let's implement the user authentication system with JWT tokens"\nassistant: "I'll use the symfony-implementation agent to implement the authentication system using LexikJWTAuthenticationBundle as specified in the project requirements."\n<uses Task tool to launch symfony-implementation agent>\n</example>
+description: Use this agent when implementing backend features, API endpoints, database entities, repositories, services, or controllers in the Symfony application. This includes tasks like creating new REST endpoints, implementing
+  business logic, designing database schemas with Doctrine entities, writing migrations with Phinx, optimizing PostgreSQL queries, implementing authentication/authorization logic, or refactoring existing Symfony code. Examples:
+
+  <example>
+  Context: User needs to implement a new API endpoint for saving theme configurations.
+  user: "I need to create an endpoint that accepts theme configuration data and saves it to the database"
+  assistant: "I'll use the symfony-implementation agent to design and implement this API endpoint with proper validation, error handling, and database persistence."
+  <uses Task tool to launch symfony-implementation agent>
+  </example>
+
+  <example>
+  Context: User is working on database schema design for the theme builder.
+  user: "Can you help me design the entities for storing page layouts and component configurations?"
+  assistant: "Let me use the symfony-implementation agent to design a robust entity structure with proper relationships and constraints."
+  <uses Task tool to launch symfony-implementation agent>
+  </example>
+
+  <example>
+  Context: User has just finished planning a feature and needs implementation.
+  user: "Now let's implement the user authentication system with JWT tokens"
+  assistant: "I'll use the symfony-implementation agent to implement the authentication system using LexikJWTAuthenticationBundle as specified in the project requirements."
+  <uses Task tool to launch symfony-implementation agent>
+  </example>
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, NotebookEdit, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: inherit
 color: green

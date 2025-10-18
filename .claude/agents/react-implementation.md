@@ -1,6 +1,35 @@
 ---
 name: react-implementation
-description: Use this agent when implementing React components, hooks, or features that require expertise in modern React patterns, TypeScript integration, React Router navigation/data loading, or state management solutions. This includes:\n\n<example>\nContext: User needs to implement a new feature component in the theme-builder application.\nuser: "I need to create a draggable component card that shows a preview and allows users to configure its settings"\nassistant: "I'll use the Task tool to launch the react-implementation agent to build this component with proper TypeScript types, React hooks, and drag-and-drop integration."\n<commentary>The user is requesting a React component implementation, so use the react-implementation agent to handle the component creation with proper patterns.</commentary>\n</example>\n\n<example>\nContext: User is working on React Router data loading in the demo-shop application.\nuser: "How should I structure the loader function for the product detail page to fetch product data?"\nassistant: "Let me use the react-implementation agent to design the loader function with proper TypeScript types and error handling."\n<commentary>This involves React Router loader patterns, so the react-implementation agent should handle it.</commentary>\n</example>\n\n<example>\nContext: User just finished writing a custom hook for managing theme state.\nuser: "I've created a useThemeState hook that manages global theme settings"\nassistant: "Great! Now let me use the react-implementation agent to review the hook implementation for best practices and potential optimizations."\n<commentary>Since a React hook was just written, proactively use the agent to review it for React patterns, TypeScript usage, and performance considerations.</commentary>\n</example>\n\n<example>\nContext: User is implementing state management for the theme builder.\nuser: "I need to set up a store for managing the component tree and theme settings across the application"\nassistant: "I'll use the Task tool to launch the react-implementation agent to architect a state management solution that fits the project's needs."\n<commentary>State management implementation requires React expertise, so delegate to the react-implementation agent.</commentary>\n</example>
+description: Use this agent when implementing React components, hooks, or features that require expertise in modern React patterns, TypeScript integration, React Router navigation/data loading, or state management solutions. This
+  includes:
+
+  <example>
+  Context: User needs to implement a new feature component in the theme-builder application.
+  user: "I need to create a draggable component card that shows a preview and allows users to configure its settings"
+  assistant: "I'll use the Task tool to launch the react-implementation agent to build this component with proper TypeScript types, React hooks, and drag-and-drop integration."
+  <commentary>The user is requesting a React component implementation, so use the react-implementation agent to handle the component creation with proper patterns.</commentary>
+  </example>
+
+  <example>
+  Context: User is working on React Router data loading in the demo-shop application.
+  user: "How should I structure the loader function for the product detail page to fetch product data?"
+  assistant: "Let me use the react-implementation agent to design the loader function with proper TypeScript types and error handling."
+  <commentary>This involves React Router loader patterns, so the react-implementation agent should handle it.</commentary>
+  </example>
+
+  <example>
+  Context: User just finished writing a custom hook for managing theme state.
+  user: "I've created a useThemeState hook that manages global theme settings"
+  assistant: "Great! Now let me use the react-implementation agent to review the hook implementation for best practices and potential optimizations."
+  <commentary>Since a React hook was just written, proactively use the agent to review it for React patterns, TypeScript usage, and performance considerations.</commentary>
+  </example>
+
+  <example>
+  Context: User is implementing state management for the theme builder.
+  user: "I need to set up a store for managing the component tree and theme settings across the application"
+  assistant: "I'll use the Task tool to launch the react-implementation agent to architect a state management solution that fits the project's needs."
+  <commentary>State management implementation requires React expertise, so delegate to the react-implementation agent.</commentary>
+  </example>
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, NotebookEdit, Bash, mcp__context7__resolve-library-id, mcp__context7__get-library-docs, Skill
 model: inherit
 color: blue
