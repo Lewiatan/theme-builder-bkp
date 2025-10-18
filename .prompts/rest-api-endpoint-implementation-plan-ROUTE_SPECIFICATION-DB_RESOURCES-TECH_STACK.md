@@ -21,10 +21,10 @@ Your task is to create a comprehensive implementation plan for the REST API endp
 
 1. Summarize key points of the API specification.
 2. List required and optional parameters from the API specification.
-3. List necessary DTO types and Command Models.
+3. List necessary Request DTO.
 4. Consider how to extract logic to a service (existing or new, if it doesn't exist).
 5. Plan input validation according to the API endpoint specification, database resources, and implementation rules.
-6. Determine how to log errors in the error table (if applicable).
+6. The validation should be performed with Request DTO class.
 7. Identify potential security threats based on the API specification and tech stack.
 8. Outline potential error scenarios and corresponding status codes.
 
@@ -66,8 +66,8 @@ The final output should be a well-organized implementation plan in markdown form
   - Optional: [List of optional parameters]
 - Request Body: [Request body structure, if applicable]
 
-## 3. Used Types
-[DTOs and Command Models necessary for implementation]
+## 3. Request class and request validation
+[Request DTO necessary for implementation]
 
 ## 3. Response Details
 [Expected response structure and status codes]
