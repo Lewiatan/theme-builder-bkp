@@ -929,6 +929,42 @@ Returns demo products with optional filtering by category.
 
 ---
 
+#### GET /api/demo/products/{id}
+
+Returns details for a single demo product.
+
+**Authentication:** None required
+
+**Path Parameters:**
+- `id` - Product ID (integer)
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "category_id": 1,
+  "category_name": "Electronics",
+  "name": "Wireless Headphones",
+  "description": "Premium noise-cancelling wireless headphones with 30-hour battery life and superior sound quality. Features include Bluetooth 5.0, active noise cancellation, and comfortable over-ear design.",
+  "price": 19999,
+  "sale_price": 14999,
+  "image_thumbnail": "https://r2.example.com/products/headphones-thumb.jpg",
+  "image_medium": "https://r2.example.com/products/headphones-medium.jpg",
+  "image_large": "https://r2.example.com/products/headphones-large.jpg"
+}
+```
+
+**Error Responses:**
+- **404 Not Found** - Product not found
+  ```json
+  {
+    "error": "product_not_found",
+    "message": "Product not found"
+  }
+  ```
+
+---
+
 #### GET /api/demo/products/batch
 
 Fetches multiple products by their IDs in a single request. Used by Featured Products component to display user-selected products.
@@ -1029,41 +1065,6 @@ GET /api/demo/products/batch?ids=1,5,12
 
 ---
 
-#### GET /api/demo/products/{id}
-
-Returns details for a single demo product.
-
-**Authentication:** None required
-
-**Path Parameters:**
-- `id` - Product ID (integer)
-
-**Response (200 OK):**
-```json
-{
-  "id": 1,
-  "category_id": 1,
-  "category_name": "Electronics",
-  "name": "Wireless Headphones",
-  "description": "Premium noise-cancelling wireless headphones with 30-hour battery life and superior sound quality. Features include Bluetooth 5.0, active noise cancellation, and comfortable over-ear design.",
-  "price": 19999,
-  "sale_price": 14999,
-  "image_thumbnail": "https://r2.example.com/products/headphones-thumb.jpg",
-  "image_medium": "https://r2.example.com/products/headphones-medium.jpg",
-  "image_large": "https://r2.example.com/products/headphones-large.jpg"
-}
-```
-
-**Error Responses:**
-- **404 Not Found** - Product not found
-  ```json
-  {
-    "error": "product_not_found",
-    "message": "Product not found"
-  }
-  ```
-
----
 
 ## 3. Authentication and Authorization
 
