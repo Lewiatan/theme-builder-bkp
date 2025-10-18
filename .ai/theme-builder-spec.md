@@ -107,7 +107,10 @@ Support for building templates for four core E-commerce page types:
 **Demo Store (Separate Application)**
 - Completely separate React application from Theme Builder
 - Built with React + React Router v7 for routing between shop pages
-- Fetches theme/page templates via REST API using **SAVED settings only**
+- **Client-side rendered** (no Server-Side Rendering in MVP)
+- Renders pages using **shared component library** (same components as Theme Builder workspace)
+- React Router loaders fetch layout JSON via REST API using **SAVED settings only**
+- Component registry maps JSON configuration to React components
 - Fetches and displays **mocked product data** from backend API
 - Changes visible in Live Preview are **NOT shown** in Demo Store until saved
 - Accessed via "Demo" button which opens demo shop in new tab/window
@@ -209,9 +212,8 @@ Support for building templates for four core E-commerce page types:
   ├── theme-builder-app/           # Theme Builder React Application
   │   ├── src/
   │   │   ├── components/         # Theme builder UI components
-  │   │   │   ├── workspace/      # Canvas, sidebar, topbar
-  │   │   │   ├── palette/        # Component library
-  │   │   │   └── theme-components/ # Renderable theme components
+  │   │   │   ├── workspace/      # Canvas, sidebar, topbar (workspace UI)
+  │   │   │   └── palette/        # Component library palette
   │   │   ├── api/                # API client & HTTP utilities
   │   │   ├── types/              # TypeScript types
   │   │   ├── hooks/              # Custom React hooks
@@ -225,8 +227,7 @@ Support for building templates for four core E-commerce page types:
   │   │   │   ├── catalog.tsx     # Catalog page route
   │   │   │   ├── product.$id.tsx # Product detail route
   │   │   │   └── contact.tsx     # Contact page route
-  │   │   ├── components/         # Shop-specific components
-  │   │   │   └── theme-components/ # Shared theme components
+  │   │   ├── components/         # Shop-specific UI components
   │   │   ├── api/                # API client for fetching themes
   │   │   └── root.tsx            # Root layout
   │   ├── public/
@@ -243,11 +244,143 @@ Support for building templates for four core E-commerce page types:
   │   ├── db/
   │   │   └── migrations/         # Phinx migrations
   │   └── composer.json
-  └── shared/                      # Shared type definitions (optional)
-      └── types/                   # TypeScript/PHP type definitions
+  └── shared/                      # Shared components & types
+      ├── components/
+      │   └── theme/               # 13 theme components (Header, Hero, Footer, etc.)
+      │       ├── types.ts         # Component config TypeScript types
+      │       ├── registry.ts      # Component registry/mapper
+      │       ├── Header.tsx
+      │       ├── Hero.tsx
+      │       └── ... (all theme components)
+      └── types/                   # Shared TypeScript/PHP type definitions
   ```
 - **Clear Separation:** All three applications can be developed, tested, and deployed independently
 - **Component Sharing:** Theme-rendering components can be shared between both frontend apps
+
+### Component Rendering Architecture
+
+Both the Theme Builder and Demo Shop applications render theme components using a **shared component library**. This architecture eliminates code duplication and ensures visual consistency across both applications.
+
+#### Shared Component Library
+
+**Location:** `shared/components/theme/` directory in monorepo
+
+**Purpose:** Contains all 13 theme components (Header, Hero, Footer, ProductGrid, etc.) as reusable React components.
+
+**Structure:**
+```
+shared/
+└── components/
+    └── theme/
+        ├── types.ts              # TypeScript types for all component configs
+        ├── registry.ts           # Component registry/mapper
+        ├── Header.tsx            # Header component with variants
+        ├── Hero.tsx              # Hero component with variants
+        ├── Footer.tsx
+        ├── ProductGrid.tsx
+        └── ... (all 13 components)
+```
+
+#### Component Configuration Schema
+
+Each component in the layout JSON follows this structure:
+
+```typescript
+// shared/components/theme/types.ts
+interface ComponentConfig {
+  id: string;              // UUID for component instance
+  type: ComponentType;     // "header" | "hero" | "footer" | ...
+  variant: string;         // Component-specific variant name
+  settings: object;        // Component-specific settings
+}
+
+// Example: Hero component configuration
+interface HeroSettings {
+  heading: string;
+  subheading: string;
+  ctaText: string;
+  ctaLink: string;
+  imageUrl?: string;
+}
+```
+
+#### Component Registry/Mapper
+
+The component registry maps JSON configuration to React components:
+
+```typescript
+// shared/components/theme/registry.ts
+import { Header } from './Header';
+import { Hero } from './Hero';
+import { Footer } from './Footer';
+// ... other imports
+
+const COMPONENT_REGISTRY = {
+  header: Header,
+  hero: Hero,
+  footer: Footer,
+  // ... all 13 components
+} as const;
+
+export function renderComponent(config: ComponentConfig) {
+  const Component = COMPONENT_REGISTRY[config.type];
+  if (!Component) {
+    console.error(`Unknown component type: ${config.type}`);
+    return null;
+  }
+  return <Component variant={config.variant} settings={config.settings} />;
+}
+```
+
+#### Rendering Flow
+
+**Theme Builder (Workspace Preview):**
+1. User drags component from palette to canvas
+2. Creates ComponentConfig with default settings
+3. Canvas renders using `renderComponent(config)`
+4. User edits settings via modal
+5. Canvas re-renders with updated config
+
+**Demo Shop (Public Preview):**
+1. React Router loader fetches layout JSON from `/api/public/shops/{shopId}/pages/{type}`
+2. Receives array of ComponentConfig objects
+3. Maps each config through `renderComponent()`
+4. Renders full page layout
+
+**Example:**
+```typescript
+// demo-shop/app/routes/_index.tsx
+import { json, LoaderFunctionArgs } from 'react-router';
+import { renderComponent } from '~/shared/components/theme/registry';
+
+export async function loader({ params }: LoaderFunctionArgs) {
+  const response = await fetch(`/api/public/shops/${shopId}/pages/home`);
+  const { layout } = await response.json();
+  return json({ layout });
+}
+
+export default function HomePage() {
+  const { layout } = useLoaderData<typeof loader>();
+
+  return (
+    <div className="page">
+      {layout.map((componentConfig) => (
+        <div key={componentConfig.id}>
+          {renderComponent(componentConfig)}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+#### Benefits of This Architecture
+
+1. **Zero Code Duplication:** Each component written once, used in both apps
+2. **Type Safety:** Shared TypeScript types ensure consistency
+3. **Easy Maintenance:** Component changes automatically propagate to both apps
+4. **Visual Consistency:** Workspace preview matches Demo Shop exactly
+5. **Simplified Testing:** Test components once, confidence in both applications
 
 ### Image Storage & Upload
 - **Storage:** Cloudflare R2 (S3-compatible object storage)
@@ -357,8 +490,11 @@ Support for building templates for four core E-commerce page types:
 - Tests must run automatically via GitHub Actions
 
 ### Rendering
-- No Server-Side Rendering (SSR) required
-- Client-side rendering only (no SEO requirements)
+- **No Server-Side Rendering (SSR)** in MVP
+- Client-side rendering only (no SEO requirements for MVP)
+- Both Theme Builder and Demo Shop use **shared React component library** for rendering theme components
+- Component registry pattern maps JSON layout configuration to rendered React components
+- Future enhancement: SSR can be added to Demo Shop using React Router v7's built-in capabilities
 
 ## Component Library (13 Components)
 
@@ -421,7 +557,16 @@ The following components cover all required page types (Home, Catalog, Product, 
 
 ## Future Considerations
 
-- Advanced image processing:
+- **Server-Side Rendering (SSR):**
+  - Enable React Router v7 SSR for Demo Shop to improve SEO and initial load performance
+  - Implement hydration for client-side interactivity after SSR
+  - Configure CDN caching strategies for server-rendered pages
+- **Component Optimization:**
+  - Lazy loading for theme components to reduce initial bundle size
+  - Code splitting per component type
+  - Tree shaking optimization for unused component variants
+  - Bundle size monitoring and optimization
+- **Advanced image processing:**
   - Image optimization and compression before upload
   - Automatic thumbnail generation
   - Format conversion (WebP, AVIF)
@@ -432,7 +577,6 @@ The following components cover all required page types (Home, Catalog, Product, 
 - Advanced undo/redo functionality
 - Multi-language support
 - Real product catalog integration
-- Advanced image optimization
 
 ## Success Criteria
 

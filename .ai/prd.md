@@ -62,8 +62,11 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 ### 3.8. Preview (Demo Store)
 - The "Demo" button opens a separate application (Demo Shop) in a new tab, which renders only the saved state of the pages and theme.
 - The Demo Shop is a standalone React Router v7 application, completely separate from the Theme Builder.
-- The Demo Shop fetches saved theme/page data and mock products from the backend API.
+- The Demo Shop uses the **same React component library** as the Theme Builder workspace to ensure visual consistency.
+- React Router loaders fetch saved theme/page layout data (JSON) and mock products from the backend API.
+- The shared component registry maps the JSON layout configuration to rendered React components.
 - Mock product catalog is stored in the database and accessed via REST API endpoints.
+- **Technical Note:** Demo Shop uses client-side rendering in MVP (no Server-Side Rendering).
 
 ### 3.9. Authentication
 - The system requires user registration and login via JWT-based authentication.
@@ -99,7 +102,7 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 - Creation of custom components or modification of their structure.
 - Viewport switcher (desktop/tablet/mobile) in the editor.
 - Integration with a real product database.
-- Server-Side Rendering (SSR).
+- Server-Side Rendering (SSR) for Demo Shop (client-side rendering only in MVP).
 - Template versioning.
 
 ## 5. User Stories
@@ -112,9 +115,9 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 - Acceptance Criteria:
   - The registration form includes fields for email and password.
   - Validation checks if the email is in a correct format and if the password meets minimum security requirements.
-  - After successful registration, I am automatically logged in.
-  - After my first login, I am redirected directly to the workspace with the home page and a default layout loaded.
+  - After successful registration, I receive a success message and am redirected to the login page.
   - The system automatically creates 4 pages for me (Home, Catalog, Product, Contact) with a predefined layout.
+  - After my first login, I am redirected directly to the workspace with the home page and a default layout loaded.
 
 - ID: US-002
 - Title: User login
@@ -268,5 +271,6 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 ### Technical Metrics:
 - The final appearance of the store in Demo Shop application is fully responsive and renders correctly on popular browsers and on mobile, tablet, and desktop devices.
 - The loading time for the Theme Builder and Demo Shop is acceptable to the user.
+- Component rendering is consistent between Theme Builder workspace preview and Demo Shop (achieved through shared component library).
 - API response times are within acceptable limits.
 - No critical errors are reported by the monitoring system.

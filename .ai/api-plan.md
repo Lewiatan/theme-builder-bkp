@@ -929,6 +929,106 @@ Returns demo products with optional filtering by category.
 
 ---
 
+#### GET /api/demo/products/batch
+
+Fetches multiple products by their IDs in a single request. Used by Featured Products component to display user-selected products.
+
+**Authentication:** None required
+
+**Query Parameters:**
+- `ids` (required) - Comma-separated list of product IDs (e.g., `1,5,12,8`)
+
+**Example Request:**
+```
+GET /api/demo/products/batch?ids=1,5,12
+```
+
+**Response (200 OK):**
+```json
+{
+  "products": [
+    {
+      "id": 1,
+      "category_id": 1,
+      "category_name": "Electronics",
+      "name": "Wireless Headphones",
+      "description": "Premium noise-cancelling wireless headphones with 30-hour battery life.",
+      "price": 19999,
+      "sale_price": 14999,
+      "image_thumbnail": "https://r2.example.com/products/headphones-thumb.jpg",
+      "image_medium": "https://r2.example.com/products/headphones-medium.jpg",
+      "image_large": "https://r2.example.com/products/headphones-large.jpg"
+    },
+    {
+      "id": 5,
+      "category_id": 2,
+      "category_name": "Clothing",
+      "name": "Cotton T-Shirt",
+      "description": "Comfortable cotton t-shirt available in multiple colors.",
+      "price": 2999,
+      "sale_price": null,
+      "image_thumbnail": "https://r2.example.com/products/tshirt-thumb.jpg",
+      "image_medium": "https://r2.example.com/products/tshirt-medium.jpg",
+      "image_large": "https://r2.example.com/products/tshirt-large.jpg"
+    },
+    {
+      "id": 12,
+      "category_id": 3,
+      "category_name": "Home & Garden",
+      "name": "LED Desk Lamp",
+      "description": "Adjustable LED desk lamp with touch controls.",
+      "price": 4999,
+      "sale_price": 3999,
+      "image_thumbnail": "https://r2.example.com/products/lamp-thumb.jpg",
+      "image_medium": "https://r2.example.com/products/lamp-medium.jpg",
+      "image_large": "https://r2.example.com/products/lamp-large.jpg"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- **400 Bad Request** - Missing or invalid `ids` parameter
+  ```json
+  {
+    "error": "invalid_parameter",
+    "message": "Query parameter 'ids' is required and must contain comma-separated integers"
+  }
+  ```
+- **400 Bad Request** - Too many IDs requested
+  ```json
+  {
+    "error": "too_many_ids",
+    "message": "Maximum 50 product IDs allowed per request"
+  }
+  ```
+
+**Business Logic:**
+1. Parse `ids` query parameter (comma-separated string)
+2. Convert to array of integers, validate all are valid integers
+3. Deduplicate IDs if duplicates exist
+4. Validate array length ≤ 50 (prevent abuse)
+5. Query: `SELECT p.*, c.name as category_name FROM demo_products p JOIN demo_categories c ON p.category_id = c.id WHERE p.id IN (ids)`
+6. Return products in same order as requested IDs (use SQL ORDER BY FIELD or application-level sorting)
+7. If some IDs don't exist, return only found products (no error, partial success)
+8. If no products found, return empty array: `{"products": []}`
+
+**Validation:**
+- Maximum 50 IDs per request
+- IDs must be valid integers
+- Duplicate IDs are automatically deduplicated
+
+**Use Cases:**
+- **Featured Products component:** User selects 3-12 products in Theme Builder, settings stored as `{"productIds": [1, 5, 12]}`, Demo Shop fetches via this endpoint
+- **Product recommendations:** Display related or handpicked products
+
+**Notes:**
+- Prices are in cents (e.g., 19999 = $199.99)
+- `sale_price` is `null` if product is not on sale
+- Products returned may be fewer than requested if some IDs don't exist (graceful degradation)
+
+---
+
 #### GET /api/demo/products/{id}
 
 Returns details for a single demo product.
@@ -1385,6 +1485,52 @@ WHERE ($category_id IS NULL OR p.category_id = $category_id)
 ORDER BY p.name ASC;
 ```
 
+#### BL-7: Batch Product Fetch
+
+**Endpoint:** GET /api/demo/products/batch
+
+**Steps:**
+1. Parse query parameters:
+   - ids (required, comma-separated string)
+2. Split ids by comma: `explode(',', $ids)`
+3. Convert all values to integers: `array_map('intval', $idsArray)`
+4. Validate all values are positive integers
+5. Deduplicate IDs: `array_unique($idsArray)`
+6. Validate count ≤ 50
+7. Build SQL query with IN clause
+8. Execute query and fetch products
+9. Sort products in same order as requested IDs (application-level)
+10. Return products array
+
+**SQL Example:**
+```sql
+SELECT p.*, c.name as category_name
+FROM demo_products p
+JOIN demo_categories c ON p.category_id = c.id
+WHERE p.id IN (1, 5, 12, 8)
+ORDER BY FIELD(p.id, 1, 5, 12, 8);  -- MySQL
+-- OR use application-level sorting for PostgreSQL
+```
+
+**PHP Sorting Example (PostgreSQL):**
+```php
+// After fetching products from database
+$productsById = [];
+foreach ($products as $product) {
+    $productsById[$product['id']] = $product;
+}
+
+// Return in requested order
+$orderedProducts = [];
+foreach ($requestedIds as $id) {
+    if (isset($productsById[$id])) {
+        $orderedProducts[] = $productsById[$id];
+    }
+}
+
+return ['products' => $orderedProducts];
+```
+
 ### 4.3. Database Constraints Enforcement
 
 **Application-Level vs. Database-Level:**
@@ -1516,7 +1662,7 @@ $logger->error('Image upload failed', [
 
 This REST API plan provides a comprehensive, secure, and performant backend for the E-commerce Theme Builder MVP. Key highlights:
 
-- **27 endpoints** covering authentication, shop management, page editing, theme customization, image uploads, and public demo access
+- **19 endpoints** covering authentication, shop management, page editing, theme customization, image uploads, and public demo access
 - **JWT-based authentication** with strict user data isolation
 - **Separate save mechanisms** for pages and theme settings (per PRD requirement)
 - **Public read-only endpoints** for Demo Shop application
