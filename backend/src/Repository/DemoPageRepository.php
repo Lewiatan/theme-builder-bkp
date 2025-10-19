@@ -13,7 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Page>
  */
-class PageRepository extends ServiceEntityRepository
+class DemoPageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

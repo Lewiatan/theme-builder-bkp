@@ -6,30 +6,30 @@ namespace App\Tests\Unit\Service;
 
 use App\Model\Enum\PageType;
 use App\ReadModel\DemoPageReadModel;
-use App\Repository\PageRepository;
-use App\Service\PageService;
+use App\Repository\DemoPageRepository;
+use App\Service\DemoPageService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for PageService
+ * Unit tests for DemoPageService
  *
  * Tests the service layer with mocked repository to verify:
  * - Correct delegation to repository
  * - Proper null handling
  * - Correct parameter passing
  */
-#[CoversClass(PageService::class)]
-final class PageServiceTest extends TestCase
+#[CoversClass(DemoPageService::class)]
+final class DemoPageServiceTest extends TestCase
 {
-    private PageRepository $pageRepository;
-    private PageService $pageService;
+    private DemoPageRepository $pageRepository;
+    private DemoPageService $pageService;
 
     protected function setUp(): void
     {
-        $this->pageRepository = $this->createMock(PageRepository::class);
-        $this->pageService = new PageService($this->pageRepository);
+        $this->pageRepository = $this->createMock(DemoPageRepository::class);
+        $this->pageService = new DemoPageService($this->pageRepository);
     }
 
     #[Test]
@@ -106,8 +106,8 @@ final class PageServiceTest extends TestCase
 
         foreach ($pageTypes as $index => $pageType) {
             // Create a fresh mock for each iteration
-            $repository = $this->createMock(PageRepository::class);
-            $service = new PageService($repository);
+            $repository = $this->createMock(DemoPageRepository::class);
+            $service = new DemoPageService($repository);
 
             $expectedReadModel = new DemoPageReadModel($pageType->value, []);
 

@@ -8,7 +8,7 @@ use App\Exception\CategoryNotFoundException;
 use App\Model\Enum\PageType;
 use App\Request\GetDemoProductsRequest;
 use App\Service\DemoProductService;
-use App\Service\PageService;
+use App\Service\DemoPageService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +26,7 @@ use Symfony\Component\Uid\Uuid;
 final class PublicShopController extends AbstractController
 {
     public function __construct(
-        private readonly PageService $pageService,
+        private readonly DemoPageService $pageService,
         private readonly DemoProductService $demoProductService,
         private readonly LoggerInterface $logger
     ) {}

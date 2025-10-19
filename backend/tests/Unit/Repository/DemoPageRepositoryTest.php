@@ -7,22 +7,22 @@ namespace App\Tests\Unit\Repository;
 use App\Model\Entity\Page;
 use App\Model\Enum\PageType;
 use App\ReadModel\DemoPageReadModel;
-use App\Repository\PageRepository;
+use App\Repository\DemoPageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * Unit tests for PageRepository
+ * Unit tests for DemoPageRepository
  *
  * Tests the findPublicPageByShopAndType method with various scenarios:
  * - Page exists for shop and type
  * - Shop doesn't exist
  * - Page doesn't exist for the given type
  */
-#[CoversClass(PageRepository::class)]
-final class PageRepositoryTest extends KernelTestCase
+#[CoversClass(DemoPageRepository::class)]
+final class DemoPageRepositoryTest extends KernelTestCase
 {
     private EntityManagerInterface $entityManager;
 
@@ -34,9 +34,9 @@ final class PageRepositoryTest extends KernelTestCase
             ->getManager();
     }
 
-    private function getRepository(): PageRepository
+    private function getRepository(): DemoPageRepository
     {
-        /** @var PageRepository $repository */
+        /** @var DemoPageRepository $repository */
         $repository = $this->entityManager->getRepository(Page::class);
         return $repository;
     }

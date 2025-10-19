@@ -6,7 +6,7 @@ namespace App\Service;
 
 use App\Model\Enum\PageType;
 use App\ReadModel\DemoPageReadModel;
-use App\Repository\PageRepository;
+use App\Repository\DemoPageRepository;
 
 /**
  * Service for page-related business operations.
@@ -14,10 +14,10 @@ use App\Repository\PageRepository;
  * Orchestrates page data retrieval through the repository layer,
  * maintaining clean separation between controllers and data access.
  */
-final readonly class PageService
+final readonly class DemoPageService
 {
     public function __construct(
-        private PageRepository $pageRepository
+        private DemoPageRepository $pageRepository
     ) {}
 
     /**
