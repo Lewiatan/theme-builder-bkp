@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Enum\PageType;
-use App\ReadModel\PageReadModel;
+use App\ReadModel\DemoPageReadModel;
 use App\Repository\PageRepository;
 
 /**
@@ -28,9 +28,9 @@ final readonly class PageService
      *
      * @param string $shopId UUID of the shop
      * @param PageType $type Page type to retrieve
-     * @return PageReadModel|null Page data if found, null if shop or page doesn't exist
+     * @return DemoPageReadModel|null Page data if found, null if shop or page doesn't exist
      */
-    public function getPublicPage(string $shopId, PageType $type): ?PageReadModel
+    public function getPublicPage(string $shopId, PageType $type): ?DemoPageReadModel
     {
         return $this->pageRepository->findPublicPageByShopAndType($shopId, $type);
     }

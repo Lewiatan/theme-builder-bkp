@@ -6,7 +6,7 @@ namespace App\Repository;
 
 use App\Model\Entity\Page;
 use App\Model\Enum\PageType;
-use App\ReadModel\PageReadModel;
+use App\ReadModel\DemoPageReadModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -31,9 +31,9 @@ class PageRepository extends ServiceEntityRepository
      *
      * @param string $shopId UUID of the shop
      * @param PageType $type Page type enum
-     * @return PageReadModel|null Read model if page found, null otherwise
+     * @return DemoPageReadModel|null Read model if page found, null otherwise
      */
-    public function findPublicPageByShopAndType(string $shopId, PageType $type): ?PageReadModel
+    public function findPublicPageByShopAndType(string $shopId, PageType $type): ?DemoPageReadModel
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -56,7 +56,7 @@ class PageRepository extends ServiceEntityRepository
         // Decode JSON layout column
         $layout = json_decode($result['layout'], true);
 
-        return new PageReadModel(
+        return new DemoPageReadModel(
             $result['type'],
             $layout
         );

@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * Demo products are read-only reference data - no write operations needed.
  */
-final class DemoProductRepository
+class DemoProductRepository
 {
     private Connection $connection;
 
@@ -131,7 +131,7 @@ final class DemoProductRepository
             'categoryId' => $categoryId,
         ]);
 
-        return $count > 0;
+        return (int) $count > 0;
     }
 
     /**

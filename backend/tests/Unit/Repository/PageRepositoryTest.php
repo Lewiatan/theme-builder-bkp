@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Repository;
 
 use App\Model\Entity\Page;
 use App\Model\Enum\PageType;
-use App\ReadModel\PageReadModel;
+use App\ReadModel\DemoPageReadModel;
 use App\Repository\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,7 +58,7 @@ final class PageRepositoryTest extends KernelTestCase
         $result = $this->getRepository()->findPublicPageByShopAndType($shopId, $pageType);
 
         // Assert
-        $this->assertInstanceOf(PageReadModel::class, $result);
+        $this->assertInstanceOf(DemoPageReadModel::class, $result);
         $serialized = $result->jsonSerialize();
 
         $this->assertArrayHasKey('type', $serialized);

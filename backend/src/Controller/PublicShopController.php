@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Exception\CategoryNotFoundException;
+use App\Model\Enum\PageType;
 use App\Request\GetDemoProductsRequest;
-use App\Request\GetDemoShopPageRequest;
 use App\Service\DemoProductService;
 use App\Service\PageService;
 use Psr\Log\LoggerInterface;
@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Public API controller for Demo Shop data retrieval.
@@ -48,20 +49,25 @@ final class PublicShopController extends AbstractController
      */
     #[Route('/api/public/shops/{shopId}/pages/{type}', name: 'public_shop_page', defaults: ['type' => 'home'], methods: ['GET'])]
     public function getPage(
-        #[MapQueryString] GetDemoShopPageRequest $request
+        string $shopId,
+        string $type = 'home'
     ): JsonResponse
     {
         try {
-            // Convert string type to PageType enum
-            $pageType = $request->getPageType();
-            $shopId = $request->getShopId();
+            // Validate shop ID
+            if (!$this->isValidUuid($shopId)) {
+                throw new \InvalidArgumentException('Invalid shop ID format');
+            }
+
+            // Validate and convert page type
+            $pageType = $this->validatePageType($type);
 
             $pageReadModel = $this->pageService->getPublicPage($shopId, $pageType);
 
             if ($pageReadModel === null) {
                 $this->logger->info('Page not found', [
                     'shopId' => $shopId,
-                    'type' => $pageType,
+                    'type' => $pageType->value,
                 ]);
 
                 return new JsonResponse(
@@ -74,7 +80,7 @@ final class PublicShopController extends AbstractController
         } catch (\Throwable $exception) {
             $this->logger->error('Unexpected error retrieving page', [
                 'shopId' => $shopId,
-                'type' => $pageType,
+                'type' => $type,
                 'exception' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString(),
             ]);
@@ -138,6 +144,37 @@ final class PublicShopController extends AbstractController
             return new JsonResponse(
                 ['error' => 'An unexpected error occurred'],
                 JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    /**
+     * Validates if a string is a valid UUID.
+     *
+     * @param string $uuid The UUID string to validate
+     * @return bool True if valid UUID, false otherwise
+     */
+    private function isValidUuid(string $uuid): bool
+    {
+        return Uuid::isValid($uuid);
+    }
+
+    /**
+     * Validates and converts a page type string to PageType enum.
+     *
+     * @param string $type The page type string to validate
+     * @return PageType The validated PageType enum
+     * @throws \InvalidArgumentException If the page type is invalid
+     */
+    private function validatePageType(string $type): PageType
+    {
+        try {
+            return PageType::fromString($type);
+        } catch (\ValueError $e) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid page type "%s". Must be one of: home, catalog, product, contact', $type),
+                0,
+                $e
             );
         }
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Model\Enum\PageType;
-use App\ReadModel\PageReadModel;
+use App\ReadModel\DemoPageReadModel;
 use App\Repository\PageRepository;
 use App\Service\PageService;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -38,7 +38,7 @@ final class PageServiceTest extends TestCase
         // Arrange
         $shopId = '550e8400-e29b-41d4-a716-446655440000';
         $pageType = PageType::HOME;
-        $expectedReadModel = new PageReadModel('home', [
+        $expectedReadModel = new DemoPageReadModel('home', [
             ['id' => 'cmp_001', 'type' => 'hero', 'variant' => 'default', 'settings' => []],
         ]);
 
@@ -109,7 +109,7 @@ final class PageServiceTest extends TestCase
             $repository = $this->createMock(PageRepository::class);
             $service = new PageService($repository);
 
-            $expectedReadModel = new PageReadModel($pageType->value, []);
+            $expectedReadModel = new DemoPageReadModel($pageType->value, []);
 
             $repository
                 ->expects($this->once())

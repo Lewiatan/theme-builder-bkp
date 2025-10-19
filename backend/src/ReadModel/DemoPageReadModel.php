@@ -16,7 +16,7 @@ use JsonSerializable;
  * Optimized for JSON serialization - no getters needed as this is only
  * used for API responses.
  */
-final readonly class PageReadModel implements JsonSerializable
+final readonly class DemoPageReadModel implements JsonSerializable
 {
     /**
      * @param string $type Page type (home, catalog, product, contact)
