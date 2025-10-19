@@ -18,6 +18,19 @@ The backend structure follows standard Symfony conventions:
 - `bin/console` - Symfony console commands
 - `public/index.php` - Entry point
 
+### Individual Service Commands
+
+```bash
+# Run inside backend container or locally with PHP 8.3+
+composer install                    # Install dependencies
+php bin/console cache:clear         # Clear Symfony cache
+php bin/console debug:router        # List all routes
+
+# Database migrations (using Phinx)
+vendor/bin/phinx migrate           # Run migrations
+vendor/bin/phinx create MigrationName  # Create new migration
+```
+
 ### Backend Standards
 
 #### PHP
@@ -57,13 +70,6 @@ The backend structure follows standard Symfony conventions:
 - Never include sensitive data (timestamps, IDs, related entities) unless explicitly needed
 - Use ReadModels to prevent accidental exposure of entity data through serialization
 
-**Benefits**:
-- Explicit data contract - only specified fields can be returned
-- Decouples API response structure from domain entity changes
-- Prevents accidental data exposure when entities evolve
-- No risk of serialization misconfiguration exposing sensitive data
-- Repository returns ReadModel directly, eliminating transformation logic in services/controllers
-
 ### Database Standards
 
 #### PostgreSQL
@@ -77,4 +83,15 @@ The backend structure follows standard Symfony conventions:
 ### Testing Standards
 
 #### PHPUnit (Unit Testing)
-- run tests via Docker container
+- **File & Naming**: Test classes end with `Test` (e.g., `MyServiceTest.php`) and mirror the source directory structure (e.g., `tests/Unit/Service/MyServiceTest.php` for `src/Service/MyService.php`).
+- **Test Methods**: Use `snake_case` for test method names to describe the behavior under test (e.g., `it_throws_exception_when_invalid()`).
+- **Structure**:
+    - Follow the Arrange-Act-Assert pattern, often explicitly with comments (`// Arrange`, `// Act`, `// Assert`).
+    - Test classes should be `final` and extend `PHPUnit\Framework\TestCase`.
+    - Use the `setUp()` method for initializing mocks and the class under test.
+- **Attributes**: Use PHPUnit's attribute syntax (`#[Test]`, `#[CoversClass(MyClass::class)]`) instead of annotations.
+- **Mocking**:
+    - Leverage `createMock()` for creating test doubles.
+    - Use `expects()` with `once()`, `never()`, etc., to assert method call expectations on mocks.
+- **Assertions**: Use specific assertions (`assertSame`, `assertCount`, `assertInstanceOf`) over generic ones. For exceptions, use `expectException()` and `expectExceptionMessage()`.
+- **Execution**: Run tests via the Docker container: `docker compose exec backend vendor/bin/phpunit`.
