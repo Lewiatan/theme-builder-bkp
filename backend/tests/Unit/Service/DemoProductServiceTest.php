@@ -10,6 +10,7 @@ use App\Repository\DemoProductRepository;
 use App\Service\DemoProductService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DemoProductService::class)]
 final class DemoProductServiceTest extends TestCase
 {
-    private DemoProductRepository $repository;
+    private DemoProductRepository|MockObject $repository;
     private DemoProductService $service;
 
     protected function setUp(): void

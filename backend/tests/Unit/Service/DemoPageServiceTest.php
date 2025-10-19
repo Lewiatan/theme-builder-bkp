@@ -10,6 +10,7 @@ use App\Repository\DemoPageRepository;
 use App\Service\DemoPageService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DemoPageService::class)]
 final class DemoPageServiceTest extends TestCase
 {
-    private DemoPageRepository $pageRepository;
+    private DemoPageRepository|MockObject $pageRepository;
     private DemoPageService $pageService;
 
     protected function setUp(): void
