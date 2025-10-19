@@ -1,6 +1,6 @@
 ---
 name: react-implementation
-description: Use this agent when implementing React components, hooks, or features that require expertise in modern React patterns, TypeScript integration, React Router navigation/data loading, or state management solutions. This
+description: Use this agent PROACTIVELY when implementing React components, hooks, or features that require expertise in modern React patterns, TypeScript integration, React Router navigation/data loading, or state management solutions. This
   includes:
 
   <example>

@@ -1,6 +1,6 @@
 ---
 name: symfony-implementation
-description: Use this agent when implementing backend features, API endpoints, database entities, repositories, services, or controllers in the Symfony application. This includes tasks like creating new REST endpoints, implementing
+description: Use this agent PROACTIVELY when implementing backend features, API endpoints, database entities, repositories, services, or controllers in the Symfony application. This includes tasks like creating new REST endpoints, implementing
   business logic, designing database schemas with Doctrine entities, writing migrations with Phinx, optimizing PostgreSQL queries, implementing authentication/authorization logic, or refactoring existing Symfony code. Examples:
 
   <example>
