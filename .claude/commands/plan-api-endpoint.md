@@ -1,5 +1,5 @@
 ---
-argument-hint: <db-resources> <tech-stack> <route-specification>
+argument-hint: <models-files> <tech-stack> <route-specification>
 description: Create a detailed implementation plan for a REST API endpoint
 ---
 
@@ -7,10 +7,10 @@ You are an experienced software architect whose task is to create a detailed imp
 
 Before we begin, review the following information:
 
-1. Related database resources:
-<related_db_resources>
+1. Database Models:
+<application_models>
 $1
-</related_db_resources>
+</application_models>
 
 2. Tech stack:
 <tech_stack>
@@ -22,7 +22,7 @@ $2
 $3
 </route_api_specification>
 
-Your task is to create a comprehensive implementation plan for the REST API endpoint. Before delivering the final plan, use <analysis> tags to analyze the information and outline your approach. In this analysis, ensure that:
+Your task is to THINK and create a comprehensive implementation plan for the REST API endpoint. Before delivering the final plan, use <analysis> tags to analyze the information and outline your approach. In this analysis, ensure that:
 
 1. Summarize key points of the API specification.
 2. List required and optional parameters from the API specification.
@@ -72,7 +72,7 @@ The final output should be a well-organized implementation plan in markdown form
 - Request Body: [Request body structure, if applicable]
 
 ## 3. Request class and request validation
-[Request DTO necessary for implementation]
+[Informations about Request DTO necessary for implementation]
 
 ## 3. Response Details
 [Expected response structure and status codes]
@@ -96,7 +96,7 @@ The final output should be a well-organized implementation plan in markdown form
 ...
 ```
 
-The final output should consist solely of the implementation plan in markdown format and should not duplicate or repeat any work done in the analysis section.
+The final output should consist solely of the implementation plan in markdown format and should not duplicate or repeat any work done in the analysis section. Do not incule code examples or implementation specifics.
 
 Remember to save your implementation plan as .ai/plan/{endpoint-name}-api-endpoint-implementation-plan.md. Ensure the plan is detailed, clear, and provides comprehensive guidance for the development team.
 

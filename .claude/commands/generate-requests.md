@@ -1,5 +1,5 @@
 ---
-argument-hint: <models-file> <endpoints-file>
+argument-hint: <models-files> <implementation-plan-file>
 description: Generate Symfony Request DTOs from application models and endpoint details
 ---
 
@@ -13,9 +13,9 @@ $1
 </application_models>
 
 2. Endpoint Plan:
-<endpoint_details>
+<implementation_plan>
 $2
-</endpoint_details>
+</implementation_plan>
 
 Your task is to create PHP classes for DTOs for request specified in the Endpoint Details, ensuring they are derived from application models. Execute the following steps:
 
