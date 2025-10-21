@@ -28,10 +28,9 @@
 The architecture is designed around two types of pages: **static pages** (Home, Contact) composed of configurable content blocks, and **dynamic template pages** (Catalog, Product Details) that render data based on the URL. The core principles are **reusability**, **separation of concerns**, and **performance**.
 
 ### 2. Component Types
-There are two distinct categories of components:
+All 13 components are **Content Components** - reusable, configurable blocks that users can place on any page. Their content (e.g., text, image URLs, lists of product IDs) is stored in the database as part of the page layout.
 
-*   **Content Components:** Reusable, configurable blocks that users can place on static pages. Their content (e.g., text, image URLs, lists of product IDs) is stored in the database as part of the page layout.
-*   **Page Template Components:** These are special-purpose components that define the layout for dynamic pages. They are not placed by users; instead, they receive their primary data context (like a `productId` or `categoryId`) from the URL via the routing system.
+The architecture treats all components uniformly - they all follow the same structure and rendering pattern, and can be used on any of the four page types (Home, Product Catalog, Product Detail, Contact).
 
 ### 3. Common Structure for All Components
 Every component in the `/shared/components` library will adhere to the following structure and contract:
@@ -51,52 +50,76 @@ Every component in the `/shared/components` library will adhere to the following
 
 ### 4. List of Components (MVP)
 
-#### Page Template Components (URL-Driven)
-These components are used to build the main dynamic pages of the shop. Their data is derived from URL parameters.
+All 13 components are defined below, matching the spec exactly. Each component is a Content Component that can be placed on pages by users.
 
-1.  **Product Catalog:**
-    *   **Data:** Receives a `categoryId` from the URL. The container component will fetch all products belonging to that category.
-    *   **Variants:** Layout (`grid`, `list`), products per page (`12`, `24`).
-2.  **Single Product View:**
-    *   **Data:** Receives a `productId` from the URL. The container component will fetch the full details for that specific product.
-    *   **Variants:** Image gallery position (`left`, `right`).
+1.  **Heading:**
+    *   **Data:** `text: string`, `level: string` (H1/H2/H3), `backgroundImageUrl?: string`.
+    *   **Variants:** Text only, Text with background image, Text with backgrund color.
+    *   **Editable:** Heading text, heading level (H1/H2/H3), height, background image (for variant with image), background color (for variant with color).
 
-#### Content Components (Database-Driven)
-These are the building blocks users can add to static pages like the Homepage.
+2.  **Header/Navigation:**
+    *   **Data:** `logoUrl: string`, `logoPosition: string` (left/center).
+    *   **Static data:** Menu links - built in the component to reflect the 4 available pages (Home, Product Catalog, Product Detail, Contact).
+    *   **Variants:** Sticky/static, simple horizontal, slide-in left.
+    *   **Editable:** Logo, logo position (left/center).
 
-3.  **Hero:**
-    *   **Data:** `title: string`, `subtitle: string`, `ctaText: string`, `ctaLink: string`, `backgroundImageUrl: string`.
-    *   **Variants:** Text alignment (`left`, `center`, `right`).
-4.  **Featured Products:**
-    *   **Data:** `title: string`, `productIds: string[]`. The container fetches products using these specific IDs.
-    *   **Variants:** Number of columns (`3`, `4`).
-5.  **Image with Text:**
-    *   **Data:** `imageUrl: string`, `title: string`, `text: string`.
-    *   **Variants:** Image position (`left`, `right`), text alignment.
-6.  **Gallery:**
-    *   **Data:** `title: string`, `images: { url: string, alt: string }[]`.
-    *   **Variants:** Number of columns (`2`, `3`, `4`).
-7.  **Testimonials:**
-    *   **Data:** `testimonials: { quote: string, author: string }[]`.
-    *   **Variants:** Layout (`slider`, `grid`).
-8.  **Contact Form:**
-    *   **Data:** `title: string`, `recipientEmail: string`.
-    *   **Variants:** Fields displayed (`name`, `email`, `phone`, `message`).
-9.  **Map:**
-    *   **Data:** `title: string`, `address: string`.
-    *   **Variants:** Map style (`roadmap`, `satellite`).
-10. **Newsletter Signup:**
-    *   **Data:** `title: string`, `placeholderText: string`.
-    *   **Variants:** Layout (`inline`, `block`).
-11. **Rich Text:**
-    *   **Data:** `htmlContent: string`.
-    *   **Variants:** None. Styling is derived from global theme settings.
-12. **Button:**
-    *   **Data:** `text: string`, `link: string`.
-    *   **Variants:** Style (`primary`, `secondary`).
-13. **Divider:**
-    *   **Data:** `height: number`, `color: string`.
-    *   **Variants:** Style (`solid`, `dashed`).
+3.  **Footer:**
+    *   **Data:** `sections: { title: string, links: { text: string, url: string }[] }[]`, `copyrightText: string`.
+    *   **Variants:** 1/2/3/4 columns.
+    *   **Editable:** Sections (About, Contact, Social media), links, copyright text.
+
+4.  **Hero/Full-Width Banner:**
+    *   **Data:** `title: string`, `subtitle: string`, `ctaButtonText: string`, `ctaButtonLink: string`, `backgroundImageUrl?: string`, `videoUrl?: string`.
+    *   **Variants:** Full-width with background image, with video, split layout (image + text).
+    *   **Editable:** Title, subtitle, CTA button, background image/video.
+
+5.  **Text Section:**
+    *   **Data:** `columns: { text: string, iconUrl?: string, imageUrl?: string }[]`.
+    *   **Variants:** 1/2/3/4 columns, with icons, with images.
+    *   **Editable:** Text content, optional images.
+
+6.  **Call-to-Action (CTA) Block:**
+    *   **Data:** `header: string`, `text: string`, `buttonText: string`, `buttonLink: string`, `backgroundImageUrl?: string`.
+    *   **Variants:** Full-width, box with shadow, with background image.
+    *   **Editable:** Header, text, button, background image.
+
+7.  **Product List/Grid:**
+    *   **Data:** `productIds: string[]`, `productsPerRow: number`, `numberOfRows: number`, `showFilters: boolean`.
+    *   **Variants:** 2/3/4/6 products per row, with/without filters.
+    *   **Editable:** Product selection from mock catalog, number of rows.
+    *   **Use:** Catalog page, Home page sections.
+
+8.  **Featured Products:**
+    *   **Data:** `productIds: string[]` (max 8-12 products).
+    *   **Variants:** Carousel, grid, list.
+    *   **Editable:** Manual product selection from mock catalog (max 8-12 products).
+    *   **Use:** Home page, promotional sections.
+
+9.  **Product Detail View:**
+    *   **Data:** `productId: string`, `visibleFields: string[]` (price, description, specs, reviews).
+    *   **Variants:** Large image gallery, compact view, with quick specifications.
+    *   **Editable:** Product selection, visible fields (price, description, specs, reviews).
+    *   **Use:** Product detail page.
+
+10. **Review/Testimonial Section:**
+    *   **Data:** `reviews: { name: string, content: string, rating: number, avatarUrl?: string }[]`.
+    *   **Variants:** Carousel, 2/3 column grid, list.
+    *   **Editable:** Add reviews (name, content, rating, avatar).
+
+11. **Contact Form:**
+    *   **Data:** `title: string`, `infoText: string`, `visibleFields: string[]` (name, email, phone, message, subject).
+    *   **Variants:** Simple (name, email, message), extended (+ phone, subject).
+    *   **Editable:** Section title, info text, visible fields.
+
+12. **Image Gallery:**
+    *   **Data:** `images: { url: string, alt: string }[]`.
+    *   **Variants:** Masonry, equal grid, carousel, lightbox.
+    *   **Editable:** Upload images, alt descriptions.
+
+13. **Map/Location Block:**
+    *   **Data:** `address: string`, `coordinates?: { lat: number, lng: number }`, `infoText: string`, `zoomLevel: number`.
+    *   **Variants:** Full-width map, split (map + info), compact embed.
+    *   **Editable:** Address/coordinates, info text, map zoom level.
 
 ### 5. Architectural and Performance Considerations
 *   **Routing and Data Loading:** The `demo-shop` will use React Router v7 loaders to fetch the necessary data for dynamic pages (e.g., getting a `productId` from the URL and fetching the product).

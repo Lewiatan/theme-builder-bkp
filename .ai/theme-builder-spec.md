@@ -501,15 +501,15 @@ export default function HomePage() {
 The following components cover all required page types (Home, Catalog, Product, Contact):
 
 ### 1. Heading
-- **Variants:** Text only, Text with background image
-- **Editable:** Heading text, heading level (H1/H2/H3), background image (for variant with image)
+- **Variants:** Text only, Text with background image, Text with backgrund color.
+- **Editable:** Heading text, heading level (H1/H2/H3), height, background image (for variant with image), background color (for variant with color).
 
 ### 2. Header/Navigation
-- **Variants:** Sticky/static, with mega menu, simple horizontal, with search bar
-- **Editable:** Logo, menu links, logo position (left/center)
+- **Variants:** Sticky/static, simple horizontal, slide-in left
+- **Editable:** Logo, logo position (left/center)
 
 ### 3. Footer
-- **Variants:** 2/3/4 columns, simple (1 column)
+- **Variants:** 1/2/3/4 columns
 - **Editable:** Sections (About, Contact, Social media), links, copyright text
 
 ### 4. Hero/Full-Width Banner
