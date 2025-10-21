@@ -53,6 +53,7 @@ Throughout the plan, ensure that you:
 - Adapt to the provided tech stack
 - Follow the provided implementation rules
 - Follow the Components Plan
+- The variants in implementation plan are exactly the same as the ones mentioned in the components plan.
 
 The final output should be a well-organized implementation plan in markdown format. Here's an example of what the output should look like:
 
