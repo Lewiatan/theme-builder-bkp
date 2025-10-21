@@ -98,14 +98,14 @@ The repository follows a monorepo pattern with three independent applications:
 
 Each application has its own dependencies managed separately. Docker Compose orchestrates all services with shared networking.
 
-**Monorepo Best Practices:**
+**Shared Component Library:**
 
-- Configure workspace-aware tooling to optimize build and test processes
-- Implement clear package boundaries with explicit dependencies between packages
-- Use consistent versioning strategy across all packages (independent or lockstep)
-- Configure CI/CD to build and test only affected packages for efficiency
-- Implement shared configurations for linting, testing, and development tooling
-- Use code generators to maintain consistency across similar packages or modules
+- **Location:** `/shared/components` directory at repository root
+- **Import Strategy:** TypeScript path aliases (`@shared/components`) configured in each frontend app
+- **Bundler Integration:** Vite (theme-builder) and React Router (demo-shop) use resolve aliases to map the TypeScript paths
+- **No Workspace Overhead:** Direct file imports without pnpm/npm workspace configuration
+- **Component Contract:** All shared components follow standardized structure with `.tsx`, `types.ts`, `meta.ts`, and `.module.css` files
+- **Type Safety:** Dual validation with TypeScript interfaces for static analysis and Zod schemas for runtime validation
 
 ### Clean Architecture Principles
 

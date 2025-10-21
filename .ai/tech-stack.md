@@ -1,5 +1,13 @@
 # Tech Stack Description
 
+## Project Structure
+
+### Monorepo Organization
+- **Monorepo without workspaces:** The project uses a simple monorepo structure with shared components
+- **Component Sharing:** TypeScript path aliases (`@shared/components`) + bundler resolve aliases
+- **No package manager workspaces:** Avoids pnpm/npm workspace overhead for this tightly-coupled monorepo
+- **Direct file imports:** Both frontends import shared components directly from `/shared/components`
+
 ## Frontend Applications
 
 ### Theme Builder Application

@@ -1,6 +1,6 @@
 <conversation_summary>
 <decisions>
-1.  **Component Sharing:** Components will be shared between the `theme-builder` and `demo-shop` applications via a common directory (`/shared/components`) within a `pnpm` workspace monopro structure.
+1.  **Component Sharing:** Components will be shared between the `theme-builder` and `demo-shop` applications via a common directory (`/shared/components`) using TypeScript path mapping and bundler aliases for clean imports.
 2.  **Styling:** Each component will be self-contained with its own co-located CSS module file. Global theme settings (colors, fonts) will be applied by the host applications using CSS Custom Properties.
 3.  **Data Flow Architecture:** The project will use the **Container/Presentational Pattern**.
     *   **Presentational Components:** Dumb, reusable UI components located in `/shared/components`.
@@ -14,7 +14,7 @@
 10. **Dynamic Pages:** The "Catalog" and "Product" pages are dynamic templates. Their primary data context (e.g., `categoryId`, `productId`) will be derived from the URL at runtime, not from static configuration.
 </decisions>
 <matched_recommendations>
-1.  **Monorepo with Workspaces:** The decision was made to set up a monorepo to treat `/shared/components` as a local package, enabling clean, aliased imports and simplified dependency management.
+1.  **TypeScript Path Mapping:** The decision was made to use TypeScript path aliases (`@shared/components`) combined with bundler-specific resolve aliases (Vite for `theme-builder`, React Router for `demo-shop`) to enable clean imports from the shared components directory without the overhead of package management.
 2.  **Container/Presentational Pattern:** This recommendation was adopted as the core architectural pattern to separate UI concerns from data-fetching logic, enabling parallel data loading and high reusability.
 3.  **Co-located Styles:** The recommendation to co-locate styles with component logic was approved to ensure components are self-contained and render consistently across applications.
 4.  **Entity-Specific Data Hooks:** The strategy to create reusable hooks like `useProducts` in the `demo-shop` was confirmed to encapsulate API logic and state management cleanly.
