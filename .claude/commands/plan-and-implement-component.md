@@ -1,5 +1,5 @@
 ---
-argument-hint: <component-name> <components-plan-file> <prd-file> <db-file> <tech-stack-file>
+argument-hint: <component-name>
 description: Plan and implement a frontend reusable component using specialized agents
 ---
 
@@ -12,26 +12,6 @@ First, review the provided inputs:
 $1
 </component_name>
 
-2. Components implementation plan:
-<components_implementation_plan>
-$2
-</components_implementation_plan>
-
-3. Product Requirements:
-<prd>
-$3
-</prd>
-
-4. Database Schema:
-<database_schema>
-$4
-</database_schema>
-
-5. Tech stack:
-<tech_stack>
-$5
-</tech_stack>
-
 Your task is to complete this workflow in two sequential phases:
 
 ## Phase 1: Planning (Software Architect Agent)
@@ -42,12 +22,8 @@ Use the Task tool with subagent_type="software-architect" to execute the plannin
 Create a detailed implementation plan for a frontend reusable component using the /component-plan command.
 
 Component name: $1
-Components plan: $2
-PRD: $3
-Database schema: $4
-Tech stack: $5
 
-Execute: /component-plan @($1) @($2) @($3) @($4) @($5)
+Execute: /component-plan @($1)
 
 Return the full file path of the saved implementation plan.
 ```

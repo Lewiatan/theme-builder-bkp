@@ -1,5 +1,5 @@
 ---
-argument-hint: <component-name> <components-plan-file> <prd-file> <db-file> <tech-stack-file>
+argument-hint: <component-name>
 description: Create a detailed implementation plan for a frontend reusable component (project)
 ---
 
@@ -14,22 +14,22 @@ $1
 
 2. Components implementation plan:
 <components_implementation_plan>
-$2
+@.ai/components-plan.md
 </components_implementation_plan>
 
 3. Product Requirements:
 <prd>
-$3
+@.ai/prd.md
 </prd>
 
 4. Database Schema:
 <database_schema>
-$4
+@.ai/db-plan.md
 </database_schema>
 
 5. Tech stack:
 <tech_stack>
-$5
+@.ai/tech-stack.md
 </tech_stack>
 
 Your task is to create a comprehensive implementation plan for the component. Before delivering the final plan, use <analysis> tags to analyze the information and outline your approach. In this analysis, ensure that:
@@ -46,12 +46,12 @@ Your task is to create a comprehensive implementation plan for the component. Be
 After conducting the analysis, create a detailed implementation plan in markdown format. The plan should contain the following sections:
 
 1. Component Overview
-2. Necessary data
+2. Necessary Data
 3. Rendering Details
 4. Data Flow
 5. Security Considerations
 6. Error Handling
-7. Performance
+7. Performance Considerations
 8. Implementation Steps
 
 Throughout the plan, ensure that you:
@@ -60,7 +60,12 @@ Throughout the plan, ensure that you:
 - Follow the Components Plan
 - The variants in implementation plan are exactly the same as the ones mentioned in the components plan.
 
-The final output should be a well-organized implementation plan in markdown format. Here's an example of what the output should look like:
+The final output should be a well-organized implementation plan in markdown format focused on implementation guidance. DO NOT include:
+- Code examples or snippets
+- Testing sections or test cases
+- Documentation sections
+
+Here's an example of what the output should look like:
 
 ```markdown
 # Component Implementation Plan: [Component Name]
@@ -97,6 +102,6 @@ The final output should be a well-organized implementation plan in markdown form
 ...
 ```
 
-The final output should consist solely of the implementation plan in markdown format and should not duplicate or repeat any work done in the analysis section.
+The final output should consist solely of the implementation plan in markdown format and should not duplicate or repeat any work done in the analysis section. Focus on clear implementation guidance without code examples.
 
 Remember to save your implementation plan as .ai/components/{component-name}-component-implementation-plan.md. Ensure the plan is detailed, clear, and provides comprehensive guidance for the development team.
