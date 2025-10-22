@@ -4,6 +4,13 @@
 
 The Demo Shop Home Page is the primary entry point for customers viewing a published e-commerce store. It fetches and renders saved page layout configuration from the backend API, applies global theme settings, and displays components dynamically using the shared component registry. The page is built using React Router 7 with server-side rendering capabilities and implements loader-based data fetching for optimal performance.
 
+**Styling Approach:**
+- All UI components and utilities use **Shadcn/ui** component library
+- Shadcn/ui provides unstyled, accessible components built on Radix UI primitives
+- Components are styled with Tailwind CSS utility classes
+- Shadcn/ui components are copied into the project (`app/components/ui/`) for full customization
+- The library provides consistent design tokens, accessibility patterns, and responsive behavior out of the box
+
 ## 2. View Routing
 
 **Primary Route:** `/shop/:shopId`
@@ -32,7 +39,7 @@ ShopHomeRoute (route component)
 - **Main elements:**
   - Root `<div>` container for the entire page
   - `DynamicComponentRenderer` component that receives layout data
-  - Loading indicator during data fetch
+  - Loading indicator during data fetch (use Shadcn/ui Skeleton components)
   - Error boundary fallback UI
 
 - **Handled events:**
@@ -81,14 +88,14 @@ ShopHomeRoute (route component)
 
 ### ErrorBoundary
 
-- **Component description:** Route-level error boundary that catches rendering errors, loader errors, and HTTP errors. Displays user-friendly error messages with appropriate status codes and allows recovery actions.
+- **Component description:** Route-level error boundary that catches rendering errors, loader errors, and HTTP errors. Displays user-friendly error messages with appropriate status codes and allows recovery actions. Uses Shadcn/ui Alert component for consistent error presentation.
 
 - **Main elements:**
-  - Error message container `<div>`
-  - Error title heading
-  - Error details paragraph
-  - Optional stack trace (development only)
-  - Link to return to a safe state
+  - Shadcn/ui `Alert` component for error message container
+  - `AlertTitle` for error heading
+  - `AlertDescription` for error details
+  - Optional stack trace in `Code` block (development only)
+  - Shadcn/ui `Button` component for recovery actions
 
 - **Handled events:**
   - None (displays error state)
@@ -318,8 +325,8 @@ The home page is primarily a read-only view with minimal direct user interaction
 
 **Error Recovery:**
 - If ErrorBoundary is displayed (due to 404 or 500 error), user can:
-  - See clear error message explaining what went wrong
-  - Click a "Return Home" link (if implemented) to navigate away
+  - See clear error message in Shadcn/ui Alert component explaining what went wrong
+  - Click a Shadcn/ui Button component to retry or navigate away
   - Use browser back button to return to previous page
 
 **Scrolling:**
@@ -467,33 +474,78 @@ The home page is primarily a read-only view with minimal direct user interaction
 - Stack traces are suppressed
 - Consider integrating error tracking service (e.g., Sentry) in future iterations
 
-## 11. Implementation Steps
+## 11. Shadcn/ui Integration
 
-1. **Configure Routes:**
+### Setup and Configuration
+
+The Demo Shop uses Shadcn/ui for UI components, which provides accessible, customizable components built on top of Radix UI primitives and styled with Tailwind CSS.
+
+**Installation:**
+Shadcn/ui components are added to the project using the CLI:
+```bash
+npx shadcn@latest init
+npx shadcn@latest add [component-name]
+```
+
+**Components Required for Home View:**
+- `alert` - For error messages in ErrorBoundary
+- `button` - For interactive actions (error recovery, navigation)
+- `skeleton` - For loading states during data fetch
+
+**Directory Structure:**
+- `app/components/ui/` - Contains all Shadcn/ui components
+- `app/lib/utils.ts` - Utility functions (cn for className merging)
+- `components.json` - Shadcn/ui configuration file
+
+**Tailwind Integration:**
+- Shadcn/ui extends Tailwind configuration with custom theme tokens
+- CSS variables defined in `app.css` for theming
+- Uses `tailwind-merge` and `clsx` for conditional className composition
+
+**Customization Strategy:**
+- All Shadcn/ui components can be customized directly in `app/components/ui/`
+- Theme colors from backend API should be mapped to CSS variables that Shadcn/ui components reference
+- Component variants can be extended or modified as needed
+
+**Accessibility:**
+- Shadcn/ui components are built with accessibility in mind (ARIA attributes, keyboard navigation)
+- All interactive elements have proper focus states
+- Error messages use semantic HTML and ARIA live regions
+
+## 12. Implementation Steps
+
+1. **Setup Shadcn/ui:**
+   - Run `npx shadcn@latest init` to initialize Shadcn/ui in the demo-shop project
+   - Add required components: `npx shadcn@latest add alert button skeleton`
+   - Verify `components.json` configuration is correct
+   - Check that `app/lib/utils.ts` contains the `cn` utility function
+   - Ensure Tailwind CSS is properly configured to work with Shadcn/ui
+
+2. **Configure Routes:**
    - Update `app/routes.ts` to add new route configuration for `/shop/:shopId`
    - Import and register the home route component
    - Verify route is accessible via React Router DevTools
 
-2. **Create Loader Function:**
+3. **Create Loader Function:**
    - Create `loader` function in route file `app/routes/shop.$shopId.tsx`
    - Implement UUID validation for `shopId` parameter
    - Add API call to `/api/public/shops/{shopId}/pages/home`
    - Handle response parsing and error cases
    - Return aggregated loader data with proper TypeScript types
 
-3. **Define TypeScript Types:**
+4. **Define TypeScript Types:**
    - Create `app/types/shop.ts` for shared types
    - Define `ShopHomeLoaderData`, `PageLayoutData`, `ComponentConfig`, `ThemeSettings` interfaces
    - Export types for use in route component and renderer
 
-4. **Implement Route Component:**
+5. **Implement Route Component:**
    - Create route component in `app/routes/shop.$shopId.tsx`
    - Use `useLoaderData<typeof loader>()` to access loader data
    - Implement theme application via CSS custom properties in `useEffect`
    - Pass data to `DynamicComponentRenderer`
-   - Add loading state UI for transitions
+   - Add Shadcn/ui Skeleton components for loading state UI during transitions
 
-5. **Build DynamicComponentRenderer:**
+6. **Build DynamicComponentRenderer:**
    - Create `app/components/DynamicComponentRenderer.tsx`
    - Build component registry mapping type strings to shared components
    - Implement component iteration logic with `.map()`
@@ -501,43 +553,48 @@ The home page is primarily a read-only view with minimal direct user interaction
    - Handle validation errors gracefully (skip or show placeholder)
    - Pass validated props to components with `isLoading: false` and `error: null`
 
-6. **Create Component Registry:**
+7. **Create Component Registry:**
    - Create `app/lib/component-registry.ts`
    - Import all shared components (HeaderNavigation, Heading, TextSection)
    - Export registry object with type-to-component mappings
    - Add TypeScript types for registry structure
 
-7. **Implement Error Boundary:**
+8. **Implement Error Boundary:**
    - Add `ErrorBoundary` export in route file
    - Use React Router's `Route.ErrorBoundaryProps` type
    - Handle `isRouteErrorResponse` for HTTP errors
-   - Display appropriate error messages for 400, 404, 500
-   - Add development-only stack trace display
-   - Include recovery action link
+   - Import and use Shadcn/ui components: `Alert`, `AlertTitle`, `AlertDescription`, `Button`
+   - Display appropriate error messages for 400, 404, 500 using Alert component with `variant="destructive"`
+   - Add development-only stack trace display in Code block
+   - Include recovery action Button with appropriate styling
 
-8. **Add API Configuration:**
+9. **Add API Configuration:**
    - Create `app/lib/api.ts` for API utilities
    - Export `API_URL` constant from `import.meta.env.VITE_API_URL`
    - Create helper function for constructing API URLs
    - Add UUID validation utility function
 
-9. **Apply Theme Settings:**
-   - In route component, extract theme settings from loader data
-   - Use `useEffect` to inject CSS custom properties on `:root`
-   - Map theme colors to CSS variables (`--color-primary`, `--color-secondary`, etc.)
-   - Map theme fonts to CSS variables (`--font-heading`, `--font-body`)
-   - Update global CSS to reference these variables
+10. **Apply Theme Settings:**
+    - In route component, extract theme settings from loader data
+    - Use `useEffect` to inject CSS custom properties on `:root`
+    - Map theme colors to CSS variables (`--color-primary`, `--color-secondary`, etc.)
+    - Map theme fonts to CSS variables (`--font-heading`, `--font-body`)
+    - Update global CSS to reference these variables
+    - Ensure Shadcn/ui components can reference these custom theme variables
 
-10. **Test Error Scenarios:**
+11. **Test Error Scenarios:**
     - Test with invalid `shopId` (not UUID) to verify 400 error
     - Test with non-existent `shopId` to verify 404 handling
     - Simulate network error to verify 500 error handling
     - Test with malformed API response to verify validation
-    - Verify ErrorBoundary displays correct messages for each scenario
+    - Verify ErrorBoundary displays correct Shadcn/ui Alert messages for each scenario
+    - Confirm Button recovery actions work as expected
 
-11. **Validate Component Rendering:**
+12. **Validate Component Rendering:**
     - Verify all shared components render correctly with sample data
     - Test different component variants (sticky header, image backgrounds, etc.)
     - Ensure theme settings are applied to all components
+    - Verify Shadcn/ui components (Skeleton, Alert, Button) display correctly
     - Test responsive behavior on mobile, tablet, desktop viewports
     - Validate image loading and fallback behavior
+    - Check accessibility with keyboard navigation and screen readers

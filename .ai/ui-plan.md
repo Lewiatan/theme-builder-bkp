@@ -18,7 +18,7 @@
 
 7. **Authentication & Session Management**: Implement axios interceptors to catch 401 responses. On token expiration: (1) Show modal warning "Your session will expire in 60 seconds", (2) Offer "Continue Working" button for re-login in modal, (3) On timeout/failed re-auth, save workspace state to localStorage with timestamp, then redirect to login with return URL. After successful login, offer to restore saved state.
 
-8. **Error Handling & User Feedback**: Use Shadcn Sonner for toast notifications positioned at top-right. Distinct styles: success (green, auto-dismiss 3s), error (red, manual dismiss with API error message), loading (blue during save operations). Show progress bar for image uploads in component settings modal. Create custom `useApiRequest` hook for consistent error handling.
+8. **Error Handling & User Feedback**: Use **Shadcn/ui Sonner** component for toast notifications positioned at top-right. Distinct styles: success (green, auto-dismiss 3s), error (red, manual dismiss with API error message), loading (blue during save operations). Show progress bar for image uploads in component settings modal using Shadcn/ui Progress component. Create custom `useApiRequest` hook for consistent error handling. Use Shadcn/ui Alert component for inline error messages and AlertDialog for confirmation prompts.
 
 9. **Shared Component Library**: Create `/shared/components` directory in monorepo containing all 13 components. Each component accepts `settings` prop (matching API component settings structure) and `themeSettings` prop for global theme. Use Tailwind CSS with CSS custom properties for theme colors/fonts. Export `ComponentRegistry` mapping component types to React components. Both Theme Builder and Demo Shop import from shared source.
 
@@ -47,6 +47,33 @@
 20. **Error Boundary Strategy**: Wrap each rendered component in canvas with individual `ComponentErrorBoundary` that catches rendering errors. On error, display fallback UI showing component type, error icon, and "Failed to render - Edit Settings" button. Log error details to console. Wrap entire workspace in top-level `WorkspaceErrorBoundary` for critical failures showing "Something went wrong" screen with "Reload Workspace" button. For API errors during save operations, show error toasts (Sonner) but keep workspace functional.
 
 ## Matched Recommendations
+
+### UI Component Library
+
+1. **Shadcn/ui Integration**
+   - Primary UI component library for both Theme Builder and Demo Shop
+   - Built on Radix UI primitives with Tailwind CSS styling
+   - Components copied into project for full customization
+   - Comprehensive component set: Button, Dialog, Sheet, Alert, Form, Input, Select, etc.
+   - Built-in accessibility features (ARIA, keyboard navigation, focus management)
+   - Type-safe with TypeScript
+   - Seamless integration with React Hook Form
+
+2. **Theme Builder Specific Components**
+   - Sheet for component settings slide-in panel
+   - AlertDialog for confirmations (delete, reset)
+   - Sonner for toast notifications
+   - Progress for image upload indicators
+   - Accordion for component library sections
+   - Card and Badge for component library items
+   - Skeleton for loading states
+
+3. **Demo Shop Specific Components**
+   - Alert for error boundaries and page errors
+   - Skeleton for loading states during data fetch
+   - Button for navigation and CTAs
+   - Card for product displays
+   - Form components for contact/newsletter
 
 ### Layout & Structure
 
@@ -150,10 +177,12 @@
     - Separate save action for persistence
 
 14. **Error Handling**
-    - Shadcn Sonner for toast notifications
+    - Shadcn/ui Sonner component for toast notifications
+    - Shadcn/ui Alert for inline error messages
+    - Shadcn/ui AlertDialog for confirmation prompts
     - Per-component error boundaries with fallback UI
     - Top-level workspace error boundary
-    - Inline error messages for uploads
+    - Shadcn/ui Progress component for upload progress
 
 15. **Responsive Design**
     - Fluid canvas adapting to viewport
@@ -176,6 +205,302 @@ The UI architecture emphasizes:
 - **Separation of Concerns**: Independent save mechanisms for pages vs. theme
 - **Visual Consistency**: Shared component library between applications
 - **User Protection**: Comprehensive unsaved changes tracking and warnings
+
+**UI Component Library:**
+- **Shadcn/ui** is used for all UI components in both Theme Builder and Demo Shop
+- Provides accessible, customizable components built on Radix UI primitives
+- Components are styled with Tailwind CSS utility classes
+- Components are copied into the project for full control and customization
+- Ensures consistent design patterns, accessibility, and responsive behavior across applications
+
+### Shadcn/ui Integration
+
+#### Overview
+
+Both frontend applications (Theme Builder and Demo Shop) use **Shadcn/ui** as the primary UI component library for all interface elements, form controls, modals, and feedback components.
+
+**Key Benefits:**
+- Built on **Radix UI** primitives for robust accessibility (ARIA attributes, keyboard navigation, focus management)
+- Styled with **Tailwind CSS** for consistency with custom components
+- Components are **copied into the project** (`components/ui/`) rather than installed as dependencies
+- Full control over component customization and styling
+- Type-safe with TypeScript
+- Works seamlessly with React 19 and React Router 7
+
+#### Setup and Installation
+
+**Initial Setup:**
+```bash
+# In theme-builder directory
+cd theme-builder
+npx shadcn@latest init
+
+# In demo-shop directory
+cd demo-shop
+npx shadcn@latest init
+```
+
+**Configuration:**
+- Creates `components.json` configuration file
+- Sets up `lib/utils.ts` with `cn()` utility for className merging
+- Extends Tailwind configuration with design tokens
+- Configures path aliases for component imports
+
+#### Required Components by Application
+
+**Theme Builder Components:**
+- `button` - Action buttons throughout UI (Save, Reset, Apply, Cancel)
+- `dialog` - Confirmation dialogs, unsaved changes warnings
+- `alert-dialog` - Destructive action confirmations (delete component, reset page)
+- `dropdown-menu` - Page selection, user menu, component actions
+- `toast` (Sonner) - Success/error/loading notifications
+- `alert` - Inline error/warning messages
+- `progress` - Image upload progress bars
+- `sheet` - Component settings slide-in panel
+- `accordion` - Component library sidebar sections
+- `form` - Component settings forms with React Hook Form integration
+- `input` - Text inputs in forms
+- `textarea` - Multi-line text inputs
+- `select` - Dropdowns (variant selector, font picker)
+- `label` - Form field labels
+- `card` - Component cards in sidebar
+- `badge` - Variant count badges, status indicators
+- `separator` - Visual dividers in UI
+- `scroll-area` - Scrollable component library and settings panels
+- `skeleton` - Loading states during data fetch
+
+**Demo Shop Components:**
+- `button` - Navigation, CTAs in components
+- `alert` - Error states (shop not found, page load errors)
+- `skeleton` - Loading states during page/product fetch
+- `card` - Product cards in grid/list views
+- `badge` - Product categories, sale badges
+- `separator` - Section dividers
+- `form` - Contact form, newsletter signup
+- `input` - Form inputs in contact/newsletter components
+- `textarea` - Message field in contact form
+
+#### Component Customization Strategy
+
+**Theme Integration:**
+All Shadcn/ui components reference CSS custom properties for colors, allowing them to adapt to user-defined theme settings:
+
+```css
+/* Generated in <style> tag based on ThemeContext */
+:root {
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  /* ... other theme colors */
+}
+
+/* Shadcn/ui components use these variables */
+.btn-primary {
+  background-color: var(--color-primary);
+}
+```
+
+**Variant Extensions:**
+Components can be extended with custom variants in `components/ui/` directory:
+
+```typescript
+// components/ui/button.tsx
+const buttonVariants = cva(
+  "base-styles...",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground",
+        destructive: "bg-destructive text-destructive-foreground",
+        // Custom variant for theme preview actions
+        theme: "bg-[var(--color-primary)] text-white",
+      },
+    },
+  }
+);
+```
+
+#### Directory Structure
+
+**Theme Builder:**
+```
+theme-builder/
+├── components/
+│   └── ui/              # Shadcn/ui components
+│       ├── button.tsx
+│       ├── dialog.tsx
+│       ├── sheet.tsx
+│       └── ... (other components)
+├── lib/
+│   └── utils.ts         # cn() utility function
+└── components.json      # Shadcn/ui configuration
+```
+
+**Demo Shop:**
+```
+demo-shop/
+├── app/
+│   ├── components/
+│   │   └── ui/          # Shadcn/ui components
+│   │       ├── alert.tsx
+│   │       ├── button.tsx
+│   │       ├── skeleton.tsx
+│   │       └── ... (other components)
+│   └── lib/
+│       └── utils.ts     # cn() utility function
+└── components.json      # Shadcn/ui configuration
+```
+
+#### Usage Patterns
+
+**Toast Notifications (Sonner):**
+```typescript
+import { toast } from "sonner";
+
+// Success
+toast.success("Page saved successfully");
+
+// Error with description
+toast.error("Failed to save page", {
+  description: "Network connection lost. Please try again.",
+});
+
+// Loading
+const toastId = toast.loading("Saving page...");
+// Later: toast.dismiss(toastId);
+```
+
+**Confirmation Dialogs:**
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Delete Component</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone. This will permanently delete this component from your page.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+**Component Settings Sheet:**
+```tsx
+<Sheet open={isOpen} onOpenChange={setIsOpen}>
+  <SheetContent side="right" className="w-[600px]">
+    <SheetHeader>
+      <SheetTitle>Component Settings</SheetTitle>
+    </SheetHeader>
+    {/* Form content */}
+    <SheetFooter>
+      <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+      <Button onClick={handleApply}>Apply</Button>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>
+```
+
+**Form Integration with React Hook Form:**
+```tsx
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+<Form {...form}>
+  <form onSubmit={form.handleSubmit(onSubmit)}>
+    <FormField
+      control={form.control}
+      name="heading"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Heading</FormLabel>
+          <FormControl>
+            <Input placeholder="Enter heading" {...field} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  </form>
+</Form>
+```
+
+#### Accessibility Features
+
+Shadcn/ui components come with built-in accessibility:
+- **Keyboard Navigation:** Full keyboard support (Tab, Enter, Esc, Arrow keys)
+- **Screen Reader Support:** Proper ARIA labels, roles, and live regions
+- **Focus Management:** Focus trapping in modals, focus restoration on close
+- **Color Contrast:** Default variants meet WCAG AA standards
+- **Semantic HTML:** Proper use of button, dialog, nav, etc. elements
+
+#### Tailwind CSS Integration
+
+**Configuration:**
+Shadcn/ui extends Tailwind with custom theme tokens in `tailwind.config.js`:
+
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        // ... other semantic colors
+      },
+    },
+  },
+};
+```
+
+**CSS Variables:**
+Defined in `app.css` or `globals.css`:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    /* ... other variables */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    /* ... dark mode variables (future enhancement) */
+  }
+}
+```
+
+#### Performance Considerations
+
+- **Tree Shaking:** Only components actually used are included in bundle
+- **Code Splitting:** Components can be lazy-loaded if needed
+- **No Runtime Dependencies:** Radix UI has minimal runtime overhead
+- **Optimized Tailwind:** PurgeCSS removes unused classes in production
+
+#### Testing Strategy
+
+**Component Testing:**
+- Shadcn/ui components are pre-tested by the library
+- Focus testing on custom business logic and integrations
+- Test form validations and user interactions
+- Verify accessibility with testing-library/react and jest-axe
 
 ### Main UI Architecture Requirements
 
@@ -565,7 +890,7 @@ Components use Tailwind classes with CSS variables:
 
 ### Error Handling & User Feedback
 
-#### Toast Notifications (Shadcn Sonner)
+#### Toast Notifications (Shadcn/ui Sonner)
 
 **Success Messages:**
 - "Page saved successfully" (auto-dismiss 3s)
@@ -734,15 +1059,20 @@ Items explicitly excluded from MVP but should be architecturally accommodated:
 
 ## Next Steps
 
-1. **Component Specification:** Create detailed specs for all 13 components
-2. **Default Layouts Definition:** Define exact component composition for 4 default pages
-3. **Environment Setup:** Configure environment variables for development
-4. **Seed Data Preparation:** Prepare demo products and categories for database seeding
-5. **Shared Component Library Setup:** Create `/shared/components` directory structure
-6. **Context Providers Implementation:** Build state management foundation
-7. **Theme Builder Layout:** Implement three-panel workspace layout
-8. **Demo Shop Routing:** Set up React Router 7 structure
-9. **API Integration Hooks:** Create custom hooks for API operations
-10. **Component Registry:** Define all component metadata and schemas
+1. **Shadcn/ui Setup:** Initialize Shadcn/ui in both theme-builder and demo-shop applications
+   - Run `npx shadcn@latest init` in each project
+   - Install required components for Theme Builder (button, dialog, sheet, alert, form, etc.)
+   - Install required components for Demo Shop (alert, button, skeleton, card, etc.)
+   - Verify `components.json` configuration and path aliases
+2. **Component Specification:** Create detailed specs for all 13 components
+3. **Default Layouts Definition:** Define exact component composition for 4 default pages
+4. **Environment Setup:** Configure environment variables for development
+5. **Seed Data Preparation:** Prepare demo products and categories for database seeding
+6. **Shared Component Library Setup:** Create `/shared/components` directory structure
+7. **Context Providers Implementation:** Build state management foundation
+8. **Theme Builder Layout:** Implement three-panel workspace layout using Shadcn/ui components
+9. **Demo Shop Routing:** Set up React Router 7 structure with error boundaries using Shadcn/ui Alert
+10. **API Integration Hooks:** Create custom hooks for API operations with Shadcn/ui toast integration
+11. **Component Registry:** Define all component metadata and schemas
 
 This UI architecture plan provides a comprehensive foundation for implementing the E-commerce Theme Builder MVP while maintaining flexibility for future enhancements.
