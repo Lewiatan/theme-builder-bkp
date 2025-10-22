@@ -5,6 +5,7 @@
  * and its associated types, schema, and metadata.
  */
 
+export { default } from './Heading';
 export { default as Heading } from './Heading';
 export type { HeadingProps } from './types';
 export { HeadingPropsSchema } from './types';

@@ -1,3 +1,6 @@
+import type { ComponentMeta } from '../../types/component-meta';
+import type { TextSectionProps } from './types';
+
 /**
  * Metadata configuration for the TextSection component
  *
@@ -5,10 +8,9 @@
  * a user-friendly interface for configuring the TextSection component.
  */
 
-export const meta = {
+export const meta: ComponentMeta<Omit<TextSectionProps, 'isLoading' | 'error'>> = {
   displayName: 'Text Section',
   description: 'Multi-column text layout with optional icons or images',
-  category: 'Content',
 
   /**
    * Fields that can be edited in the Theme Builder

@@ -17,5 +17,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["components/**/*", "global.d.ts"]
+  "include": ["components/**/*", "types/**/*", "global.d.ts"]
 }

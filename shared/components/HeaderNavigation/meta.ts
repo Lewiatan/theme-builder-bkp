@@ -1,11 +1,13 @@
+import type { ComponentMeta } from '../../types/component-meta';
+import type { HeaderNavigationProps } from './types';
+
 /**
  * Metadata for the HeaderNavigation component
  * Used by the theme editor for component configuration UI
  */
-export const meta = {
+export const meta: ComponentMeta<Omit<HeaderNavigationProps, 'isLoading' | 'error'>> = {
   displayName: 'Header/Navigation',
   description: 'Main navigation header with configurable logo and variants',
-  category: 'Navigation',
   editableFields: [
     {
       name: 'logoUrl',
@@ -44,4 +46,11 @@ export const meta = {
     },
   ],
   defaultVariant: 'static',
-};
+  defaultConfig: {
+    logoUrl: 'https://via.placeholder.com/150x50',
+    logoPosition: 'left',
+    variant: 'static',
+  },
+} as const;
+
+export type HeaderNavigationMeta = typeof meta;

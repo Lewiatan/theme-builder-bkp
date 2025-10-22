@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { HeaderNavigationProps, HeaderNavigationPropsSchema, NavigationLink } from './types';
 import styles from './HeaderNavigation.module.css';
 
@@ -33,17 +33,19 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   const [logoError, setLogoError] = useState(false);
 
   // Validate props with Zod schema
-  useEffect(() => {
-    const validation = HeaderNavigationPropsSchema.safeParse({
-      logoUrl,
-      logoPosition,
-      variant,
-      isLoading,
-      error,
-    });
-
-    if (!validation.success) {
-      console.error('HeaderNavigation: Invalid props', validation.error.format());
+  const validationResult = useMemo(() => {
+    try {
+      HeaderNavigationPropsSchema.parse({
+        logoUrl,
+        logoPosition,
+        variant,
+        isLoading,
+        error,
+      });
+      return { success: true, error: null };
+    } catch (err) {
+      console.error('HeaderNavigation component validation error:', err);
+      return { success: false, error: err };
     }
   }, [logoUrl, logoPosition, variant, isLoading, error]);
 
@@ -93,6 +95,11 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
     setIsDrawerOpen(false);
     setIsMobileMenuOpen(false);
   }, []);
+
+  // Warn if validation failed but continue with rendering
+  if (!validationResult.success) {
+    console.warn('HeaderNavigation component rendering with validation errors');
+  }
 
   // Loading state
   if (isLoading) {

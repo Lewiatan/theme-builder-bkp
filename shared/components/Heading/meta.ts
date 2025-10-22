@@ -1,3 +1,6 @@
+import type { ComponentMeta } from '../../types/component-meta';
+import type { HeadingProps } from './types';
+
 /**
  * Metadata configuration for the Heading component
  *
@@ -5,10 +8,9 @@
  * a user-friendly interface for configuring the Heading component.
  */
 
-export const meta = {
+export const meta: ComponentMeta<Omit<HeadingProps, 'isLoading' | 'error'>> = {
   displayName: 'Heading',
   description: 'Semantic heading with optional background image or color',
-  category: 'Content',
 
   /**
    * Fields that can be edited in the Theme Builder
@@ -110,6 +112,15 @@ export const meta = {
    * Default variant when component is added to the page
    */
   defaultVariant: 'text-only',
+
+  /**
+   * Default configuration for new instances
+   */
+  defaultConfig: {
+    text: 'Heading Text',
+    level: 'h2',
+    variant: 'text-only',
+  },
 } as const;
 
 export type HeadingMeta = typeof meta;
