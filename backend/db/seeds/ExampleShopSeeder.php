@@ -57,11 +57,13 @@ class ExampleShopSeeder extends AbstractSeed
 
         // Define the HeaderNavigation component configuration
         $headerComponent = [
+            'id' => Uuid::v4()->toRfc4122(),
             'type' => 'HeaderNavigation',
             'variant' => 'static',
             'props' => [
                 'logoUrl' => 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200',
                 'logoPosition' => 'center',
+                'variant' => 'static',
             ],
         ];
 
@@ -69,6 +71,7 @@ class ExampleShopSeeder extends AbstractSeed
         $pageConfigurations = [
             'home' => [
                 'heading1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'background-image',
                     'props' => [
@@ -81,6 +84,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -94,6 +98,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'text-only',
                     'props' => [
@@ -103,6 +108,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'with-icons',
                     'props' => [
@@ -127,6 +133,7 @@ class ExampleShopSeeder extends AbstractSeed
             ],
             'catalog' => [
                 'heading1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'background-color',
                     'props' => [
@@ -139,6 +146,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -152,6 +160,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'background-color',
                     'props' => [
@@ -164,6 +173,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'with-images',
                     'props' => [
@@ -184,6 +194,7 @@ class ExampleShopSeeder extends AbstractSeed
             ],
             'product' => [
                 'heading1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'text-only',
                     'props' => [
@@ -193,6 +204,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -206,6 +218,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'background-image',
                     'props' => [
@@ -218,6 +231,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -242,6 +256,7 @@ class ExampleShopSeeder extends AbstractSeed
             ],
             'contact' => [
                 'heading1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'background-image',
                     'props' => [
@@ -254,6 +269,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -267,6 +283,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'Heading',
                     'variant' => 'background-color',
                     'props' => [
@@ -279,6 +296,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
+                    'id' => Uuid::v4()->toRfc4122(),
                     'type' => 'TextSection',
                     'variant' => 'with-icons',
                     'props' => [
