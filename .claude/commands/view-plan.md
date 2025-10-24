@@ -1,3 +1,8 @@
+---
+description: "Create a detailed implementation plan for a frontend reusable component (project)"
+argument-hint: "<view-description> <user-stories> <endpoint-description> <endpoint-implementation>"
+---
+
 # View Implementation Plan Generator
 
 As a senior frontend developer, your task is to create a detailed implementation plan for a new view in a web application. This plan should be comprehensive and clear enough for another frontend developer to implement the view correctly and efficiently.
