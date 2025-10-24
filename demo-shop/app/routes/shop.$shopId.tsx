@@ -1,79 +1,70 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useEffect } from "react";
+import { useLoaderData, isRouteErrorResponse } from "react-router";
+import type { Route } from "./+types/shop.$shopId";
 import { buildApiUrl } from "~/lib/api";
 import { isValidUuid } from "~/lib/validation";
-import type { ShopHomeLoaderData, PageLayoutData } from "~/types/shop";
+import type { ShopPageLoaderData, PageLayoutData } from "~/types/shop";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { Skeleton } from "~/components/ui/skeleton";
 import DynamicComponentRenderer from "~/components/DynamicComponentRenderer";
+
+/**
+ * Loader function that fetches shop page data from the API
+ * Validates shopId parameter and handles errors
+ */
+export async function loader({ params }: Route.LoaderArgs) {
+  const { shopId } = params;
+
+  // Validate shopId format
+  if (!shopId || !isValidUuid(shopId)) {
+    throw new Response("Invalid shop ID format", { status: 400 });
+  }
+
+  try {
+    // Fetch page data from API
+    const response = await fetch(
+      buildApiUrl(`/api/public/shops/${shopId}/pages/home`)
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Response("Shop not found", { status: 404 });
+      }
+      throw new Response("Failed to load shop data", { status: 500 });
+    }
+
+    const pageData: PageLayoutData = await response.json();
+
+    // Return aggregated loader data
+    const loaderData: ShopPageLoaderData = {
+      shopId,
+      page: pageData,
+      theme: {}, // TODO: Fetch theme settings in future iteration
+    };
+
+    return loaderData;
+  } catch (error) {
+    // Handle network errors
+    if (error instanceof Response) {
+      throw error;
+    }
+    console.error("Error loading shop data:", error);
+    throw new Response("Failed to load shop data", { status: 500 });
+  }
+}
 
 /**
  * Shop Home Route Component
  * Displays the shop's home page with dynamic components
- * Uses client-side data fetching (SPA mode)
+ * Uses server-side rendering with loader function
  */
 export default function ShopHomeRoute() {
-  const { shopId } = useParams();
-  const [data, setData] = useState<ShopHomeLoaderData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ status: number; message: string } | null>(null);
-
-  // Fetch shop data on mount or when shopId changes
-  useEffect(() => {
-    async function fetchShopData() {
-      // Validate shopId format
-      if (!shopId || !isValidUuid(shopId)) {
-        setError({ status: 400, message: "Invalid shop ID format" });
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch page data from API
-        const response = await fetch(
-          buildApiUrl(`/api/public/shops/${shopId}/pages/home`)
-        );
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            setError({ status: 404, message: "Shop not found" });
-          } else {
-            setError({ status: 500, message: "Failed to load shop data" });
-          }
-          setLoading(false);
-          return;
-        }
-
-        const pageData: PageLayoutData = await response.json();
-
-        // Set aggregated data
-        setData({
-          shopId,
-          page: pageData,
-          theme: {}, // TODO: Fetch theme settings in future iteration
-        });
-        setLoading(false);
-      } catch (err) {
-        console.error("Error loading shop data:", err);
-        setError({ status: 500, message: "Failed to load shop data" });
-        setLoading(false);
-      }
-    }
-
-    fetchShopData();
-  }, [shopId]);
+  const data = useLoaderData<typeof loader>();
 
   // Apply theme settings via CSS custom properties
   useEffect(() => {
-    if (!data?.theme) return;
-
-    const root = document.documentElement;
-
     if (data.theme.colors) {
+      const root = document.documentElement;
       if (data.theme.colors.primary) {
         root.style.setProperty('--color-primary', data.theme.colors.primary);
       }
@@ -89,6 +80,7 @@ export default function ShopHomeRoute() {
     }
 
     if (data.theme.fonts) {
+      const root = document.documentElement;
       if (data.theme.fonts.heading) {
         root.style.setProperty('--font-heading', data.theme.fonts.heading);
       }
@@ -96,23 +88,22 @@ export default function ShopHomeRoute() {
         root.style.setProperty('--font-body', data.theme.fonts.body);
       }
     }
-  }, [data?.theme]);
+  }, [data.theme]);
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen p-8">
-        <div className="space-y-4">
-          <Skeleton className="h-20 w-full" />
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-32 w-full" />
-        </div>
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen">
+      <DynamicComponentRenderer layout={data.page} themeSettings={data.theme} />
+    </div>
+  );
+}
 
-  // Error state
-  if (error) {
+/**
+ * Error Boundary Component
+ * Displays user-friendly error messages for different error scenarios
+ */
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  // Handle React Router HTTP errors
+  if (isRouteErrorResponse(error)) {
     let title = "Error";
     let description = "An unexpected error occurred";
 
@@ -141,6 +132,13 @@ export default function ShopHomeRoute() {
             <AlertDescription className="mb-4">
               {description}
             </AlertDescription>
+            {process.env.NODE_ENV === 'development' && (
+              <pre className="mt-4 p-4 bg-gray-100 rounded text-xs overflow-auto">
+                Status: {error.status}
+                {"\n"}
+                {error.data}
+              </pre>
+            )}
           </Alert>
           <div className="mt-4 flex gap-2">
             <Button
@@ -162,13 +160,51 @@ export default function ShopHomeRoute() {
     );
   }
 
-  // Success state - render components
-  if (!data) return null;
-
+  // Handle unexpected React rendering errors
   return (
-    <div className="min-h-screen">
-      <DynamicComponentRenderer layout={data.page} themeSettings={data.theme} />
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <Alert variant="destructive">
+          <AlertTitle className="text-lg font-semibold mb-2">
+            Unexpected Error
+          </AlertTitle>
+          <AlertDescription className="mb-4">
+            Something went wrong while rendering this page. Please try refreshing.
+          </AlertDescription>
+          {process.env.NODE_ENV === 'development' && error instanceof Error && (
+            <pre className="mt-4 p-4 bg-gray-100 rounded text-xs overflow-auto">
+              {error.message}
+              {"\n\n"}
+              {error.stack}
+            </pre>
+          )}
+        </Alert>
+        <div className="mt-4">
+          <Button
+            onClick={() => window.location.reload()}
+            className="w-full"
+          >
+            Refresh Page
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
 
+/**
+ * Meta function for SEO
+ */
+export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      { title: "Shop Not Found" },
+      { name: "description", content: "The requested shop could not be found." },
+    ];
+  }
+
+  return [
+    { title: `Shop ${data.shopId}` },
+    { name: "description", content: `Welcome to our online shop` },
+  ];
+}
