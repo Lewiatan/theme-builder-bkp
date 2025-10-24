@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
-import { HeadingProps, HeadingPropsSchema } from './types';
+import type { HeadingProps } from './types';
+import { HeadingPropsSchema } from './types';
 import styles from './Heading.module.css';
 
 /**

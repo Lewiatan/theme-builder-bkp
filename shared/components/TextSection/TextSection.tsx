@@ -1,5 +1,6 @@
 import React, { useState, useMemo, memo } from 'react';
-import { TextSectionProps, TextSectionColumn, TextSectionPropsSchema } from './types';
+import type { TextSectionProps, TextSectionColumn } from './types';
+import { TextSectionPropsSchema } from './types';
 import styles from './TextSection.module.css';
 
 /**

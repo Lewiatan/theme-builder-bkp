@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
-import { HeaderNavigationProps, HeaderNavigationPropsSchema, NavigationLink } from './types';
+import type { HeaderNavigationProps, NavigationLink } from './types';
+import { HeaderNavigationPropsSchema } from './types';
 import styles from './HeaderNavigation.module.css';
 
 /**

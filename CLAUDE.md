@@ -116,22 +116,6 @@ Each application has its own dependencies managed separately. Docker Compose orc
 - Create use cases that orchestrate entity interactions for specific business operations
 - Implement mappers to transform data between layers to maintain separation of concerns
 
-### Frontend Architecture
-
-**Theme Builder:**
-
-- Vanilla React 19 with Vite for HMR
-- No routing library (simple SPA)
-- Expected to have drag-and-drop functionality (dnd kit mentioned in main README)
-- Component-based architecture for 13 predefined components
-
-**Demo Shop:**
-
-- React Router 7 with SSR capabilities
-- Tailwind CSS 4 for styling
-- Uses React Router's file-based routing (`app/routes/`)
-- Designed to render saved themes with mock product data
-
 ### Data Flow
 
 The original architecture planned:
@@ -161,60 +145,7 @@ The original architecture planned:
 - Use the --fix flag in CI/CD pipelines to automatically correct fixable issues
 - Implement staged linting with husky and lint-staged to prevent committing non-compliant code
 
-### Frontend Standards
-
-#### React
-
-- Use functional components with hooks instead of class components
-- Implement React.memo() for expensive components that render often with the same props
-- Utilize React.lazy() and Suspense for code-splitting and performance optimization
-- Use the useCallback hook for event handlers passed to child components to prevent unnecessary re-renders
-- Prefer useMemo for expensive calculations to avoid recomputation on every render
-- Implement useId() for generating unique IDs for accessibility attributes
-- Use the new use hook for data fetching in React 19+ projects
-- Consider using the new useOptimistic hook for optimistic UI updates in forms
-- Use useTransition for non-urgent state updates to keep the UI responsive
-
-#### React Router
-
-- Use createBrowserRouter instead of BrowserRouter for better data loading and error handling
-- Implement lazy loading with React.lazy() for route components to improve initial load time
-- Use the useNavigate hook instead of the navigate component prop for programmatic navigation
-- Leverage loader and action functions to handle data fetching and mutations at the route level
-- Implement error boundaries with errorElement to gracefully handle routing and data errors
-- Use relative paths with dot notation (e.g., "../parent") to maintain route hierarchy flexibility
-- Utilize the useRouteLoaderData hook to access data from parent routes
-- Implement fetchers for non-navigation data mutations
-- Use route.lazy() for route-level code splitting with automatic loading states
-- Implement shouldRevalidate functions to control when data revalidation happens after navigation
-
-#### Tailwind CSS
-
-- Use the @layer directive to organize styles into components, utilities, and base layers
-- Implement Just-in-Time (JIT) mode for development efficiency and smaller CSS bundles
-- Use arbitrary values with square brackets (e.g., w-[123px]) for precise one-off designs
-- Leverage the @apply directive in component classes to reuse utility combinations
-- Implement the Tailwind configuration file for customizing theme, plugins, and variants
-- Use component extraction for repeated UI patterns instead of copying utility classes
-- Leverage the theme() function in CSS for accessing Tailwind theme values
-- Implement dark mode with the dark: variant
-- Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
-- Leverage state variants (hover:, focus:, active:, etc.) for interactive elements
-
 ### Testing Standards
-
-#### Vitest (Unit Testing)
-
-- Leverage the `vi` object for test doubles - Use `vi.fn()` for function mocks, `vi.spyOn()` to monitor existing functions, and `vi.stubGlobal()` for global mocks
-- Master `vi.mock()` factory patterns - Place mock factory functions at the top level of your test file
-- Create setup files for reusable configuration - Define global mocks, custom matchers, and environment setup in dedicated files referenced in your `vitest.config.ts`
-- Use inline snapshots for readable assertions with `expect(value).toMatchInlineSnapshot()`
-- Monitor coverage with purpose and only when asked - Configure coverage thresholds in `vitest.config.ts`
-- Make watch mode part of your workflow - Run `vitest --watch` during development
-- Explore UI mode for complex test suites - Use `vitest --ui` to visually navigate large test suites
-- Configure jsdom for DOM testing - Set `environment: 'jsdom'` for frontend component tests
-- Structure tests for maintainability - Group related tests with descriptive `describe` blocks
-- Leverage TypeScript type checking in tests - Enable strict typing, use `expectTypeOf()` for type-level assertions
 
 #### Playwright (E2E Testing)
 
@@ -297,4 +228,5 @@ The original architecture planned:
 4. **Backend Entrypoint**: The entrypoint.sh automatically runs `composer install` on container start
 5. **Docker Files Organization**: Docker-related files are in `backend/docker/` directory (nginx.conf, entrypoint.sh)
 
-- Use "docker compose" instead of "docker compose"
+- Use "docker-compose" instead of "docker compose"
+- Run all project commands like `comoposer`, `npm` via container
