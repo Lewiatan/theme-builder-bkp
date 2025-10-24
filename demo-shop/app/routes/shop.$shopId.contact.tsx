@@ -1,38 +1,37 @@
+
 import { useEffect } from "react";
 import { useLoaderData, isRouteErrorResponse } from "react-router";
-import type { Route } from "./+types/shop.$shopId";
-import { buildApiUrl } from "~/lib/api";
-import { isValidUuid } from "~/lib/validation";
-import type { ShopPageLoaderData, PageLayoutData } from "~/types/shop";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { Button } from "~/components/ui/button";
-import DynamicComponentRenderer from "~/components/DynamicComponentRenderer";
+import type * as Route from "@react-router/dev/routes";
+import { buildApiUrl } from "../lib/api";
+import { isValidUuid } from "../lib/validation";
+import type { ShopPageLoaderData, PageLayoutData } from "../types/shop";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
+import { Button } from "../components/ui/button";
+import DynamicComponentRenderer from "../components/DynamicComponentRenderer";
 
-/**
- * Loader function that fetches shop page data from the API
- * Validates shopId parameter and handles errors
- */
 export async function loader({ params }: Route.LoaderArgs) {
   const { shopId } = params;
 
-  // Validate shopId format
+  // Validate shopId format before making API call
   if (!shopId || !isValidUuid(shopId)) {
     throw new Response("Invalid shop ID format", { status: 400 });
   }
 
   try {
-    // Fetch page data from API
+    // Fetch contact page data from public API
     const response = await fetch(
-      buildApiUrl(`/api/public/shops/${shopId}/pages/home`)
+      buildApiUrl(`/api/public/shops/${shopId}/pages/contact`)
     );
 
+    // Handle non-success responses
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Response("Shop not found", { status: 404 });
+        throw new Response("Contact page not found", { status: 404 });
       }
-      throw new Response("Failed to load shop data", { status: 500 });
+      throw new Response("Failed to load contact page data", { status: 500 });
     }
 
+    // Parse JSON response
     const pageData: PageLayoutData = await response.json();
 
     // Return aggregated loader data
@@ -44,21 +43,29 @@ export async function loader({ params }: Route.LoaderArgs) {
 
     return loaderData;
   } catch (error) {
-    // Handle network errors
+    // Handle network errors and re-throw Response errors
     if (error instanceof Response) {
       throw error;
     }
-    console.error("Error loading shop data:", error);
-    throw new Response("Failed to load shop data", { status: 500 });
+    console.error("Error loading contact page data:", error);
+    throw new Response("Failed to load contact page data", { status: 500 });
   }
 }
 
-/**
- * Shop Home Route Component
- * Displays the shop's home page with dynamic components
- * Uses server-side rendering with loader function
- */
-export default function ShopHomeRoute() {
+export function meta({ data }: Route.MetaArgs<typeof loader>) {
+  if (!data) {
+    return [
+      { title: "Page Not Found" },
+      { name: "description", content: "The requested page could not be found." },
+    ];
+  }
+  return [
+    { title: `Contact Us - Shop ${data.shopId}` },
+    { name: "description", content: "Get in touch with us." },
+  ];
+}
+
+export default function ShopContactRoute() {
   const data = useLoaderData<typeof loader>();
 
   // Apply theme settings via CSS custom properties
@@ -97,10 +104,6 @@ export default function ShopHomeRoute() {
   );
 }
 
-/**
- * Error Boundary Component
- * Displays user-friendly error messages for different error scenarios
- */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   // Handle React Router HTTP errors
   if (isRouteErrorResponse(error)) {
@@ -113,12 +116,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         description = "The shop ID provided is not valid. Please check the URL and try again.";
         break;
       case 404:
-        title = "Shop Not Found";
-        description = "The shop you're looking for doesn't exist or has been removed.";
+        title = "Contact Page Not Found";
+        description = "The contact page for this shop doesn't exist or has been removed.";
         break;
       case 500:
         title = "Server Error";
-        description = "We're having trouble loading this shop. Please try again later.";
+        description = "We're having trouble loading this contact page. Please try again later.";
         break;
     }
 
@@ -190,21 +193,4 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       </div>
     </div>
   );
-}
-
-/**
- * Meta function for SEO
- */
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      { title: "Shop Not Found" },
-      { name: "description", content: "The requested shop could not be found." },
-    ];
-  }
-
-  return [
-    { title: `Shop ${data.shopId}` },
-    { name: "description", content: `Welcome to our online shop` },
-  ];
 }

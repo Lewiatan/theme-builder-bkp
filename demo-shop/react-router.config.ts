@@ -1,6 +1,6 @@
 import type { Config } from "@react-router/dev/config";
 
 export default {
-  // SPA mode - client-side data fetching
-  ssr: false,
+  // Enable server-side rendering for better SEO and performance
+  ssr: true,
 } satisfies Config;

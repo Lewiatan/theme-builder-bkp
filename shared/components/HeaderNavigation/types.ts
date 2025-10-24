@@ -18,6 +18,8 @@ export interface HeaderNavigationProps {
   logoPosition: 'left' | 'center';
   /** Visual variant of the navigation component */
   variant: 'sticky' | 'static' | 'slide-in-left';
+  /** The ID of the shop, used to construct navigation links */
+  shopId: string;
   /** Loading state passed by container component */
   isLoading: boolean;
   /** Error state passed by container component */
@@ -31,6 +33,7 @@ export const HeaderNavigationPropsSchema = z.object({
   logoUrl: z.string().min(1, 'Logo URL is required'),
   logoPosition: z.enum(['left', 'center']),
   variant: z.enum(['sticky', 'static', 'slide-in-left']),
+  shopId: z.string().uuid('Invalid shop ID format'),
   isLoading: z.boolean(),
   error: z.instanceof(Error).nullable(),
 });

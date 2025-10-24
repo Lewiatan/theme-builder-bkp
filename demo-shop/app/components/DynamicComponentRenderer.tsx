@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 interface DynamicComponentRendererProps {
   layout: PageLayoutData;
   themeSettings: ThemeSettings;
+  runtimeProps?: Record<string, any>;
 }
 
 /**
@@ -49,10 +50,14 @@ function validateComponentProps(type: string, props: Record<string, any>) {
  * Renders a single component from the registry
  * @param config - Component configuration from layout
  * @param index - Component index for key prop
+ * @param runtimeProps - Runtime props to merge with component's props
  * @returns React element or error placeholder
  */
-function renderComponent(config: ComponentConfig, index: number) {
+function renderComponent(config: ComponentConfig, index: number, runtimeProps?: Record<string, any>) {
   const { id, type, props } = config;
+
+  // Merge runtime props with component's props
+  const mergedProps = { ...props, ...runtimeProps };
 
   // Check if component type exists in registry
   if (!isValidComponentType(type)) {
@@ -68,7 +73,7 @@ function renderComponent(config: ComponentConfig, index: number) {
   }
 
   // Validate component props
-  const validation = validateComponentProps(type, props);
+  const validation = validateComponentProps(type, mergedProps);
 
   if (!validation.success) {
     console.error(`Component validation failed for ${type}:`, validation.error);
@@ -100,7 +105,8 @@ function renderComponent(config: ComponentConfig, index: number) {
  */
 export default function DynamicComponentRenderer({
   layout,
-  themeSettings
+  themeSettings,
+  runtimeProps,
 }: DynamicComponentRendererProps) {
   // Validate layout structure
   if (!layout.layout?.components || !Array.isArray(layout.layout.components)) {
@@ -135,7 +141,7 @@ export default function DynamicComponentRenderer({
   // Render all components
   return (
     <Fragment>
-      {components.map((component, index) => renderComponent(component, index))}
+      {components.map((component, index) => renderComponent(component, index, runtimeProps))}
     </Fragment>
   );
 }

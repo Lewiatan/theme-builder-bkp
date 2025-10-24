@@ -1,16 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { Link } from 'react-router-dom';
 import type { HeaderNavigationProps, NavigationLink } from './types';
 import { HeaderNavigationPropsSchema } from './types';
 import styles from './HeaderNavigation.module.css';
-
-/**
- * Static navigation links - hardcoded as per requirements
- */
-const NAVIGATION_LINKS: NavigationLink[] = [
-  { label: 'Home', path: '/' },
-  { label: 'Catalog', path: '/catalog' },
-  { label: 'Contact', path: '/contact' },
-];
 
 const FALLBACK_SITE_NAME = 'Shop';
 
@@ -26,12 +18,19 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   logoUrl,
   logoPosition,
   variant,
+  shopId,
   isLoading,
   error,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
+
+  const navigationLinks = useMemo((): NavigationLink[] => [
+    { label: 'Home', path: `/shop/${shopId}` },
+    { label: 'Catalog', path: `/shop/${shopId}/catalog` },
+    { label: 'Contact', path: `/shop/${shopId}/contact` },
+  ], [shopId]);
 
   // Validate props with Zod schema
   const validationResult = useMemo(() => {
@@ -40,6 +39,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
         logoUrl,
         logoPosition,
         variant,
+        shopId,
         isLoading,
         error,
       });
@@ -48,7 +48,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
       console.error('HeaderNavigation component validation error:', err);
       return { success: false, error: err };
     }
-  }, [logoUrl, logoPosition, variant, isLoading, error]);
+  }, [logoUrl, logoPosition, variant, shopId, isLoading, error]);
 
   // Body scroll lock when drawer is open
   useEffect(() => {
@@ -127,14 +127,14 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
             Failed to load navigation. Please try again.
           </div>
           <div className={styles.navLinks}>
-            {NAVIGATION_LINKS.map((link) => (
-              <a
+            {navigationLinks.map((link) => (
+              <Link
                 key={link.path}
-                href={link.path}
+                to={link.path}
                 className={styles.navLink}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -161,15 +161,15 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   // Navigation links component (reusable across variants)
   const NavLinks = ({ className, onClick }: { className?: string; onClick?: () => void }) => (
     <div className={`${styles.navLinks} ${className || ''}`}>
-      {NAVIGATION_LINKS.map((link) => (
-        <a
+      {navigationLinks.map((link) => (
+        <Link
           key={link.path}
-          href={link.path}
+          to={link.path}
           className={styles.navLink}
           onClick={onClick}
         >
           {link.label}
-        </a>
+        </Link>
       ))}
     </div>
   );

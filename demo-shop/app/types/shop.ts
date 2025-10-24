@@ -3,7 +3,7 @@
 /**
  * Custom view model that aggregates data from multiple API endpoints
  */
-export interface ShopHomeLoaderData {
+export interface ShopPageLoaderData {
   shopId: string;
   page: PageLayoutData;
   theme: ThemeSettings;
