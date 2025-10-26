@@ -149,6 +149,15 @@ class ExampleShopSeeder extends AbstractSeed
                         'height' => 250,
                     ],
                 ],
+                'categoryPills' => [
+                    'id' => '550e8400-e29b-41d4-a716-446655440305',
+                    'type' => 'CategoryPills',
+                    'variant' => 'center',
+                    'props' => [
+                        'variant' => 'center',
+                        'showAllOption' => true,
+                    ],
+                ],
                 'textSection1' => [
                     'id' => '550e8400-e29b-41d4-a716-446655440302',
                     'type' => 'TextSection',
@@ -331,13 +340,21 @@ class ExampleShopSeeder extends AbstractSeed
 
         $pages = [];
         foreach ($pageConfigurations as $pageType => $components) {
-            $layout = [
-                $headerComponent,
-                $components['heading1'],
-                $components['textSection1'],
-                $components['heading2'],
-                $components['textSection2'],
-            ];
+            $layout = [$headerComponent];
+
+            // Build layout based on page type
+            if ($pageType === 'catalog') {
+                $layout[] = $components['heading1'];
+                $layout[] = $components['categoryPills'];
+                $layout[] = $components['textSection1'];
+                $layout[] = $components['heading2'];
+                $layout[] = $components['textSection2'];
+            } else {
+                $layout[] = $components['heading1'];
+                $layout[] = $components['textSection1'];
+                $layout[] = $components['heading2'];
+                $layout[] = $components['textSection2'];
+            }
 
             $pages[] = [
                 'id' => $pageIds[$pageType],

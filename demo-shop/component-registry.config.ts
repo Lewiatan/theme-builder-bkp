@@ -15,6 +15,8 @@
 import { HeaderNavigation, HeaderNavigationPropsSchema } from '@shared/components/HeaderNavigation';
 import { Heading, HeadingPropsSchema } from '@shared/components/Heading';
 import { TextSection, TextSectionPropsSchema } from '@shared/components/TextSection';
+import CategoryPills from '@shared/components/CategoryPills';
+import { CategoryPillsPropsSchema } from '@shared/components/CategoryPills';
 import type React from 'react';
 
 /**
@@ -41,6 +43,10 @@ const componentRegistryConfig: Record<string, ComponentRegistryEntry> = {
   TextSection: {
     component: TextSection,
     schema: TextSectionPropsSchema,
+  },
+  CategoryPills: {
+    component: CategoryPills,
+    schema: CategoryPillsPropsSchema,
   },
 };
 
