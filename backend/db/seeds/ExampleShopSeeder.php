@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Phinx\Seed\AbstractSeed;
-use Symfony\Component\Uid\Uuid;
 
 /**
  * Seeder for example shop with user and page layouts.
@@ -22,9 +21,14 @@ class ExampleShopSeeder extends AbstractSeed
      */
     public function run(): void
     {
-        // Generate UUIDs for the entities
-        $userId = Uuid::v4()->toRfc4122();
-        $shopId = Uuid::v4()->toRfc4122();
+        // Truncate tables to allow reseeding with static UUIDs
+        $this->execute('TRUNCATE TABLE pages CASCADE');
+        $this->execute('TRUNCATE TABLE shops CASCADE');
+        $this->execute('TRUNCATE TABLE users CASCADE');
+
+        // Static UUIDs for consistent reseeding
+        $userId = '550e8400-e29b-41d4-a716-446655440001';
+        $shopId = '550e8400-e29b-41d4-a716-446655440002';
 
         // Hash the password using PHP's password_hash function
         $hashedPassword = password_hash('test123', PASSWORD_DEFAULT);
@@ -57,7 +61,7 @@ class ExampleShopSeeder extends AbstractSeed
 
         // Define the HeaderNavigation component configuration
         $headerComponent = [
-            'id' => Uuid::v4()->toRfc4122(),
+            'id' => '550e8400-e29b-41d4-a716-446655440100',
             'type' => 'HeaderNavigation',
             'variant' => 'static',
             'props' => [
@@ -71,7 +75,7 @@ class ExampleShopSeeder extends AbstractSeed
         $pageConfigurations = [
             'home' => [
                 'heading1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440201',
                     'type' => 'Heading',
                     'variant' => 'background-image',
                     'props' => [
@@ -84,7 +88,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440202',
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -98,7 +102,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440203',
                     'type' => 'Heading',
                     'variant' => 'text-only',
                     'props' => [
@@ -108,7 +112,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440204',
                     'type' => 'TextSection',
                     'variant' => 'with-icons',
                     'props' => [
@@ -133,7 +137,7 @@ class ExampleShopSeeder extends AbstractSeed
             ],
             'catalog' => [
                 'heading1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440301',
                     'type' => 'Heading',
                     'variant' => 'background-color',
                     'props' => [
@@ -146,7 +150,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440302',
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -160,7 +164,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440303',
                     'type' => 'Heading',
                     'variant' => 'background-color',
                     'props' => [
@@ -173,7 +177,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440304',
                     'type' => 'TextSection',
                     'variant' => 'with-images',
                     'props' => [
@@ -194,7 +198,7 @@ class ExampleShopSeeder extends AbstractSeed
             ],
             'product' => [
                 'heading1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440401',
                     'type' => 'Heading',
                     'variant' => 'text-only',
                     'props' => [
@@ -204,7 +208,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440402',
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -218,7 +222,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440403',
                     'type' => 'Heading',
                     'variant' => 'background-image',
                     'props' => [
@@ -231,7 +235,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440404',
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -256,7 +260,7 @@ class ExampleShopSeeder extends AbstractSeed
             ],
             'contact' => [
                 'heading1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440501',
                     'type' => 'Heading',
                     'variant' => 'background-image',
                     'props' => [
@@ -269,7 +273,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection1' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440502',
                     'type' => 'TextSection',
                     'variant' => 'text-only',
                     'props' => [
@@ -283,7 +287,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'heading2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440503',
                     'type' => 'Heading',
                     'variant' => 'background-color',
                     'props' => [
@@ -296,7 +300,7 @@ class ExampleShopSeeder extends AbstractSeed
                     ],
                 ],
                 'textSection2' => [
-                    'id' => Uuid::v4()->toRfc4122(),
+                    'id' => '550e8400-e29b-41d4-a716-446655440504',
                     'type' => 'TextSection',
                     'variant' => 'with-icons',
                     'props' => [
@@ -318,6 +322,13 @@ class ExampleShopSeeder extends AbstractSeed
         ];
 
         // Create pages with all components
+        $pageIds = [
+            'home' => '550e8400-e29b-41d4-a716-446655440601',
+            'catalog' => '550e8400-e29b-41d4-a716-446655440602',
+            'product' => '550e8400-e29b-41d4-a716-446655440603',
+            'contact' => '550e8400-e29b-41d4-a716-446655440604',
+        ];
+
         $pages = [];
         foreach ($pageConfigurations as $pageType => $components) {
             $layout = [
@@ -329,7 +340,7 @@ class ExampleShopSeeder extends AbstractSeed
             ];
 
             $pages[] = [
-                'id' => Uuid::v4()->toRfc4122(),
+                'id' => $pageIds[$pageType],
                 'shop_id' => $shopId,
                 'type' => $pageType,
                 'layout' => json_encode($layout),

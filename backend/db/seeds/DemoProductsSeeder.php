@@ -19,6 +19,10 @@ class DemoProductsSeeder extends AbstractSeed
      */
     public function run(): void
     {
+        // Truncate tables to allow reseeding with static IDs
+        $this->execute('TRUNCATE TABLE demo_products CASCADE');
+        $this->execute('TRUNCATE TABLE demo_categories CASCADE');
+
         // Insert demo categories
         $this->table('demo_categories')->insert([
             ['id' => 1, 'name' => 'Electronics'],
