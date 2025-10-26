@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Exception\CategoryNotFoundException;
 use App\Model\Enum\PageType;
 use App\Request\GetDemoProductsRequest;
+use App\Service\DemoCategoryService;
 use App\Service\DemoProductService;
 use App\Service\DemoPageService;
 use Psr\Log\LoggerInterface;
@@ -28,6 +29,7 @@ final class PublicShopController extends AbstractController
     public function __construct(
         private readonly DemoPageService $pageService,
         private readonly DemoProductService $demoProductService,
+        private readonly DemoCategoryService $demoCategoryService,
         private readonly LoggerInterface $logger
     ) {}
 
@@ -137,6 +139,42 @@ final class PublicShopController extends AbstractController
         } catch (\Throwable $exception) {
             $this->logger->error('Unexpected error retrieving demo products', [
                 'category_id' => $requestDto->getCategoryId(),
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            return new JsonResponse(
+                ['error' => 'An unexpected error occurred'],
+                JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    /**
+     * Retrieves all demo product categories.
+     *
+     * This endpoint provides category data for the Demo Shop frontend.
+     * Categories are returned ordered alphabetically by name.
+     * No authentication is required as this is public demo data.
+     *
+     * @return JsonResponse Category data (200) or error (500)
+     *
+     * Response examples:
+     * - 200 OK: {"categories": [{"id": 1, "name": "Beauty & Personal Care"}, ...]}
+     * - 500 Internal Server Error: {"error": "An unexpected error occurred"}
+     */
+    #[Route('/api/demo/categories', name: 'demo_categories_list', methods: ['GET'])]
+    public function getDemoCategories(): JsonResponse
+    {
+        try {
+            $categories = $this->demoCategoryService->getAllCategories();
+
+            return new JsonResponse(
+                ['categories' => $categories],
+                JsonResponse::HTTP_OK
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->error('Unexpected error retrieving demo categories', [
                 'exception' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString(),
             ]);
