@@ -525,9 +525,7 @@ The following components cover all required page types (Home, Catalog, Product, 
 - **Editable:** Header, text, button, background image
 
 ### 7. Product List/Grid
-- **Variants:** 2/3/4/6 products per row, with/without filters
-- **Editable:** Product selection from mock catalog, number of rows
-- **Use:** Catalog page, Home page sections
+- **Variants:** 2/3/4/6 products per row
 
 ### 8. Featured Products
 - **Variants:** Carousel, grid, list

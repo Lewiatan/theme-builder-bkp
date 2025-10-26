@@ -84,10 +84,8 @@ All 14 components are defined below, matching the spec exactly. Each component i
     *   **Editable:** Header, text, button, background image.
 
 7.  **Product List/Grid:**
-    *   **Data:** `productIds: string[]`, `productsPerRow: number`, `numberOfRows: number`, `showFilters: boolean`.
-    *   **Variants:** 2/3/4/6 products per row, with/without filters.
-    *   **Editable:** Product selection from mock catalog, number of rows.
-    *   **Use:** Catalog page, Home page sections.
+    *   **Data:** `productsPerRow: number`
+    *   **Variants:** 2/3/4/6 products per row.
 
 8.  **Featured Products:**
     *   **Data:** `productIds: string[]` (max 8-12 products).
