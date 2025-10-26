@@ -50,7 +50,7 @@ Every component in the `/shared/components` library will adhere to the following
 
 ### 4. List of Components (MVP)
 
-All 13 components are defined below, matching the spec exactly. Each component is a Content Component that can be placed on pages by users.
+All 14 components are defined below, matching the spec exactly. Each component is a Content Component that can be placed on pages by users.
 
 1.  **Heading:**
     *   **Data:** `text: string`, `level: string` (H1/H2/H3), `backgroundImageUrl?: string`.
@@ -121,8 +121,15 @@ All 13 components are defined below, matching the spec exactly. Each component i
     *   **Variants:** Full-width map, split (map + info), compact embed.
     *   **Editable:** Address/coordinates, info text, map zoom level.
 
+14. **CategoryPills:**
+    *   **Data:** `categories: { id: number, name: string }[]`, `activeCategoryId?: number` (derived from URL).
+    *   **Variants:** Horizontal pills (default), vertical list, compact chips.
+    *   **Editable:** None - categories are automatically fetched from database via `GET /api/demo/categories`.
+    *   **Use:** Catalog page for category navigation.
+    *   **Behavior:** Displays product categories as clickable navigation elements. Clicking a category navigates to `/catalog/:categoryId` to filter products. Automatically highlights active category based on URL parameter. Includes "All Products" option for viewing unfiltered catalog.
+
 ### 5. Architectural and Performance Considerations
-*   **Routing and Data Loading:** The `demo-shop` will use React Router v7 loaders to fetch the necessary data for dynamic pages (e.g., getting a `productId` from the URL and fetching the product).
+*   **Routing and Data Loading:** The `demo-shop` will use React Router v7 loaders to fetch the necessary data for dynamic pages (e.g., getting a `productId` from the URL and fetching the product, or a `categoryId` for filtering products by category).
 *   **Parallel Data Fetching:** For static pages, the container/presentational model allows each Content Component to fetch its data needs in parallel.
 *   **Code Splitting:** The page renderer should use `React.lazy()` to dynamically import only the components needed for a specific page, reducing the initial bundle size.
 *   **Type Safety:** A dual approach of TypeScript for static analysis and Zod for runtime validation will be used to ensure data integrity from the API to the rendered component.

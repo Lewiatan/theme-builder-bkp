@@ -20,9 +20,9 @@
 
 8. **Error Handling & User Feedback**: Use **Shadcn/ui Sonner** component for toast notifications positioned at top-right. Distinct styles: success (green, auto-dismiss 3s), error (red, manual dismiss with API error message), loading (blue during save operations). Show progress bar for image uploads in component settings modal using Shadcn/ui Progress component. Create custom `useApiRequest` hook for consistent error handling. Use Shadcn/ui Alert component for inline error messages and AlertDialog for confirmation prompts.
 
-9. **Shared Component Library**: Create `/shared/components` directory in monorepo containing all 13 components. Each component accepts `settings` prop (matching API component settings structure) and `themeSettings` prop for global theme. Use Tailwind CSS with CSS custom properties for theme colors/fonts. Export `ComponentRegistry` mapping component types to React components. Both Theme Builder and Demo Shop import from shared source.
+9. **Shared Component Library**: Create `/shared/components` directory in monorepo containing all 14 components. Each component accepts `settings` prop (matching API component settings structure) and `themeSettings` prop for global theme. Use Tailwind CSS with CSS custom properties for theme colors/fonts. Export `ComponentRegistry` mapping component types to React components. Both Theme Builder and Demo Shop import from shared source.
 
-10. **Demo Shop Routing & Data Loading**: Implement route loaders at root layout level to fetch shop theme settings once, use `useRouteLoaderData` in child routes. Individual routes for each page type: `/` (home), `/catalog`, `/product/:id`, `/contact`. Each route loader fetches corresponding page layout from `/api/public/shops/{shopId}/pages/{type}`. Additional loaders for demo products from `/api/demo/products` and `/api/demo/products/{id}`. Use React Router's deferred data pattern for product images.
+10. **Demo Shop Routing & Data Loading**: Implement route loaders at root layout level to fetch shop theme settings once, use `useRouteLoaderData` in child routes. Individual routes for each page type: `/` (home), `/catalog`, `/catalog/:categoryId`, `/product/:id`, `/contact`. The catalog route supports optional category filtering via URL parameter. Each route loader fetches corresponding page layout from `/api/public/shops/{shopId}/pages/{type}`. Additional loaders for demo products from `/api/demo/products` (with optional `?category={id}` filter), `/api/demo/products/{id}`, and `/api/demo/categories`. Use React Router's deferred data pattern for product images.
 
 ### Round 2: Implementation Details
 
@@ -545,14 +545,16 @@ Defined in `app.css` or `globals.css`:
 
 **Page Routes:**
 - `/shop/{shopId}` - Home page
-- `/shop/{shopId}/catalog` - Product catalog
+- `/shop/{shopId}/catalog` - Product catalog (all products)
+- `/shop/{shopId}/catalog/:categoryId` - Product catalog filtered by category
 - `/shop/{shopId}/product/:id` - Product detail
 - `/shop/{shopId}/contact` - Contact page
 
 **Data Loading Strategy:**
 - Root loader: Shop metadata and theme settings
 - Page loaders: Page-specific layouts
-- Product loaders: Demo product data
+- Product loaders: Demo product data (with optional category filtering)
+- Category loader: All categories for CategoryPills component
 - Deferred loading for images
 
 ### Key User Flows
@@ -737,7 +739,7 @@ const { upload, progress, isUploading } = useImageUpload();
 
 **Demo Product Catalog:**
 - `GET /api/demo/categories` - Get all categories
-- `GET /api/demo/products` - Get products (with optional category filter)
+- `GET /api/demo/products` - Get products (with optional `?category={id}` filter for CategoryPills component)
 - `GET /api/demo/products/{id}` - Get single product
 - `GET /api/demo/products/batch?ids=1,5,12` - Batch fetch for featured products
 
@@ -782,20 +784,21 @@ export const componentRegistry = {
 };
 ```
 
-**13 Predefined Components (from PRD):**
-1. Hero
-2. Featured Products
-3. Product Grid/List
-4. Text Section
-5. Image Gallery
-6. Testimonials
-7. Newsletter Signup
-8. Contact Form
-9. Header (navigation)
-10. Footer
-11. Category Grid
-12. Product Detail
-13. Call-to-Action Banner
+**14 Predefined Components (from PRD):**
+1. Heading
+2. Header/Navigation
+3. Footer
+4. Hero/Full-Width Banner
+5. Text Section
+6. Call-to-Action (CTA) Block
+7. Product List/Grid
+8. Featured Products
+9. Product Detail View
+10. Review/Testimonial Section
+11. Contact Form
+12. Image Gallery
+13. Map/Location Block
+14. CategoryPills (category navigation for Catalog page)
 
 #### Theme Application via CSS Custom Properties
 

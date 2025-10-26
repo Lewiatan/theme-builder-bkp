@@ -496,7 +496,7 @@ export default function HomePage() {
 - Component registry pattern maps JSON layout configuration to rendered React components
 - Future enhancement: SSR can be added to Demo Shop using React Router v7's built-in capabilities
 
-## Component Library (13 Components)
+## Component Library (14 Components)
 
 The following components cover all required page types (Home, Catalog, Product, Contact):
 
@@ -555,6 +555,12 @@ The following components cover all required page types (Home, Catalog, Product, 
 - **Variants:** Full-width map, split (map + info), compact embed
 - **Editable:** Address/coordinates, info text, map zoom level
 
+### 14. CategoryPills
+- **Variants:** Align left, centered, full width (stretched)
+- **Editable:** None - categories are automatically fetched from database
+- **Use:** Catalog page for category navigation
+- **Behavior:** Displays product categories as clickable navigation elements. Clicking a category navigates to `/catalog/:categoryId` to filter products. Automatically fetches categories from `GET /api/demo/categories` endpoint. Highlights active category based on URL parameter.
+
 ## Future Considerations
 
 - **Server-Side Rendering (SSR):**
@@ -581,7 +587,7 @@ The following components cover all required page types (Home, Catalog, Product, 
 ## Success Criteria
 
 - ✅ Functional drag-and-drop interface with hover controls
-- ✅ All 13 components working with variants and content editing
+- ✅ All 14 components working with variants and content editing
 - ✅ Save/reset functionality
 - ✅ Demo store with mocked products from database
 - ✅ Live preview showing unsaved changes

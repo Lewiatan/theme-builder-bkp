@@ -66,6 +66,7 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 - React Router loaders fetch saved theme/page layout data (JSON) and mock products from the backend API.
 - The shared component registry maps the JSON layout configuration to rendered React components.
 - Mock product catalog is stored in the database and accessed via REST API endpoints.
+- **Category Navigation:** The Catalog page includes category filtering via a CategoryPills component that displays product categories and allows visitors to browse products by category using URL-based navigation (`/catalog/:categoryId`).
 - **Technical Note:** Demo Shop uses client-side rendering in MVP (no Server-Side Rendering).
 
 ### 3.9. Authentication
@@ -83,7 +84,7 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
 
 ### Features Included in MVP:
 - Full drag-and-drop functionality for managing components on a page.
-- All 13 defined components with their variants and content editing options.
+- All 14 defined components with their variants and content editing options.
 - User authentication system (registration, login) via JWT tokens.
 - Separate save mechanisms for page layout and global theme settings.
 - Functionality to reset changes to the last saved state.
@@ -253,10 +254,20 @@ The E-commerce Theme Builder solves this problem by offering a fully visual envi
   - Product components in the Demo Store are populated with mock data.
   - Navigation in the Demo Store (e.g., the header menu) allows moving between the saved versions of pages (Home, Catalog, etc.).
 
+- ID: US-017
+- Title: Browsing products by category in Demo Store
+- Description: As a store visitor viewing the Demo Store, I want to browse products by category to easily find products that interest me.
+- Acceptance Criteria:
+  - The Catalog page displays category navigation via a CategoryPills component.
+  - Clicking a category pill navigates to `/catalog/:categoryId` and filters products to show only items in that category.
+  - Clicking "All Products" pill shows all products without category filtering.
+  - The active category is visually highlighted in the category navigation.
+  - Categories are automatically fetched from the database with no manual configuration required.
+
 ## 6. Success Metrics
 
 ### Functional Metrics:
-- All 13 defined components are fully functional, including variant selection and content editing.
+- All 14 defined components are fully functional, including variant selection and content editing.
 - The save and reset mechanisms for pages and the theme work reliably and according to specification.
 - The authentication system correctly manages user sessions and isolates their data via JWT tokens.
 - The CI/CD pipeline is fully operational, automating testing and deployment.
