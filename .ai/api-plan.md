@@ -861,7 +861,19 @@ Returns all product categories.
     },
     {
       "id": 3,
+      "name": "Books"
+    },
+    {
+      "id": 4,
       "name": "Home & Garden"
+    },
+    {
+      "id": 5,
+      "name": "Sports & Outdoors"
+    },
+    {
+      "id": 6,
+      "name": "Beauty & Personal Care"
     }
   ]
 }
@@ -871,6 +883,10 @@ Returns all product categories.
 - Query all demo_categories
 - Order alphabetically by name
 - No pagination needed (small, static dataset)
+
+**Use Cases:**
+- **CategoryPills component:** Fetches all categories to display as navigation pills on the Catalog page
+- **Category filtering:** Provides category list for filtering products by category ID
 
 ---
 
@@ -926,6 +942,8 @@ Returns demo products with optional filtering by category.
 **Notes:**
 - Prices are in cents (e.g., 19999 = $199.99)
 - `sale_price` is `null` if product is not on sale
+- When `category_id` is provided, only products from that category are returned
+- Used by Catalog page with CategoryPills component for category-based filtering (route: `/catalog/:categoryId`)
 
 ---
 
