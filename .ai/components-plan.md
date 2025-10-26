@@ -123,6 +123,7 @@ All 14 components are defined below, matching the spec exactly. Each component i
 
 14. **CategoryPills:**
     *   **Data:** `categories: { id: number, name: string }[]`, `activeCategoryId?: number` (derived from URL).
+    *   **Variants:** Align left, centered, full width (stretched)
     *   **Editable:** None - categories are automatically fetched from database via `GET /api/demo/categories`.
     *   **Use:** Catalog page for category navigation.
     *   **Behavior:** Displays product categories as clickable navigation elements. Clicking a category navigates to `/catalog/:categoryId` to filter products. Automatically highlights active category based on URL parameter. Includes "All Products" option for viewing unfiltered catalog.
