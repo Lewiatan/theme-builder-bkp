@@ -19,6 +19,7 @@
 
 // Export presentational component as default
 export { default } from './CategoryPills';
+export { default as CategoryPills } from './CategoryPills';
 
 // Export all TypeScript types and interfaces
 export type { CategoryPillsProps, Category } from './types';

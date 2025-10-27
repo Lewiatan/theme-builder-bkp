@@ -15,8 +15,10 @@
 import { HeaderNavigation, HeaderNavigationPropsSchema } from '@shared/components/HeaderNavigation';
 import { Heading, HeadingPropsSchema } from '@shared/components/Heading';
 import { TextSection, TextSectionPropsSchema } from '@shared/components/TextSection';
-import CategoryPills from '@shared/components/CategoryPills';
+import CategoryPillsContainer from '~/containers/CategoryPillsContainer';
 import { CategoryPillsPropsSchema } from '@shared/components/CategoryPills';
+import ProductListGridContainer from '~/containers/ProductListGridContainer';
+import { ProductListGridPropsSchema } from '@shared/components/ProductListGrid';
 import type React from 'react';
 
 /**
@@ -45,8 +47,12 @@ const componentRegistryConfig: Record<string, ComponentRegistryEntry> = {
     schema: TextSectionPropsSchema,
   },
   CategoryPills: {
-    component: CategoryPills,
+    component: CategoryPillsContainer,
     schema: CategoryPillsPropsSchema,
+  },
+  ProductListGrid: {
+    component: ProductListGridContainer,
+    schema: ProductListGridPropsSchema,
   },
 };
 
