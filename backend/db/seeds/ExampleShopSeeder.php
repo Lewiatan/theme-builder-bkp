@@ -158,6 +158,14 @@ class ExampleShopSeeder extends AbstractSeed
                         'showAllOption' => true,
                     ],
                 ],
+                'productListGrid' => [
+                    'id' => '550e8400-e29b-41d4-a716-446655440306',
+                    'type' => 'ProductListGrid',
+                    'variant' => '3',
+                    'props' => [
+                        'productsPerRow' => 3,
+                    ],
+                ],
                 'textSection1' => [
                     'id' => '550e8400-e29b-41d4-a716-446655440302',
                     'type' => 'TextSection',
@@ -346,6 +354,7 @@ class ExampleShopSeeder extends AbstractSeed
             if ($pageType === 'catalog') {
                 $layout[] = $components['heading1'];
                 $layout[] = $components['categoryPills'];
+                $layout[] = $components['productListGrid'];
                 $layout[] = $components['textSection1'];
                 $layout[] = $components['heading2'];
                 $layout[] = $components['textSection2'];

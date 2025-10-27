@@ -7,11 +7,13 @@ namespace App\Model\Entity;
 use App\Model\ValueObject\Email;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
 #[ORM\Index(columns: ['email'], name: 'idx_users_email')]
-final class User
+final class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public function __construct(
         #[ORM\Id]
@@ -82,5 +84,22 @@ final class User
     {
         $this->email = $email;
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    // UserInterface implementation
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email->getValue();
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+        // No sensitive temporary credentials to erase
     }
 }

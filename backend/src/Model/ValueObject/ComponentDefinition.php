@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Model\ValueObject;
 
 use InvalidArgumentException;
+use JsonSerializable;
 
-final readonly class ComponentDefinition
+final readonly class ComponentDefinition implements JsonSerializable
 {
     /**
      * @param array<int,mixed> $settings
@@ -47,6 +48,11 @@ final readonly class ComponentDefinition
             'variant' => $this->variant,
             'settings' => $this->settings,
         ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     public function getId(): string
