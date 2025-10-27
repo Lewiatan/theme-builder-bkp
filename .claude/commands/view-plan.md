@@ -5,7 +5,7 @@ argument-hint: "<view-description> <user-stories> <endpoint-description> <endpoi
 
 # View Implementation Plan Generator
 
-As a senior frontend developer, your task is to create a detailed implementation plan for a new view in a web application. This plan should be comprehensive and clear enough for another frontend developer to implement the view correctly and efficiently.
+As a software architect, your task is to create a detailed implementation plan for a new view in a web application. This plan should be comprehensive and clear enough for another frontend developer to implement the view correctly and efficiently.
 
 First, review the following information:
 
@@ -132,4 +132,4 @@ Here's an example of what the output file should look like (content is to be rep
 3. [...]
 ```
 
-Begin analysis and planning now. Your final output should consist solely of the implementation plan in English in markdown format, which you will save in the .ai/views/{view-name}-view-implementation-plan.md file and should not duplicate or repeat any work done in the implementation breakdown.
+Begin analysis and planning now. Your final output should consist solely of the implementation plan in English in markdown format, which you will save in the .ai/views/{view-name}-view-implementation-plan.md file and should not duplicate or repeat any work done in the implementation breakdown. Do not include code snippets.
