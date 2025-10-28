@@ -5,7 +5,24 @@ description: Plan and implement a REST API endpoint using specialized agents
 
 You will orchestrate the complete process of planning and implementing a REST API endpoint by coordinating specialized agents.
 
-First, review the provided inputs:
+## Parameter Validation
+
+**Use the `parameter-validation` skill to validate the following required parameters:**
+
+Required parameters:
+- $1: `<models-files>` - Database models/entities that define the data structure for this endpoint
+- $2: `<tech-stack>` - Technology stack details including framework versions, libraries, and architectural patterns
+- $3: `<route-specification>` - Complete route specification including HTTP method, path, request/response format, and business logic
+
+**STOP execution and wait for user input if any parameters are missing.**
+
+Only proceed to Phase 1 after all 3 parameters are validated and available.
+
+---
+
+## Provided Inputs
+
+Once validated, the following inputs will be used:
 
 1. Database Models:
 <application_models>

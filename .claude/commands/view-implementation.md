@@ -16,7 +16,7 @@ $1
 Implement the plan according to the following approach:
 
 <implementation_approach>
-Implement a maximum of 3 steps from the implementation plan, briefly summarize what you've done, and describe the plan for the next 3 actions - stop work at this point and wait for my feedback.
+Use "3x3 Workflow"
 </implementation_approach>
 
 Carefully analyze the implementation plan and rules. Pay special attention to component structure, API integration requirements, and user interactions described in the plan.

@@ -12,7 +12,7 @@ $1
 </implementation_plan>
 
 <implementation_approach>
-Implement a maximum of 3 steps from the implementation plan, briefly summarize what you've done, and describe the plan for the next 3 actions - stop work at this point and wait for my feedback.
+Use "3x3 Workflow"
 </implementation_approach>
 
 Now perform the following steps to implement the REST API endpoint:

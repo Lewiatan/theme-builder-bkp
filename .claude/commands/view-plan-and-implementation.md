@@ -15,46 +15,17 @@ Execute a two-phase workflow for planning and implementing a frontend view using
 
 ## Parameter Validation
 
-**FIRST, validate that all required parameters have been provided:**
+**Use the `parameter-validation` skill to validate the following required parameters:**
 
-1. Check if all 4 parameters ($1, $2, $3, $4) are present and non-empty
-2. Identify which parameters are missing or empty
+Required parameters:
+- $1: `<view-description>` - Describe the view's purpose, main features, and what it should display
+- $2: `<user-stories>` - Include the relevant user stories with acceptance criteria
+- $3: `<endpoint-description>` - Describe the API endpoint(s) including HTTP methods, paths, and data structure
+- $4: `<endpoint-implementation>` - Detail the backend implementation including controllers, services, and response format
 
-**If ANY parameter is missing or empty:**
+**STOP execution and wait for user input if any parameters are missing.**
 
-1. **STOP EXECUTION immediately** - Do not proceed to Phase 1
-2. Inform the user which parameters are missing by their argument-hint names:
-   - $1 = `<view-description>`
-   - $2 = `<user-stories>`
-   - $3 = `<endpoint-description>`
-   - $4 = `<endpoint-implementation>`
-
-3. **Request the user to provide the missing information directly** - Do NOT suggest answers or provide options
-
-Display missing parameters clearly:
-```
-Missing required parameters:
-- ❌ <user-stories>
-- ❌ <endpoint-implementation>
-
-Please provide the missing information to proceed with the view plan and implementation.
-```
-
-4. **Ask the user directly** for each missing parameter:
-   - For missing `<view-description>`: "Please provide the `<view-description>`: Describe the view's purpose, main features, and what it should display."
-   - For missing `<user-stories>`: "Please provide the `<user-stories>`: Include the relevant user stories with acceptance criteria."
-   - For missing `<endpoint-description>`: "Please provide the `<endpoint-description>`: Describe the API endpoint(s) including HTTP methods, paths, and data structure."
-   - For missing `<endpoint-implementation>`: "Please provide the `<endpoint-implementation>`: Detail the backend implementation including controllers, services, and response format."
-
-5. **Wait for user response** - Do not proceed until all parameters are provided
-
-**Important:**
-- Reference parameters by their argument-hint names (e.g., `<view-description>`, not "view description")
-- Do NOT use AskUserQuestion tool with predefined options
-- Simply ask for text input in your response to the user
-- After user provides missing information, validate again before proceeding
-
-**Only proceed to Phase 1 after ALL 4 parameters are validated and available (either from original $1-$4 or provided by user).**
+Only proceed to Phase 1 after all 4 parameters are validated and available (either from original $1-$4 or provided by user).
 
 ---
 
@@ -135,9 +106,8 @@ Follow the implementation plan precisely and adhere to all specified requirement
 
 ## Execution Flow Summary
 
-1. **Validate Parameters** - Check all 4 required parameters are provided
-   - If missing: Display which `<parameter-names>` are missing and ask user to provide them
-   - Wait for user response and re-validate
+1. **Validate Parameters** - Use `parameter-validation` skill to check all 4 required parameters
+   - If missing: Follow skill guidance to collect missing parameters
    - If complete: Proceed to next step
 2. Launch software-architect agent for planning
 3. Wait for planning completion
@@ -149,9 +119,7 @@ Follow the implementation plan precisely and adhere to all specified requirement
 
 ## Important Notes
 
-- **Parameter Naming**: Always refer to parameters using their argument-hint names: `<view-description>`, `<user-stories>`, `<endpoint-description>`, `<endpoint-implementation>`
-- **Direct Requests**: Ask user to provide missing parameters directly via text response, do NOT use AskUserQuestion tool or provide multiple choice options
-- **Parameter Collection**: If multiple parameters are missing, list them all at once and wait for user to provide them
+- **Parameter Validation**: The `parameter-validation` skill handles all parameter validation - follow its guidance before proceeding to Phase 1
 - **Parameter Usage**: Use the validated/collected parameters when constructing the task prompts for both agents
-- **No Assumptions**: Never proceed with empty or placeholder parameters - always wait for user input
-- **Validation Loop**: Re-validate after user provides information before proceeding to Phase 1
+- **Mandatory Stop**: Always wait for user confirmation after Phase 1 (planning) before proceeding to Phase 2 (implementation)
+- **Sequential Execution**: Run agents sequentially, not in parallel - wait for each phase to complete before proceeding
