@@ -45,34 +45,34 @@ final readonly class DemoProductReadModel implements JsonSerializable
     ) {}
 
     /**
-     * Serializes the product to JSON with camelCase keys for API response.
+     * Serializes the product to JSON with snake_case keys for API response.
      *
      * @return array{
      *     id: int,
-     *     categoryId: int,
-     *     categoryName: string,
+     *     category_id: int,
+     *     category_name: string,
      *     name: string,
      *     description: string,
      *     price: int,
-     *     salePrice: int|null,
-     *     imageThumbnail: string,
-     *     imageMedium: string,
-     *     imageLarge: string
+     *     sale_price: int|null,
+     *     image_thumbnail: string,
+     *     image_medium: string,
+     *     image_large: string
      * }
      */
     public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
-            'categoryId' => $this->categoryId,
-            'categoryName' => $this->categoryName,
+            'category_id' => $this->categoryId,
+            'category_name' => $this->categoryName,
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
-            'salePrice' => $this->salePrice,
-            'imageThumbnail' => $this->imageThumbnail,
-            'imageMedium' => $this->imageMedium,
-            'imageLarge' => $this->imageLarge,
+            'sale_price' => $this->salePrice,
+            'image_thumbnail' => $this->imageThumbnail,
+            'image_medium' => $this->imageMedium,
+            'image_large' => $this->imageLarge,
         ];
     }
 }
