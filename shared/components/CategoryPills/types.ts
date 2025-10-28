@@ -40,11 +40,12 @@ export const CategorySchema = z.object({
 
 /**
  * Zod schema for runtime validation of CategoryPills props
+ * Note: onCategorySelect uses z.function() which validates it's a function but doesn't validate arguments/return type
  */
 export const CategoryPillsPropsSchema = z.object({
   categories: z.array(CategorySchema),
   selectedCategoryId: z.number().int().positive().nullable(),
-  onCategorySelect: z.function().args(z.number().int().positive().nullable()).returns(z.void()),
+  onCategorySelect: z.function(),
   variant: z.enum(['left', 'center', 'fullWidth']),
   showAllOption: z.boolean(),
   isLoading: z.boolean(),

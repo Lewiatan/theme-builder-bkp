@@ -58,6 +58,24 @@ const CategoryPills: React.FC<CategoryPillsProps> = (props) => {
     [onCategorySelect]
   );
 
+  // Build pills array with optional "All" option
+  // IMPORTANT: This hook must be called before any conditional returns to avoid React Hooks violations
+  const pills: Array<{ id: number | null; name: string }> = useMemo(() => {
+    const result: Array<{ id: number | null; name: string }> = [];
+
+    if (showAllOption) {
+      result.push({ id: null, name: 'All' });
+    }
+
+    if (categories && Array.isArray(categories)) {
+      categories.forEach((category: Category) => {
+        result.push({ id: category.id, name: category.name });
+      });
+    }
+
+    return result;
+  }, [categories, showAllOption]);
+
   // Render error state
   if (error) {
     return (
@@ -97,21 +115,6 @@ const CategoryPills: React.FC<CategoryPillsProps> = (props) => {
       </div>
     );
   }
-
-  // Build pills array with optional "All" option
-  const pills: Array<{ id: number | null; name: string }> = useMemo(() => {
-    const result: Array<{ id: number | null; name: string }> = [];
-
-    if (showAllOption) {
-      result.push({ id: null, name: 'All' });
-    }
-
-    categories.forEach((category: Category) => {
-      result.push({ id: category.id, name: category.name });
-    });
-
-    return result;
-  }, [categories, showAllOption]);
 
   return (
     <nav

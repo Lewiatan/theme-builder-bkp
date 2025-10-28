@@ -15,6 +15,30 @@ interface DynamicComponentRendererProps {
 }
 
 /**
+ * Provides default runtime data for container components that fetch data
+ * These components need data arrays and callbacks that aren't stored in the database
+ */
+function getDefaultRuntimeProps(type: string): Record<string, any> {
+  const defaults: Record<string, Record<string, any>> = {
+    CategoryPills: {
+      categories: [],
+      selectedCategoryId: null,
+      onCategorySelect: () => {},
+      isLoading: false,
+      error: null,
+    },
+    ProductListGrid: {
+      products: [],
+      isLoading: false,
+      error: null,
+      onRetry: () => {},
+    },
+  };
+
+  return defaults[type] || { isLoading: false, error: null };
+}
+
+/**
  * Validates component props against its Zod schema
  * @param type - Component type identifier
  * @param props - Props to validate (without isLoading and error)
@@ -30,11 +54,13 @@ function validateComponentProps(type: string, props: Record<string, any>) {
     };
   }
 
-  // Add required runtime props before validation
+  // Get default runtime props for this component type
+  const defaultRuntimeProps = getDefaultRuntimeProps(type);
+
+  // Merge props: defaults < stored props < runtime overrides
   const propsWithRuntimeFields = {
+    ...defaultRuntimeProps,
     ...props,
-    isLoading: false,
-    error: null,
   };
 
   try {

@@ -202,6 +202,20 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 
 /**
+ * Prevent loader from re-running when only search params change
+ * This ensures SPA-like behavior for category filtering without page re-renders
+ */
+export function shouldRevalidate({ currentUrl, nextUrl, defaultShouldRevalidate }: Route.ShouldRevalidateArgs) {
+  // Only revalidate if the pathname changes (not search params)
+  // This prevents loader re-runs when category filter changes via URL params
+  if (currentUrl.pathname !== nextUrl.pathname) {
+    return defaultShouldRevalidate;
+  }
+
+  return false;
+}
+
+/**
  * Meta function for SEO
  */
 export function meta({ data }: Route.MetaArgs) {
