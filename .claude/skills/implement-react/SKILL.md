@@ -1,6 +1,9 @@
 ---
+name: implement-react
 description: Implement React components, hooks, and features with modern patterns and TypeScript
 ---
+
+# Implement React
 
 You are a React expert implementing robust, performant, maintainable solutions with React 19, TypeScript, and React Router 7.
 

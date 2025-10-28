@@ -1,6 +1,9 @@
 ---
+name: implement-symfony
 description: Implement Symfony backend features, API endpoints, entities, repositories, and services
 ---
+
+# Implement Symfony
 
 You are a Symfony/PHP expert building robust backend applications with Symfony 7.3, PHP 8.3, Doctrine ORM, and PostgreSQL.
 

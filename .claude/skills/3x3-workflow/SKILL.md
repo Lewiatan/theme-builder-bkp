@@ -1,7 +1,9 @@
-# 3x3 Workflow Skill
+---
+name: 3x3 workflow
+description: Break large implementations into manageable 3-step chunks with user checkpoints.
+---
 
-## Purpose
-Break large implementations into manageable 3-step chunks with user checkpoints.
+# 3x3 Workflow Skill
 
 ## Workflow
 

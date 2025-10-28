@@ -1,8 +1,9 @@
 ---
-description: "Validate required command parameters before execution"
+name: parameter-validation
+description: Validate required command parameters before execution
 ---
 
-# Parameter Validation Skill
+# Parameter Validation
 
 This skill validates that all required parameters for a command are provided before execution begins.
 
