@@ -12,7 +12,7 @@ $1
 </implementation_plan>
 
 <implementation_approach>
-Use "3x3 Workflow"
+Use `3x3-wokflow` skill
 </implementation_approach>
 
 Now perform the following steps to implement the REST API endpoint:

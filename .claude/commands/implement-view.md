@@ -16,7 +16,7 @@ $1
 Implement the plan according to the following approach:
 
 <implementation_approach>
-Use "3x3 Workflow"
+Use `3x3-wokflow` skill
 </implementation_approach>
 
 Carefully analyze the implementation plan and rules. Pay special attention to component structure, API integration requirements, and user interactions described in the plan.
