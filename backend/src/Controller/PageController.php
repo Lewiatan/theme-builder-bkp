@@ -8,10 +8,12 @@ use App\Exception\PageNotFoundException;
 use App\Exception\ShopNotFoundException;
 use App\Model\Entity\User;
 use App\Model\Enum\PageType;
+use App\Request\UpdatePageLayoutRequest;
 use App\Service\PageService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -186,6 +188,148 @@ final class PageController extends AbstractController
         } catch (\Throwable $exception) {
             // Unexpected error
             $this->logger->error('Unexpected error retrieving page by type', [
+                'type' => $type,
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            return new JsonResponse(
+                ['error' => 'An unexpected error occurred'],
+                JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    /**
+     * Updates the layout for a specific page type for the authenticated user's shop.
+     *
+     * Accepts a layout array in the request body and updates the specified page.
+     * The page type must be one of: home, catalog, product, contact.
+     * Layout validation is handled by UpdatePageLayoutRequest DTO.
+     *
+     * Request body format:
+     * {
+     *   "layout": [
+     *     {
+     *       "id": "uuid",
+     *       "type": "component-type",
+     *       "variant": "variant-name",
+     *       "settings": {...}
+     *     }
+     *   ]
+     * }
+     *
+     * @param string $type Page type path parameter (home, catalog, product, contact)
+     * @param UpdatePageLayoutRequest $request Validated request DTO with layout data
+     * @return JsonResponse Updated page data (200), invalid type/layout (400), not found (404), or error (500)
+     *
+     * Response examples:
+     * - 200 OK: {"type": "home", "layout": [...], "created_at": "...", "updated_at": "..."}
+     * - 400 Bad Request: {"error": "invalid_page_type", "message": "Page type must be one of: home, catalog, product, contact"}
+     * - 400 Bad Request: {"error": "validation_error", "message": "Component id is required"}
+     * - 404 Not Found: {"error": "page_not_found", "message": "Page of type 'home' not found..."}
+     * - 500 Internal Server Error: {"error": "An unexpected error occurred"}
+     */
+    #[Route('/api/pages/{type}', name: 'api_pages_update_by_type', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
+    public function updatePageByType(
+        string $type,
+        #[MapRequestPayload] UpdatePageLayoutRequest $request
+    ): JsonResponse {
+        try {
+            // Validate and convert type parameter to PageType enum
+            // This will throw ValueError if the type is invalid
+            $pageType = PageType::fromString($type);
+
+            // Get the authenticated user from security context
+            /** @var User $authenticatedUser */
+            $authenticatedUser = $this->getUser();
+
+            if (!$authenticatedUser instanceof User) {
+                $this->logger->error('Authenticated user is not a User instance', [
+                    'user_class' => get_class($authenticatedUser),
+                ]);
+
+                return new JsonResponse(
+                    ['error' => 'Authentication error'],
+                    JsonResponse::HTTP_UNAUTHORIZED
+                );
+            }
+
+            // Transform request DTO to Layout ValueObject
+            // This may throw InvalidArgumentException if layout structure is invalid at domain level
+            $layout = $request->getLayout();
+
+            // Update page layout via service layer
+            $updatedPage = $this->pageService->updatePageLayout(
+                $authenticatedUser->getId(),
+                $pageType,
+                $layout
+            );
+
+            // Return updated page data (PageReadModel auto-serializes via jsonSerialize())
+            return new JsonResponse(
+                $updatedPage,
+                JsonResponse::HTTP_OK
+            );
+        } catch (\ValueError $exception) {
+            // Invalid page type parameter
+            $this->logger->info('Invalid page type parameter', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'invalid_page_type',
+                    'message' => 'Page type must be one of: home, catalog, product, contact'
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        } catch (\InvalidArgumentException $exception) {
+            // Invalid layout structure at domain level (from Layout::fromArray or ComponentDefinition::fromArray)
+            $this->logger->info('Invalid layout structure', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'validation_error',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        } catch (PageNotFoundException $exception) {
+            // Page not found for user
+            $this->logger->info('Page not found for update', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'page_not_found',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        } catch (ShopNotFoundException $exception) {
+            // User has no shop (edge case)
+            $this->logger->info('Shop not found for user', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'shop_not_found',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        } catch (\Throwable $exception) {
+            // Unexpected error
+            $this->logger->error('Unexpected error updating page layout', [
                 'type' => $type,
                 'exception' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString(),
