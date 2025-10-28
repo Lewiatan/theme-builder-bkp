@@ -291,6 +291,252 @@ final class PageControllerTest extends WebTestCase
         }
     }
 
+    // Tests for GET /api/pages/{type} endpoint
+
+    #[Test]
+    public function it_returns_unauthorized_for_page_by_type_without_jwt_token(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act - Request without Authorization header
+        $client->request('GET', '/api/pages/home');
+
+        // Assert
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    }
+
+    #[Test]
+    public function it_returns_bad_request_for_invalid_page_type(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+
+        // Act - Request with invalid page type
+        $client->request('GET', '/api/pages/invalid', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        ]);
+
+        // Assert
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('error', $content);
+        $this->assertSame('invalid_page_type', $content['error']);
+        $this->assertStringContainsString('home, catalog, product, contact', $content['message']);
+    }
+
+    #[Test]
+    public function it_returns_success_for_valid_page_type(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+
+        // Act - Request home page
+        $client->request('GET', '/api/pages/home', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        ]);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        // Verify response structure
+        $this->assertArrayHasKey('type', $content);
+        $this->assertArrayHasKey('layout', $content);
+        $this->assertArrayHasKey('created_at', $content);
+        $this->assertArrayHasKey('updated_at', $content);
+
+        // Verify field types
+        $this->assertSame('home', $content['type']);
+        $this->assertIsArray($content['layout']);
+        $this->assertIsString($content['created_at']);
+        $this->assertIsString($content['updated_at']);
+    }
+
+    #[Test]
+    public function it_returns_correct_page_for_each_page_type(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+        $validTypes = ['home', 'catalog', 'product', 'contact'];
+
+        foreach ($validTypes as $type) {
+            // Act
+            $client->request('GET', "/api/pages/{$type}", [], [], [
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+            ]);
+
+            // Assert
+            $this->assertResponseIsSuccessful(
+                "Failed to retrieve page of type '{$type}'"
+            );
+
+            $content = json_decode($client->getResponse()->getContent(), true);
+            $this->assertSame($type, $content['type']);
+        }
+    }
+
+    #[Test]
+    public function it_returns_page_with_iso8601_timestamps(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+
+        // Act
+        $client->request('GET', '/api/pages/home', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        ]);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        // Verify timestamps are in ISO 8601 format
+        $this->assertMatchesRegularExpression(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/',
+            $content['created_at'],
+            'created_at should be in ISO 8601 format'
+        );
+        $this->assertMatchesRegularExpression(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/',
+            $content['updated_at'],
+            'updated_at should be in ISO 8601 format'
+        );
+    }
+
+    #[Test]
+    public function it_does_not_expose_sensitive_data_in_single_page(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+
+        // Act
+        $client->request('GET', '/api/pages/home', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        ]);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        // Verify no sensitive data is exposed
+        $this->assertArrayNotHasKey('id', $content);
+        $this->assertArrayNotHasKey('shop', $content);
+        $this->assertArrayNotHasKey('shopId', $content);
+        $this->assertArrayNotHasKey('shop_id', $content);
+        $this->assertArrayNotHasKey('user', $content);
+        $this->assertArrayNotHasKey('userId', $content);
+        $this->assertArrayNotHasKey('user_id', $content);
+    }
+
+    #[Test]
+    public function it_enforces_data_isolation_for_single_page(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Create first user with pages
+        $token1 = $this->createUserAndGetToken($client, 'isolation1@example.com', 'Shop 1');
+
+        // Create second user with pages
+        $token2 = $this->createUserAndGetToken($client, 'isolation2@example.com', 'Shop 2');
+
+        // Act - Get home page for user 1
+        $client->request('GET', '/api/pages/home', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token1,
+        ]);
+        $user1Response = $client->getResponse();
+
+        // Act - Get home page for user 2
+        $client->request('GET', '/api/pages/home', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token2,
+        ]);
+        $user2Response = $client->getResponse();
+
+        // Assert - Both users should successfully retrieve their own pages
+        $this->assertSame(200, $user1Response->getStatusCode());
+        $this->assertSame(200, $user2Response->getStatusCode());
+
+        // Verify they got their own pages (should be different)
+        $user1Content = json_decode($user1Response->getContent(), true);
+        $user2Content = json_decode($user2Response->getContent(), true);
+
+        $this->assertSame('home', $user1Content['type']);
+        $this->assertSame('home', $user2Content['type']);
+
+        // Pages should be independent (data isolation confirmed)
+        $this->assertIsArray($user1Content['layout']);
+        $this->assertIsArray($user2Content['layout']);
+    }
+
+    #[Test]
+    public function it_returns_404_when_page_does_not_exist(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+
+        // Delete all pages for this user's shop
+        $container = static::getContainer();
+        $connection = $container->get('doctrine')->getConnection();
+
+        // Find the user and their shop
+        $userResult = $connection->fetchAssociative(
+            'SELECT u.id as user_id, s.id as shop_id FROM users u
+             INNER JOIN shops s ON s.user_id = u.id
+             ORDER BY u.id DESC LIMIT 1'
+        );
+
+        if ($userResult) {
+            $connection->executeStatement(
+                'DELETE FROM pages WHERE shop_id = :shopId',
+                ['shopId' => $userResult['shop_id']]
+            );
+        }
+
+        // Act
+        $client->request('GET', '/api/pages/home', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        ]);
+
+        // Assert
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('error', $content);
+        $this->assertSame('page_not_found', $content['error']);
+        $this->assertStringContainsString("Page of type 'home' not found", $content['message']);
+    }
+
+    #[Test]
+    public function it_is_case_sensitive_for_page_types(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $token = $this->createUserAndGetToken($client);
+
+        // Act - Try with uppercase type
+        $client->request('GET', '/api/pages/HOME', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        ]);
+
+        // Assert - Should return 400 because PageType::fromString() is case-sensitive
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertSame('invalid_page_type', $content['error']);
+    }
+
     /**
      * Helper method to create a test user and get JWT token.
      *

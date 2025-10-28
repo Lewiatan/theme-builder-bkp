@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Exception\PageNotFoundException;
 use App\Exception\ShopNotFoundException;
 use App\Model\Entity\User;
+use App\Model\Enum\PageType;
 use App\Service\PageService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -80,6 +82,111 @@ final class PageController extends AbstractController
             );
         } catch (\Throwable $exception) {
             $this->logger->error('Unexpected error retrieving pages', [
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            return new JsonResponse(
+                ['error' => 'An unexpected error occurred'],
+                JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    /**
+     * Retrieves a specific page by type for the authenticated user's shop.
+     *
+     * Returns a single page with its layout configuration and metadata.
+     * The page type must be one of: home, catalog, product, contact.
+     * Pages are automatically filtered to only include those belonging
+     * to the authenticated user's shop.
+     *
+     * @param string $type Page type path parameter (home, catalog, product, contact)
+     * @return JsonResponse Page data (200), invalid type (400), page not found (404), or error (500)
+     *
+     * Response examples:
+     * - 200 OK: {"type": "home", "layout": [...], "created_at": "...", "updated_at": "..."}
+     * - 400 Bad Request: {"error": "invalid_page_type", "message": "Page type must be one of: home, catalog, product, contact"}
+     * - 404 Not Found: {"error": "page_not_found", "message": "Page of type 'home' not found for user..."}
+     * - 500 Internal Server Error: {"error": "An unexpected error occurred"}
+     */
+    #[Route('/api/pages/{type}', name: 'api_pages_get_by_type', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function getPageByType(string $type): JsonResponse
+    {
+        try {
+            // Validate and convert type parameter to PageType enum
+            // This will throw ValueError if the type is invalid
+            $pageType = PageType::fromString($type);
+
+            // Get the authenticated user from security context
+            /** @var User $authenticatedUser */
+            $authenticatedUser = $this->getUser();
+
+            if (!$authenticatedUser instanceof User) {
+                $this->logger->error('Authenticated user is not a User instance', [
+                    'user_class' => get_class($authenticatedUser),
+                ]);
+
+                return new JsonResponse(
+                    ['error' => 'Authentication error'],
+                    JsonResponse::HTTP_UNAUTHORIZED
+                );
+            }
+
+            // Retrieve page by type for user's shop
+            $page = $this->pageService->getPageByType($authenticatedUser->getId(), $pageType);
+
+            // Return page data (PageReadModel auto-serializes via jsonSerialize())
+            return new JsonResponse(
+                $page,
+                JsonResponse::HTTP_OK
+            );
+        } catch (\ValueError $exception) {
+            // Invalid page type parameter
+            $this->logger->info('Invalid page type parameter', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'invalid_page_type',
+                    'message' => 'Page type must be one of: home, catalog, product, contact'
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        } catch (PageNotFoundException $exception) {
+            // Page not found for user
+            $this->logger->info('Page not found', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'page_not_found',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        } catch (ShopNotFoundException $exception) {
+            // User has no shop (edge case)
+            $this->logger->info('Shop not found for user', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'shop_not_found',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        } catch (\Throwable $exception) {
+            // Unexpected error
+            $this->logger->error('Unexpected error retrieving page by type', [
+                'type' => $type,
                 'exception' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString(),
             ]);

@@ -102,4 +102,51 @@ final class PageRepository extends ServiceEntityRepository
             );
         }, $results);
     }
+
+    /**
+     * Retrieves a single page by shop ID and page type for authenticated access.
+     *
+     * Returns PageReadModel containing type, layout, and timestamps,
+     * decoupled from the domain entity to prevent accidental data exposure.
+     *
+     * Performance optimization: Uses plain query with array result to bypass
+     * entity hydration since we don't need entity capabilities for this read-only operation.
+     *
+     * @param string $shopId UUID of the shop
+     * @param PageType $type Page type to retrieve
+     * @return PageReadModel|null Page read model if found, null otherwise
+     */
+    public function findOneByShopIdAndType(string $shopId, PageType $type): ?PageReadModel
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT p.type, p.layout, p.created_at, p.updated_at
+            FROM pages p
+            WHERE p.shop_id = :shopId AND p.type = :type
+        ';
+
+        $result = $conn->fetchAssociative($sql, [
+            'shopId' => $shopId,
+            'type' => $type->value,
+        ]);
+
+        if ($result === false) {
+            return null;
+        }
+
+        // Decode JSON layout column
+        $layout = json_decode($result['layout'], true);
+
+        // Format timestamps to ISO 8601
+        $createdAt = (new \DateTimeImmutable($result['created_at']))->format('c');
+        $updatedAt = (new \DateTimeImmutable($result['updated_at']))->format('c');
+
+        return new PageReadModel(
+            $result['type'],
+            $layout,
+            $createdAt,
+            $updatedAt
+        );
+    }
 }
