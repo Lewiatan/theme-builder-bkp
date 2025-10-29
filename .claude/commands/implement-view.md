@@ -5,7 +5,7 @@ argument-hint: "<implementation-plan-file-or-content>"
 
 # View Implementation
 
-Your task is to implement a frontend view based on the provided implementation plan and implementation rules. Your goal is to create a detailed and accurate implementation that conforms to the provided plan, correctly represents the component structure, integrates with the API, and handles all specified user interactions.
+Use the `implement-react` skill.
 
 First, review the implementation plan:
 

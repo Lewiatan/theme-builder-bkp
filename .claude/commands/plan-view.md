@@ -5,7 +5,7 @@ argument-hint: "<view-description> <user-stories> <endpoint-description> <endpoi
 
 # View Implementation Plan Generator
 
-As a software architect, your task is to create a detailed implementation plan for a new view in a web application. This plan should be comprehensive and clear enough for another frontend developer to implement the view correctly and efficiently.
+Use the `architect` skill.
 
 First, review the following information:
 

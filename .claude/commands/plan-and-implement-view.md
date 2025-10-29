@@ -17,7 +17,7 @@ Use `parameter-validation` skill to validate all 4 parameters. **STOP if any are
 
 ## Phase 1: Planning
 
-Use the `architect` skill, then run `/view-plan` with the 4 validated parameters
+Run `/view-plan` with the 4 validated parameters
 
 After planning completes, display the plan file path and **WAIT for user confirmation** before proceeding.
 
@@ -25,7 +25,7 @@ After planning completes, display the plan file path and **WAIT for user confirm
 
 **ONLY after user confirmation:**
 
-Read the implementation plan file (captures any user edits), then use the `implement-react` skill followed by `/view-implementation @[PLAN_FILE_PATH]`
+Read the implementation plan file (captures any user edits), then run `/view-implementation @[PLAN_FILE_PATH]`
 
 ## Notes
 
