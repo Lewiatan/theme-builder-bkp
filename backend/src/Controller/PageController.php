@@ -341,4 +341,111 @@ final class PageController extends AbstractController
             );
         }
     }
+
+    /**
+     * Resets a page to its default layout for the authenticated user's shop.
+     *
+     * Loads the default layout for the specified page type and replaces
+     * the current layout. This operation is irreversible (no undo in MVP).
+     * The page type must be one of: home, catalog, product, contact.
+     *
+     * @param string $type Page type path parameter (home, catalog, product, contact)
+     * @return JsonResponse Updated page data (200), invalid type (400), not found (404), or error (500)
+     *
+     * Response examples:
+     * - 200 OK: {"type": "home", "layout": [...], "created_at": "...", "updated_at": "..."}
+     * - 400 Bad Request: {"error": "invalid_page_type", "message": "Page type must be one of: home, catalog, product, contact"}
+     * - 404 Not Found: {"error": "page_not_found", "message": "Page of type 'home' not found..."}
+     * - 500 Internal Server Error: {"error": "An unexpected error occurred"}
+     */
+    #[Route('/api/pages/{type}/reset', name: 'api_pages_reset', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function resetPage(string $type): JsonResponse
+    {
+        try {
+            // Validate and convert type parameter to PageType enum
+            // This will throw ValueError if the type is invalid
+            $pageType = PageType::fromString($type);
+
+            // Get the authenticated user from security context
+            /** @var User $authenticatedUser */
+            $authenticatedUser = $this->getUser();
+
+            if (!$authenticatedUser instanceof User) {
+                $this->logger->error('Authenticated user is not a User instance', [
+                    'user_class' => get_class($authenticatedUser),
+                ]);
+
+                return new JsonResponse(
+                    ['error' => 'Authentication error'],
+                    JsonResponse::HTTP_UNAUTHORIZED
+                );
+            }
+
+            // Reset page to default layout via service layer
+            $resetPage = $this->pageService->resetPageToDefault(
+                $authenticatedUser->getId(),
+                $pageType
+            );
+
+            // Return updated page data (PageReadModel auto-serializes via jsonSerialize())
+            return new JsonResponse(
+                $resetPage,
+                JsonResponse::HTTP_OK
+            );
+        } catch (\ValueError $exception) {
+            // Invalid page type parameter
+            $this->logger->info('Invalid page type parameter for reset', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'invalid_page_type',
+                    'message' => 'Page type must be one of: home, catalog, product, contact'
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        } catch (PageNotFoundException $exception) {
+            // Page not found for user
+            $this->logger->info('Page not found for reset', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'page_not_found',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        } catch (ShopNotFoundException $exception) {
+            // User has no shop (edge case)
+            $this->logger->info('Shop not found for user during page reset', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(
+                [
+                    'error' => 'shop_not_found',
+                    'message' => $exception->getMessage()
+                ],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        } catch (\Throwable $exception) {
+            // Unexpected error
+            $this->logger->error('Unexpected error resetting page to default', [
+                'type' => $type,
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            return new JsonResponse(
+                ['error' => 'An unexpected error occurred'],
+                JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }

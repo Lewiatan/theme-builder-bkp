@@ -22,7 +22,8 @@ final readonly class PageService
 {
     public function __construct(
         private ShopRepository $shopRepository,
-        private PageRepository $pageRepository
+        private PageRepository $pageRepository,
+        private DefaultLayoutService $defaultLayoutService
     ) {}
 
     /**
@@ -125,6 +126,65 @@ final readonly class PageService
 
         // Update page layout using entity method (updates timestamp automatically)
         $page->updateLayout($layout);
+
+        // Persist changes to database
+        $this->pageRepository->save($page);
+
+        // Construct and return PageReadModel from updated entity
+        return new PageReadModel(
+            $page->getType()->value,
+            $page->getLayout()->toArray(),
+            $page->getCreatedAt()->format('c'),
+            $page->getUpdatedAt()->format('c')
+        );
+    }
+
+    /**
+     * Resets a page to its default layout for the authenticated user's shop.
+     *
+     * Loads the default layout for the specified page type from DefaultLayoutService
+     * and updates the page entity. The updated_at timestamp is automatically updated
+     * by the entity's updateLayout() method.
+     *
+     * Business logic flow:
+     * 1. Find shop by user ID
+     * 2. Find page entity by shop ID and page type
+     * 3. Load default layout from DefaultLayoutService
+     * 4. Update page layout using entity's updateLayout method
+     * 5. Persist changes to database
+     * 6. Return updated PageReadModel
+     *
+     * @param string $userId UUID of the authenticated user
+     * @param PageType $type Page type to reset
+     * @return PageReadModel Updated page read model with default layout and new timestamp
+     * @throws ShopNotFoundException If user doesn't have an associated shop
+     * @throws PageNotFoundException If page doesn't exist
+     */
+    public function resetPageToDefault(
+        string $userId,
+        PageType $type
+    ): PageReadModel {
+        // Find shop by user ID
+        $shop = $this->shopRepository->findByUserId($userId);
+
+        // If user has no shop, throw exception (edge case)
+        if ($shop === null) {
+            throw new ShopNotFoundException($userId);
+        }
+
+        // Retrieve page entity by shop ID and type (for updating)
+        $page = $this->pageRepository->findByShopIdAndType($shop->getId(), $type);
+
+        // If page doesn't exist, throw exception
+        if ($page === null) {
+            throw new PageNotFoundException($userId, $type->value);
+        }
+
+        // Load default layout for the page type
+        $defaultLayout = $this->defaultLayoutService->getDefaultLayout($type);
+
+        // Update page layout using entity method (updates timestamp automatically)
+        $page->updateLayout($defaultLayout);
 
         // Persist changes to database
         $this->pageRepository->save($page);
