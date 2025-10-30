@@ -59,7 +59,7 @@ export interface ComponentRegistryEntry {
   meta: ComponentMetadata; // From shared component's meta.ts
   Component: React.LazyExoticComponent<React.ComponentType<any>>;
   category: ComponentCategory;
-  defaultSettings: Record<string, unknown>; // Default settings for new instances
+  defaultProps: Record<string, unknown>; // Default props for new instances
 }
 
 // Component registry map

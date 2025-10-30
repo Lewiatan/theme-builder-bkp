@@ -114,7 +114,7 @@ export function CanvasComponent({
       >
         <div className="rounded-lg border border-transparent transition-colors group-hover:border-blue-300">
           <Component
-            {...componentDefinition.settings}
+            {...componentDefinition.props}
             variant={componentDefinition.variant}
           />
         </div>

@@ -41,7 +41,7 @@ export const componentRegistry: ComponentRegistry = {
     },
     Component: Heading,
     category: 'Content' as ComponentCategory,
-    defaultSettings: headingMeta.defaultConfig || {
+    defaultProps: headingMeta.defaultConfig || {
       text: 'Heading Text',
       level: 'h2',
       variant: 'text-only',
@@ -63,7 +63,7 @@ export const componentRegistry: ComponentRegistry = {
     },
     Component: TextSection,
     category: 'Content' as ComponentCategory,
-    defaultSettings: textSectionMeta.defaultConfig || {
+    defaultProps: textSectionMeta.defaultConfig || {
       content: 'Text content',
       variant: '1-column',
     },
@@ -84,7 +84,7 @@ export const componentRegistry: ComponentRegistry = {
     },
     Component: HeaderNavigation,
     category: 'Navigation' as ComponentCategory,
-    defaultSettings: headerNavigationMeta.defaultConfig || {
+    defaultProps: headerNavigationMeta.defaultConfig || {
       variant: 'default',
     },
   },
@@ -104,7 +104,7 @@ export const componentRegistry: ComponentRegistry = {
     },
     Component: CategoryPills,
     category: 'Navigation' as ComponentCategory,
-    defaultSettings: categoryPillsMeta.defaultConfig || {
+    defaultProps: categoryPillsMeta.defaultConfig || {
       variant: 'default',
     },
   },
@@ -124,7 +124,7 @@ export const componentRegistry: ComponentRegistry = {
     },
     Component: ProductListGrid,
     category: 'Products' as ComponentCategory,
-    defaultSettings: productListGridMeta.defaultConfig || {
+    defaultProps: productListGridMeta.defaultConfig || {
       variant: 'grid-3',
     },
   },

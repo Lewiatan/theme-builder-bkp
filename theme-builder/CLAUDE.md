@@ -8,6 +8,7 @@
 - No routing library (simple SPA)
 - Expected to have drag-and-drop functionality (dnd kit mentioned in main README)
 - Component-based architecture for 13 predefined components
+- Shadcn UI library for UI components
 
 ## Coding Standards
 

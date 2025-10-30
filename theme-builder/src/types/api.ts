@@ -8,7 +8,7 @@ export const ComponentDefinitionSchema = z.object({
   id: z.string().uuid(),
   type: z.string().min(1),
   variant: z.string().min(1),
-  settings: z.record(z.unknown()),
+  props: z.record(z.string(), z.unknown()),
 });
 
 // Component definition in layout array
@@ -16,15 +16,15 @@ export interface ComponentDefinition {
   id: string; // UUID v4
   type: string; // e.g., "hero", "text-section", "featured-products"
   variant: string; // e.g., "with-image", "grid-3", "2-column"
-  settings: Record<string, unknown>; // Component-specific settings object
+  props: Record<string, unknown>; // Component-specific props object
 }
 
 // Zod schema for PageData
 export const PageDataSchema = z.object({
   type: z.enum(['home', 'catalog', 'product', 'contact']),
   layout: z.array(ComponentDefinitionSchema),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  created_at: z.string().datetime({ offset: true }),
+  updated_at: z.string().datetime({ offset: true }),
 });
 
 // Response from GET /api/pages/{type}

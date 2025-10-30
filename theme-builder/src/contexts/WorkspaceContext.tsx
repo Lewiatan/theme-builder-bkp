@@ -113,7 +113,7 @@ function workspaceReducer(
         id,
         type: componentType,
         variant: defaultVariant,
-        settings: { ...componentEntry.defaultSettings },
+        props: { ...componentEntry.defaultProps },
       };
 
       const newLayout = [...state.currentLayout];
