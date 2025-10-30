@@ -24,7 +24,8 @@ const ProductListGrid = lazy(() => import('@shared/components/ProductListGrid'))
  * - Display components on the canvas
  * - Apply default settings when adding new components
  */
-export const componentRegistry: ComponentRegistry = {
+// Base registry with kebab-case keys
+const baseRegistry: ComponentRegistry = {
   'heading': {
     meta: {
       id: 'heading',
@@ -130,6 +131,17 @@ export const componentRegistry: ComponentRegistry = {
   },
 };
 
+// Export registry with both kebab-case and PascalCase keys for compatibility
+export const componentRegistry: ComponentRegistry = {
+  ...baseRegistry,
+  // Add PascalCase aliases for backend compatibility
+  'Heading': baseRegistry['heading'],
+  'TextSection': baseRegistry['text-section'],
+  'HeaderNavigation': baseRegistry['header-navigation'],
+  'CategoryPills': baseRegistry['category-pills'],
+  'ProductListGrid': baseRegistry['product-list-grid'],
+};
+
 /**
  * Component categories for organizing the library sidebar
  */
@@ -150,9 +162,10 @@ export function getComponentByType(type: string) {
 
 /**
  * Get all components in a specific category
+ * Only returns kebab-case keys to avoid duplicates
  */
 export function getComponentsByCategory(category: ComponentCategory) {
-  return Object.entries(componentRegistry)
+  return Object.entries(baseRegistry)
     .filter(([, entry]) => entry.category === category)
     .map(([type, entry]) => ({ type, ...entry }));
 }

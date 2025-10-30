@@ -155,15 +155,28 @@ final readonly class AuthService
             throw new InvalidCredentialsException();
         }
 
+        // Get user's shop (every user must have a shop)
+        $shop = $this->shopRepository->findByUserId($user->getId());
+
+        if ($shop === null) {
+            $this->logger->error('Login failed: user has no associated shop', [
+                'userId' => $user->getId(),
+                'email' => $email,
+            ]);
+            throw new \RuntimeException('User account is incomplete: no shop found');
+        }
+
         // Generate JWT token with custom claims
         $token = $this->jwtManager->createFromPayload($user, [
             'userId' => $user->getId(),
             'email' => $user->getEmail()->getValue(),
+            'shopId' => $shop->getId(),
         ]);
 
         $this->logger->info('User logged in successfully', [
             'userId' => $user->getId(),
             'email' => $email,
+            'shopId' => $shop->getId(),
         ]);
 
         // Return token and user read model

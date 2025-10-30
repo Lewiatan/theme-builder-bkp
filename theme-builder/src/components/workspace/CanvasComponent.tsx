@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import type { ComponentRegistry } from '../../types/workspace';
 import { ComponentDefinition } from '@/types/api';
+import { getShopIdFromToken } from '@/lib/auth';
 
 export interface CanvasComponentProps {
   componentDefinition: ComponentDefinition;
@@ -57,6 +58,20 @@ export function CanvasComponent({
   }
 
   const Component = componentEntry.Component;
+
+  // Get shopId from JWT token
+  const shopId = getShopIdFromToken();
+
+  if (!shopId) {
+    throw new Error('Shop ID not found in JWT token. Please log in again.');
+  }
+
+  // Provide default props for preview context
+  const defaultProps = {
+    shopId,
+    isLoading: false,
+    error: null,
+  };
 
   return (
     <div
@@ -114,6 +129,7 @@ export function CanvasComponent({
       >
         <div className="rounded-lg border border-transparent transition-colors group-hover:border-blue-300">
           <Component
+            {...defaultProps}
             {...componentDefinition.props}
             variant={componentDefinition.variant}
           />
