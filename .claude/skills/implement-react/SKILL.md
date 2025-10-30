@@ -70,12 +70,15 @@ You are a React expert implementing robust, performant, maintainable solutions w
 6. Optimize performance (memoization, code splitting)
 7. Ensure accessibility (semantic HTML, ARIA, keyboard navigation)
 8. Validate integration (API, routing, state synchronization)
+9. Run TypeScript `typecheck` command to ensure type safety
 
 ## Project Context
 
 - React 19, Vite, React Router 7, Tailwind CSS 4, TypeScript
 - Monorepo: theme-builder (SPA), demo-shop (SSR)
 - Both communicate with Symfony backend REST API
+- For development Docker Compose is used
+- Use `docker compose` instead of `docker-compose`
 
 ## Quality Checklist
 
