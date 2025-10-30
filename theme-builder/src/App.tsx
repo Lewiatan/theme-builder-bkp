@@ -1,34 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import { Toaster } from 'sonner'
+import { WorkspaceProvider } from './contexts/WorkspaceContext'
+import { WorkspaceView } from './components/workspace/WorkspaceView'
+import { LoginForm } from './components/auth/LoginForm'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
+  useEffect(() => {
+    // Check if user has a token
+    const token = localStorage.getItem('jwt_token')
+    setIsAuthenticated(!!token)
+  }, [])
+
+  // Show nothing while checking authentication
+  if (isAuthenticated === null) {
+    return null
+  }
+
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return <LoginForm />
+  }
+
+  // Show workspace if authenticated
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <WorkspaceProvider>
+      <WorkspaceView />
+      <Toaster position="bottom-right" richColors />
+    </WorkspaceProvider>
   )
 }
 
