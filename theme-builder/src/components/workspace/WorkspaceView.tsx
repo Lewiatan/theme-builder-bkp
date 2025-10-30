@@ -203,7 +203,7 @@ export function WorkspaceView() {
             role="main"
             aria-label="Page canvas"
           >
-            <div className="mx-auto max-w-5xl">
+            <div className="w-full">
               <Canvas
                 layout={currentLayout}
                 componentRegistry={componentRegistry}
