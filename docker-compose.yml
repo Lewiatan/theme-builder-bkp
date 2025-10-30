@@ -82,6 +82,7 @@ services:
     environment:
       NODE_ENV: development
       VITE_API_URL: ${VITE_API_URL}
+      VITE_DEFAULT_JWT_TOKEN: ${VITE_DEFAULT_JWT_TOKEN}
     volumes:
       - ./theme-builder:/app
       - ./shared:/shared
