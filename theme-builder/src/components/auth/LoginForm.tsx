@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
 export function LoginForm() {
-  const [token, setToken] = useState('eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NjE4MjA1MTIsImV4cCI6MTc2MTgyNDExMiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJJZCI6ImRlbW9AZXhhbXBsZS5jb20iLCJlbWFpbCI6ImRlbW9AZXhhbXBsZS5jb20ifQ.RpYVyThLARvwkj1MciuFtvCcgDAlDfxCXuHGcx5nQtdJXW-s7BeAEm--yui6F5TheaWzfEAfcOfMXtYUQ48CIyW3nlgxYcQHOnbSJzOm33n04EMFx_u3gkTJwmW_BD6OwZv_rRSnc1nPz028ANaISJOxY-pcyebQQ50sdGp4SAaTxSiOIObWyHf_PjwIEo1F4S9y6hkNfG86ItJko5Z3cMM46v5xwQ5exaY4KRjXH8IKCjFvsEwV3NaW9_v_9jnKSU7AiCorFQz-RXY6tzy2rK1BWbGxDlGW6N9IrfuyafifsQXlE2Bv3m8gKcnMLYnWSAftJAEQCAfvm5Oawm7FhA');
+  const [token, setToken] = useState(import.meta.env.VITE_DEFAULT_JWT_TOKEN || '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
