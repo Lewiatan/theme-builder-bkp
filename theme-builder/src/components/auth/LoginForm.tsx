@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
 export function LoginForm() {
   const [token, setToken] = useState(import.meta.env.VITE_DEFAULT_JWT_TOKEN || '');
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (token.trim()) {
       localStorage.setItem('jwt_token', token.trim());
-      window.location.href = '/';
+      navigate('/', { replace: true });
     }
   };
 

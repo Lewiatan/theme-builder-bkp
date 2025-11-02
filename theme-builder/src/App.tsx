@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { WorkspaceProvider } from './contexts/WorkspaceContext'
 import { WorkspaceView } from './components/workspace/WorkspaceView'
@@ -19,17 +20,38 @@ function App() {
     return null
   }
 
-  // Show login form if not authenticated
-  if (!isAuthenticated) {
-    return <LoginForm />
-  }
-
-  // Show workspace if authenticated
   return (
-    <WorkspaceProvider>
-      <WorkspaceView />
+    <>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/" replace />
+            ) : (
+              <LoginForm />
+            )
+          }
+        />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <WorkspaceProvider>
+                <WorkspaceView />
+              </WorkspaceProvider>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="*"
+          element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />}
+        />
+      </Routes>
       <Toaster position="bottom-right" richColors />
-    </WorkspaceProvider>
+    </>
   )
 }
 
