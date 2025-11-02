@@ -228,5 +228,5 @@ The original architecture planned:
 4. **Backend Entrypoint**: The entrypoint.sh automatically runs `composer install` on container start
 5. **Docker Files Organization**: Docker-related files are in `backend/docker/` directory (nginx.conf, entrypoint.sh)
 
-- Use "docker-compose" instead of "docker compose"
+- Use "docker compose" instead of "docker-compose"
 - Run all project commands like `comoposer`, `npm` via container
