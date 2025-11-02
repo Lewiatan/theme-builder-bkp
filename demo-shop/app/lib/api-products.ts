@@ -2,8 +2,24 @@ import { z } from 'zod';
 import { buildApiUrl } from './api';
 
 /**
- * Zod schema for validating a single product
- * Matches the Product interface from shared components
+ * Zod schema for validating a single product from the API response
+ * Backend returns fields in snake_case, which we transform to camelCase
+ */
+const ApiProductSchema = z.object({
+  id: z.number().int().positive(),
+  category_id: z.number().int().positive(),
+  category_name: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string(),
+  price: z.number().int().nonnegative(),
+  sale_price: z.number().int().nonnegative().nullable(),
+  image_thumbnail: z.string().min(1),
+  image_medium: z.string().min(1),
+  image_large: z.string().min(1),
+});
+
+/**
+ * Product schema with camelCase for use in the application
  */
 const ProductSchema = z.object({
   id: z.number().int().positive(),
@@ -24,16 +40,28 @@ const ProductSchema = z.object({
 export type Product = z.infer<typeof ProductSchema>;
 
 /**
- * Zod schema for validating products API response
+ * Zod schema for validating products API response (with snake_case fields)
  */
-const ProductsResponseSchema = z.object({
-  products: z.array(ProductSchema),
+const ApiProductsResponseSchema = z.object({
+  products: z.array(ApiProductSchema),
 });
 
 /**
- * TypeScript type for the full API response
+ * Transforms a product from API format (snake_case) to application format (camelCase)
  */
-export type ProductsResponse = z.infer<typeof ProductsResponseSchema>;
+function transformProduct(apiProduct: z.infer<typeof ApiProductSchema>): Product {
+  return {
+    id: apiProduct.id,
+    categoryId: apiProduct.category_id,
+    name: apiProduct.name,
+    description: apiProduct.description,
+    price: apiProduct.price,
+    salePrice: apiProduct.sale_price,
+    imageThumbnail: apiProduct.image_thumbnail,
+    imageMedium: apiProduct.image_medium,
+    imageLarge: apiProduct.image_large,
+  };
+}
 
 /**
  * Fetches products filtered by category ID from the backend API
@@ -83,14 +111,15 @@ export async function fetchProductsByCategory(categoryId: number): Promise<Produ
     const data: unknown = await response.json();
 
     // Validate response with Zod
-    const validationResult = ProductsResponseSchema.safeParse(data);
+    const validationResult = ApiProductsResponseSchema.safeParse(data);
 
     if (!validationResult.success) {
       console.error('Products API response validation failed:', validationResult.error);
       throw new Error('Invalid products data received from server');
     }
 
-    return validationResult.data.products;
+    // Transform API products to application format
+    return validationResult.data.products.map(transformProduct);
   } catch (error) {
     // Re-throw with context
     if (error instanceof Error) {
@@ -152,14 +181,15 @@ export async function fetchAllProducts(): Promise<Product[]> {
     const data: unknown = await response.json();
 
     // Validate response with Zod
-    const validationResult = ProductsResponseSchema.safeParse(data);
+    const validationResult = ApiProductsResponseSchema.safeParse(data);
 
     if (!validationResult.success) {
       console.error('Products API response validation failed:', validationResult.error);
       throw new Error('Invalid products data received from server');
     }
 
-    return validationResult.data.products;
+    // Transform API products to application format
+    return validationResult.data.products.map(transformProduct);
   } catch (error) {
     // Re-throw with context
     if (error instanceof Error) {

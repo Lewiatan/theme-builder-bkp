@@ -135,6 +135,10 @@ export function WorkspaceView() {
     setIsThemeSidebarOpen((prev) => !prev);
   }, []);
 
+  const handleLibraryToggle = useCallback(() => {
+    setIsLibraryCollapsed((prev) => !prev);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -199,7 +203,7 @@ export function WorkspaceView() {
           {/* Left Sidebar - Component Library */}
           <ComponentLibrarySidebar
             isCollapsed={isLibraryCollapsed}
-            onCollapseToggle={() => setIsLibraryCollapsed(!isLibraryCollapsed)}
+            onCollapseToggle={handleLibraryToggle}
             componentRegistry={componentRegistry}
           />
 

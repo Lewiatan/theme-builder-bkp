@@ -84,11 +84,15 @@ export function CanvasComponent({
     );
   }
 
-  // Provide default props for preview context
-  const defaultProps = {
+  // Merge defaultProps from registry with saved props from database
+  // This ensures components have all required runtime props (like categories, products)
+  // even if the database only has the editable configuration props
+  const mergedProps = {
     shopId,
     isLoading: false,
     error: null,
+    ...componentEntry.defaultProps, // Default props from componentRegistry
+    ...componentDefinition.props,    // Saved props from database (overrides defaults)
   };
 
   return (
@@ -147,8 +151,7 @@ export function CanvasComponent({
       >
         <div className="rounded-lg border border-transparent transition-colors group-hover:border-blue-300">
           <Component
-            {...defaultProps}
-            {...componentDefinition.props}
+            {...mergedProps}
             variant={componentDefinition.variant}
           />
         </div>

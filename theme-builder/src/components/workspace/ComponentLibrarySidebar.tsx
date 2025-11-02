@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import type { ComponentRegistry } from '../../types/workspace';
 import { DraggableComponentCard } from './DraggableComponentCard';
@@ -15,26 +15,30 @@ export function ComponentLibrarySidebar({
   onCollapseToggle,
   componentRegistry,
 }: ComponentLibrarySidebarProps) {
-  // Load collapsed state from localStorage
+  // Track if we've loaded from localStorage to prevent infinite loops
+  const hasLoadedFromStorage = useRef(false);
+
+  // Load collapsed state from localStorage once on mount
   useEffect(() => {
-    const saved = localStorage.getItem('componentLibrary:collapsed');
-    if (saved !== null && onCollapseToggle) {
-      const savedCollapsed = JSON.parse(saved);
-      if (savedCollapsed !== isCollapsed) {
-        onCollapseToggle();
+    if (!hasLoadedFromStorage.current) {
+      const saved = localStorage.getItem('componentLibrary:collapsed');
+      if (saved !== null) {
+        const savedCollapsed = JSON.parse(saved);
+        if (savedCollapsed !== isCollapsed) {
+          onCollapseToggle();
+        }
       }
+      hasLoadedFromStorage.current = true;
     }
-  }, [onCollapseToggle, isCollapsed]);
+  }, []);
 
   // Save collapsed state to localStorage
   useEffect(() => {
     localStorage.setItem('componentLibrary:collapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
-  // Get all components as a flat list (using componentRegistry to support both kebab-case and PascalCase)
-  // Filter to only show kebab-case keys to avoid duplicates in the UI
+  // Get all components as a flat list
   const allComponents = Object.entries(componentRegistry)
-    .filter(([type]) => type.includes('-')) // Only kebab-case keys
     .map(([type, entry]) => ({
       type,
       meta: entry.meta,

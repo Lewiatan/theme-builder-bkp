@@ -24,11 +24,10 @@ const ProductListGrid = lazy(() => import('@shared/components/ProductListGrid'))
  * - Display components on the canvas
  * - Apply default settings when adding new components
  */
-// Base registry with kebab-case keys (exported for UI listing to avoid duplicates)
-export const baseRegistry: ComponentRegistry = {
-  'heading': {
+export const componentRegistry: ComponentRegistry = {
+  'Heading': {
     meta: {
-      id: 'heading',
+      id: 'Heading',
       name: headingMeta.displayName,
       description: headingMeta.description,
       icon: 'Heading',
@@ -48,9 +47,9 @@ export const baseRegistry: ComponentRegistry = {
       variant: 'text-only',
     },
   },
-  'text-section': {
+  'TextSection': {
     meta: {
-      id: 'text-section',
+      id: 'TextSection',
       name: textSectionMeta.displayName,
       description: textSectionMeta.description,
       icon: 'FileText',
@@ -69,9 +68,9 @@ export const baseRegistry: ComponentRegistry = {
       variant: '1-column',
     },
   },
-  'header-navigation': {
+  'HeaderNavigation': {
     meta: {
-      id: 'header-navigation',
+      id: 'HeaderNavigation',
       name: headerNavigationMeta.displayName,
       description: headerNavigationMeta.description,
       icon: 'Menu',
@@ -89,9 +88,9 @@ export const baseRegistry: ComponentRegistry = {
       variant: 'default',
     },
   },
-  'category-pills': {
+  'CategoryPills': {
     meta: {
-      id: 'category-pills',
+      id: 'CategoryPills',
       name: categoryPillsMeta.displayName,
       description: categoryPillsMeta.description,
       icon: 'Tags',
@@ -105,13 +104,23 @@ export const baseRegistry: ComponentRegistry = {
     },
     Component: CategoryPills,
     category: 'Navigation' as ComponentCategory,
-    defaultProps: categoryPillsMeta.defaultConfig || {
-      variant: 'default',
+    defaultProps: {
+      ...(categoryPillsMeta.defaultConfig || {}),
+      categories: [
+        { id: 1, name: 'Electronics' },
+        { id: 2, name: 'Clothing' },
+        { id: 3, name: 'Home & Garden' },
+        { id: 4, name: 'Sports' },
+      ],
+      selectedCategoryId: null,
+      onCategorySelect: () => {}, // No-op function for editor
+      isLoading: false,
+      error: null,
     },
   },
-  'product-list-grid': {
+  'ProductListGrid': {
     meta: {
-      id: 'product-list-grid',
+      id: 'ProductListGrid',
       name: productListGridMeta.displayName,
       description: productListGridMeta.description,
       icon: 'LayoutGrid',
@@ -125,21 +134,47 @@ export const baseRegistry: ComponentRegistry = {
     },
     Component: ProductListGrid,
     category: 'Products' as ComponentCategory,
-    defaultProps: productListGridMeta.defaultConfig || {
-      variant: 'grid-3',
+    defaultProps: {
+      ...(productListGridMeta.defaultConfig || {}),
+      products: [
+        {
+          id: 1,
+          categoryId: 1,
+          name: 'Sample Product 1',
+          description: 'This is a sample product description',
+          price: 2999, // $29.99
+          salePrice: null,
+          imageThumbnail: 'https://via.placeholder.com/150',
+          imageMedium: 'https://via.placeholder.com/300',
+          imageLarge: 'https://via.placeholder.com/600',
+        },
+        {
+          id: 2,
+          categoryId: 1,
+          name: 'Sample Product 2',
+          description: 'Another sample product',
+          price: 4999, // $49.99
+          salePrice: 3999, // $39.99
+          imageThumbnail: 'https://via.placeholder.com/150',
+          imageMedium: 'https://via.placeholder.com/300',
+          imageLarge: 'https://via.placeholder.com/600',
+        },
+        {
+          id: 3,
+          categoryId: 2,
+          name: 'Sample Product 3',
+          description: 'Yet another sample product',
+          price: 1999, // $19.99
+          salePrice: null,
+          imageThumbnail: 'https://via.placeholder.com/150',
+          imageMedium: 'https://via.placeholder.com/300',
+          imageLarge: 'https://via.placeholder.com/600',
+        },
+      ],
+      isLoading: false,
+      error: null,
     },
   },
-};
-
-// Export registry with both kebab-case and PascalCase keys for compatibility
-export const componentRegistry: ComponentRegistry = {
-  ...baseRegistry,
-  // Add PascalCase aliases for backend compatibility
-  'Heading': baseRegistry['heading'],
-  'TextSection': baseRegistry['text-section'],
-  'HeaderNavigation': baseRegistry['header-navigation'],
-  'CategoryPills': baseRegistry['category-pills'],
-  'ProductListGrid': baseRegistry['product-list-grid'],
 };
 
 /**
@@ -162,10 +197,9 @@ export function getComponentByType(type: string) {
 
 /**
  * Get all components in a specific category
- * Only returns kebab-case keys to avoid duplicates
  */
 export function getComponentsByCategory(category: ComponentCategory) {
-  return Object.entries(baseRegistry)
+  return Object.entries(componentRegistry)
     .filter(([, entry]) => entry.category === category)
     .map(([type, entry]) => ({ type, ...entry }));
 }
