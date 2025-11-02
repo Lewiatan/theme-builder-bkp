@@ -28,11 +28,9 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     if (response.status === 401) {
-      // Clear token and redirect to login on auth failure (only if not already on login page)
+      // Clear token and reload page to show login form
       localStorage.removeItem('jwt_token');
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
+      window.location.href = '/';
       throw new ApiError('Authentication failed', 401);
     }
 

@@ -63,7 +63,25 @@ export function CanvasComponent({
   const shopId = getShopIdFromToken();
 
   if (!shopId) {
-    throw new Error('Shop ID not found in JWT token. Please log in again.');
+    return (
+      <div className="rounded-lg border-2 border-yellow-300 bg-yellow-50 p-4">
+        <p className="text-sm text-yellow-800 font-semibold">Invalid Token</p>
+        <p className="text-xs text-yellow-700 mt-1">
+          Shop ID not found in JWT token. Please log in again with a valid token.
+        </p>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => {
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/';
+          }}
+          className="mt-3"
+        >
+          Re-login
+        </Button>
+      </div>
+    );
   }
 
   // Provide default props for preview context

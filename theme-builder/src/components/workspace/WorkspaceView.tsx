@@ -145,7 +145,7 @@ export function WorkspaceView() {
           <div className="text-center">
             <p className="text-lg font-semibold text-gray-900">Not Authenticated</p>
             <p className="mt-2 text-gray-600">Please log in to access the workspace.</p>
-            <Button onClick={() => window.location.href = '/login'} className="mt-4">
+            <Button onClick={() => window.location.href = '/'} className="mt-4">
               Go to Login
             </Button>
           </div>
