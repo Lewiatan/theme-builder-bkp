@@ -10,13 +10,13 @@ use JsonSerializable;
 final readonly class ComponentDefinition implements JsonSerializable
 {
     /**
-     * @param array<int,mixed> $settings
+     * @param array<int,mixed> $props
      */
     public function __construct(
         private string $id,
         private string $type,
         private string $variant,
-        private array $settings
+        private array $props
     ) {
         $this->validate();
     }
@@ -26,7 +26,7 @@ final readonly class ComponentDefinition implements JsonSerializable
      */
     public static function fromArray(array $data): self
     {
-        if (!isset($data['id'], $data['type'], $data['variant'], $data['settings'])) {
+        if (!isset($data['id'], $data['type'], $data['variant'], $data['props'])) {
             throw new InvalidArgumentException("Invalid component definition structure");
         }
 
@@ -34,7 +34,7 @@ final readonly class ComponentDefinition implements JsonSerializable
             $data['id'],
             $data['type'],
             $data['variant'],
-            $data['settings']
+            $data['props']
         );
     }
     /**
@@ -46,7 +46,7 @@ final readonly class ComponentDefinition implements JsonSerializable
             'id' => $this->id,
             'type' => $this->type,
             'variant' => $this->variant,
-            'settings' => $this->settings,
+            'props' => $this->props,
         ];
     }
 
@@ -73,9 +73,9 @@ final readonly class ComponentDefinition implements JsonSerializable
     /**
      * @return array<int,mixed>
      */
-    public function getSettings(): array
+    public function getProps(): array
     {
-        return $this->settings;
+        return $this->props;
     }
 
     private function validate(): void

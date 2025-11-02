@@ -29,7 +29,7 @@ final readonly class UpdatePageLayoutRequest
          * - id: UUID string identifying the component instance
          * - type: Component type name (e.g., 'hero', 'text-section')
          * - variant: Component variant name (e.g., 'with-image', 'single-column')
-         * - settings: Component-specific settings object/array
+         * - props: Component-specific props object/array
          *
          * Empty array is valid and allows clearing all components from the page.
          */
@@ -53,8 +53,8 @@ final readonly class UpdatePageLayoutRequest
                         new Assert\NotBlank(message: 'Component variant is required'),
                         new Assert\Type(type: 'string', message: 'Component variant must be a string'),
                     ],
-                    'settings' => [
-                        new Assert\Type(type: 'array', message: 'Component settings must be an object'),
+                    'props' => [
+                        new Assert\Type(type: 'array', message: 'Component props must be an object'),
                     ],
                 ],
                 allowExtraFields: false,

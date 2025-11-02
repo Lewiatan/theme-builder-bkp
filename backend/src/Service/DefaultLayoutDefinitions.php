@@ -21,7 +21,7 @@ final class DefaultLayoutDefinitions
             'id' => 'default-header-' . $idSuffix,
             'type' => 'HeaderNavigation',
             'variant' => 'static',
-            'settings' => [
+            'props' => [
                 'logoUrl' => 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200',
                 'logoPosition' => 'center',
                 'variant' => 'static',
@@ -40,7 +40,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading1-home',
                 'type' => 'Heading',
                 'variant' => 'background-image',
-                'settings' => [
+                'props' => [
                     'text' => 'Home',
                     'level' => 'h1',
                     'variant' => 'background-image',
@@ -53,7 +53,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection1-home',
                 'type' => 'TextSection',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'variant' => 'text-only',
                     'columnCount' => 1,
                     'columns' => [
@@ -67,7 +67,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading2-home',
                 'type' => 'Heading',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'text' => 'Why Choose Us',
                     'level' => 'h2',
                     'variant' => 'text-only',
@@ -77,7 +77,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection2-home',
                 'type' => 'TextSection',
                 'variant' => 'with-icons',
-                'settings' => [
+                'props' => [
                     'variant' => 'with-icons',
                     'columnCount' => 3,
                     'columns' => [
@@ -110,7 +110,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading1-catalog',
                 'type' => 'Heading',
                 'variant' => 'background-color',
-                'settings' => [
+                'props' => [
                     'text' => 'Catalog',
                     'level' => 'h1',
                     'variant' => 'background-color',
@@ -123,7 +123,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-categorypills-catalog',
                 'type' => 'CategoryPills',
                 'variant' => 'center',
-                'settings' => [
+                'props' => [
                     'variant' => 'center',
                     'showAllOption' => true,
                 ],
@@ -132,7 +132,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-productlistgrid-catalog',
                 'type' => 'ProductListGrid',
                 'variant' => '3',
-                'settings' => [
+                'props' => [
                     'productsPerRow' => 3,
                 ],
             ],
@@ -140,7 +140,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection1-catalog',
                 'type' => 'TextSection',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'variant' => 'text-only',
                     'columnCount' => 1,
                     'columns' => [
@@ -154,7 +154,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading2-catalog',
                 'type' => 'Heading',
                 'variant' => 'background-color',
-                'settings' => [
+                'props' => [
                     'text' => 'Featured Collections',
                     'level' => 'h2',
                     'variant' => 'background-color',
@@ -167,7 +167,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection2-catalog',
                 'type' => 'TextSection',
                 'variant' => 'with-images',
-                'settings' => [
+                'props' => [
                     'variant' => 'with-images',
                     'columnCount' => 2,
                     'columns' => [
@@ -196,7 +196,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading1-product',
                 'type' => 'Heading',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'text' => 'Product',
                     'level' => 'h1',
                     'variant' => 'text-only',
@@ -206,7 +206,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection1-product',
                 'type' => 'TextSection',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'variant' => 'text-only',
                     'columnCount' => 1,
                     'columns' => [
@@ -220,7 +220,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading2-product',
                 'type' => 'Heading',
                 'variant' => 'background-image',
-                'settings' => [
+                'props' => [
                     'text' => 'Product Features',
                     'level' => 'h2',
                     'variant' => 'background-image',
@@ -233,7 +233,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection2-product',
                 'type' => 'TextSection',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'variant' => 'text-only',
                     'columnCount' => 4,
                     'columns' => [
@@ -266,7 +266,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading1-contact',
                 'type' => 'Heading',
                 'variant' => 'background-image',
-                'settings' => [
+                'props' => [
                     'text' => 'Contact',
                     'level' => 'h1',
                     'variant' => 'background-image',
@@ -279,7 +279,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection1-contact',
                 'type' => 'TextSection',
                 'variant' => 'text-only',
-                'settings' => [
+                'props' => [
                     'variant' => 'text-only',
                     'columnCount' => 1,
                     'columns' => [
@@ -293,7 +293,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-heading2-contact',
                 'type' => 'Heading',
                 'variant' => 'background-color',
-                'settings' => [
+                'props' => [
                     'text' => 'Get In Touch',
                     'level' => 'h3',
                     'variant' => 'background-color',
@@ -306,7 +306,7 @@ final class DefaultLayoutDefinitions
                 'id' => 'default-textsection2-contact',
                 'type' => 'TextSection',
                 'variant' => 'with-icons',
-                'settings' => [
+                'props' => [
                     'variant' => 'with-icons',
                     'columnCount' => 2,
                     'columns' => [
