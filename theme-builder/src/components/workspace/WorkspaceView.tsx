@@ -19,6 +19,7 @@ import { ThemeSettingsSidebar } from './ThemeSettingsSidebar';
 import { Canvas } from './Canvas';
 import { componentRegistry } from '../../lib/componentRegistry';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { getShopIdFromToken } from '../../lib/auth';
 import type { PageType } from '../../types/api';
 
 export function WorkspaceView() {
@@ -122,7 +123,12 @@ export function WorkspaceView() {
   }, [saveLayout]);
 
   const handleDemo = useCallback(() => {
-    window.open('http://localhost:5174', '_blank');
+    const shopId = getShopIdFromToken();
+    if (shopId) {
+      window.open(`http://localhost:5174/shop/${shopId}`, '_blank');
+    } else {
+      toast.error('Unable to open demo: Shop ID not found');
+    }
   }, []);
 
   const handleThemeToggle = useCallback(() => {

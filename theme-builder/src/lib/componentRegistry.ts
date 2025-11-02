@@ -24,8 +24,8 @@ const ProductListGrid = lazy(() => import('@shared/components/ProductListGrid'))
  * - Display components on the canvas
  * - Apply default settings when adding new components
  */
-// Base registry with kebab-case keys
-const baseRegistry: ComponentRegistry = {
+// Base registry with kebab-case keys (exported for UI listing to avoid duplicates)
+export const baseRegistry: ComponentRegistry = {
   'heading': {
     meta: {
       id: 'heading',

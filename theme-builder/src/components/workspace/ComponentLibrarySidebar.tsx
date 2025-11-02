@@ -31,11 +31,14 @@ export function ComponentLibrarySidebar({
     localStorage.setItem('componentLibrary:collapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
-  // Get all components as a flat list
-  const allComponents = Object.entries(componentRegistry).map(([type, entry]) => ({
-    type,
-    meta: entry.meta,
-  }));
+  // Get all components as a flat list (using componentRegistry to support both kebab-case and PascalCase)
+  // Filter to only show kebab-case keys to avoid duplicates in the UI
+  const allComponents = Object.entries(componentRegistry)
+    .filter(([type]) => type.includes('-')) // Only kebab-case keys
+    .map(([type, entry]) => ({
+      type,
+      meta: entry.meta,
+    }));
 
   if (isCollapsed) {
     return (
