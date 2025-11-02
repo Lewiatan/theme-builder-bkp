@@ -1,6 +1,6 @@
 ---
 name: application-debugging
-description: Debug issues by first validating sufficient context (error messages, steps to reproduce, expected vs actual behavior)
+description: Fix bugs, debug errors, troubleshoot issues, resolve problems, investigate broken functionality - validates context (error messages, steps to reproduce, expected vs actual behavior) before fixing
 ---
 
 # Application Debugging
