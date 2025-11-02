@@ -12,6 +12,8 @@ export function LoginForm() {
 
     if (token.trim()) {
       localStorage.setItem('jwt_token', token.trim());
+      // Dispatch custom event to notify App component of auth change
+      window.dispatchEvent(new Event('auth-change'));
       navigate('/', { replace: true });
     }
   };

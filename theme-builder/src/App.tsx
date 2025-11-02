@@ -13,6 +13,27 @@ function App() {
     // Check if user has a token
     const token = localStorage.getItem('jwt_token')
     setIsAuthenticated(!!token)
+
+    // Listen for storage changes (for cross-tab synchronization)
+    const handleStorageChange = () => {
+      const currentToken = localStorage.getItem('jwt_token')
+      setIsAuthenticated(!!currentToken)
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    // Listen for custom auth events (for same-tab synchronization)
+    const handleAuthChange = () => {
+      const currentToken = localStorage.getItem('jwt_token')
+      setIsAuthenticated(!!currentToken)
+    }
+
+    window.addEventListener('auth-change', handleAuthChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('auth-change', handleAuthChange)
+    }
   }, [])
 
   // Show nothing while checking authentication
