@@ -7,7 +7,7 @@ on:
     paths:
       - 'demo-shop/**'
       - 'shared/**'
-      - '.github/workflows/pull-request.yml'
+      - '.github/workflows/demo-shop-pull-request.yml'
 
 jobs:
   lint:
