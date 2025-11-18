@@ -1,8 +1,8 @@
 ---
 name: shadcn-ui
 description: Implement frontend UI using Shadcn UI components
-
 ---
+
 # Shadcn UI Components
 
 You are a Shadcn UI expert. Help users work with Shadcn UI components in this React project.
