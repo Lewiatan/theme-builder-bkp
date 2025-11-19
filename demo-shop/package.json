@@ -10,7 +10,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "shared:install": "npm install --prefix ../shared --no-audit --no-fund",
+    "postinstall": "npm run shared:install"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
