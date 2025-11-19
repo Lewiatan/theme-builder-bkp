@@ -24,14 +24,14 @@ test.describe('Demo Shop Navigation', () => {
     await page.goto('/login');
 
     // Wait for login form to be visible
-    await expect(page.locator('h1:has-text("Theme Builder Login")')).toBeVisible();
+    await expect(page.getByTestId('login-header')).toBeVisible();
 
     // Fill in JWT token in the textarea
-    const tokenTextarea = page.locator('textarea#token');
+    const tokenTextarea = page.getByTestId('token-input');
     await tokenTextarea.fill(testJWT);
 
     // Submit the login form
-    const loginButton = page.getByRole('button', { name: 'Login' });
+    const loginButton = page.getByTestId('login-button');
     await loginButton.click();
 
     // Wait for navigation to workspace
@@ -46,11 +46,11 @@ test.describe('Demo Shop Navigation', () => {
     await loginToWorkspace(page);
 
     // Verify we're in the workspace (page selector is visible)
-    const pageSelector = page.locator('button[role="combobox"]').first();
+    const pageSelector = page.getByTestId('page-selector');
     await expect(pageSelector).toBeVisible();
 
     // Click the Demo button in the TopNavigationBar
-    const demoButton = page.getByRole('button', { name: 'Demo' });
+    const demoButton = page.getByTestId('demo-button');
     await expect(demoButton).toBeVisible();
 
     // Set up listener for new page before clicking
@@ -71,12 +71,12 @@ test.describe('Demo Shop Navigation', () => {
 
     // Assert: DynamicComponentRenderer renders at least one component from seeded layout
     // Based on ExampleShopSeeder, the home page should have a HeaderNavigation component
-    const renderedContent = demoShopPage.locator('body');
+    const renderedContent = demoShopPage.getByTestId('demo-shop-body');
     await expect(renderedContent).not.toBeEmpty();
 
     // Wait for any component to be rendered (seeded layout should contain components)
     // We look for common elements that would be in a header or section
-    const hasContent = await demoShopPage.locator('nav, header, section, main').count();
+    const hasContent = await demoShopPage.getByTestId('shop-container').locator('nav, header, section, main').count();
     expect(hasContent).toBeGreaterThan(0);
 
     // Clean up: close the demo shop tab
@@ -94,6 +94,6 @@ test.describe('Demo Shop Navigation', () => {
     });
 
     // Verify login form is visible
-    await expect(page.locator('h1:has-text("Theme Builder Login")')).toBeVisible();
+    await expect(page.getByTestId('login-header')).toBeVisible();
   });
 });

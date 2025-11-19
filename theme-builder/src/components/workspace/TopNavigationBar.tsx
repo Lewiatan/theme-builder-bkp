@@ -77,7 +77,7 @@ export function TopNavigationBar({
             {isSaving ? 'Saving...' : 'Save'}
           </Button>
 
-          <Button variant="outline" onClick={onDemo}>
+          <Button variant="outline" onClick={onDemo} data-testid="demo-button">
             Demo
           </Button>
 

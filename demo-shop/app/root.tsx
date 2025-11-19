@@ -32,7 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body data-testid="demo-shop-body">
         {children}
         <ScrollRestoration />
         <Scripts />

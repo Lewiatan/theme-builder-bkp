@@ -150,6 +150,17 @@ final class AuthController extends AbstractController
                 'trace' => $e->getTraceAsString(),
             ]);
 
+            // In development, return the actual error
+            if ($_ENV['APP_ENV'] === 'dev' || $_ENV['APP_ENV'] === 'test') {
+                return new JsonResponse([
+                    'error' => 'login_failed',
+                    'message' => $e->getMessage(),
+                    'exception' => get_class($e),
+                    'file' => $e->getFile() . ':' . $e->getLine(),
+                    'trace' => $e->getTraceAsString(),
+                ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
             return new JsonResponse([
                 'error' => 'login_failed',
                 'message' => 'Login failed. Please try again.',

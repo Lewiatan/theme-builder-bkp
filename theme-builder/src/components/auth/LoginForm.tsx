@@ -21,7 +21,7 @@ export function LoginForm() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-900">
+        <h1 className="mb-6 text-center text-2xl font-bold text-gray-900" data-testid="login-header">
           Theme Builder Login
         </h1>
         <p className="mb-6 text-center text-sm text-gray-600">
@@ -33,6 +33,7 @@ export function LoginForm() {
             <Label htmlFor="token">JWT Token</Label>
             <textarea
               id="token"
+              data-testid="token-input"
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="Paste your JWT token here..."
@@ -42,7 +43,7 @@ export function LoginForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={!token.trim()}>
+          <Button type="submit" className="w-full" disabled={!token.trim()} data-testid="login-button">
             Login
           </Button>
         </form>

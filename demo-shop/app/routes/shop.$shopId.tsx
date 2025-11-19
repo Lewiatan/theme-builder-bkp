@@ -91,7 +91,7 @@ export default function ShopHomeRoute() {
   }, [data.theme]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" data-testid="shop-container">
       <DynamicComponentRenderer layout={data.page} themeSettings={data.theme} runtimeProps={{ shopId: data.shopId }} />
     </div>
   );
