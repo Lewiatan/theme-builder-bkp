@@ -98,6 +98,7 @@ jobs:
           cp .env.example .env
           cat >> .env << EOF
           APP_ENV=test
+          APP_DEBUG=1
           APP_SECRET=test-secret-for-ci
           DATABASE_URL=postgresql://builder:builder@localhost:5432/builder_test?serverVersion=16&charset=utf8
           CORS_ALLOW_ORIGIN=.*
@@ -158,6 +159,7 @@ jobs:
         working-directory: ./backend
         env:
           APP_ENV: test
+          APP_DEBUG: 1
           DATABASE_URL: postgresql://builder:builder@localhost:5432/builder_test
 
       - name: Install shared dependencies
@@ -250,6 +252,17 @@ jobs:
         env:
           CI: true
           VITE_API_URL: http://localhost:8000
+
+      - name: Show backend logs on failure
+        if: failure()
+        run: |
+          echo "=== Backend Logs ==="
+          cat backend/backend.log || echo "No backend logs found"
+          echo ""
+          echo "=== Backend Process Status ==="
+          if [ -f backend/backend.pid ]; then
+            ps -p $(cat backend/backend.pid) || echo "Backend process not running"
+          fi
 
       - name: Upload Playwright report
         if: always()
