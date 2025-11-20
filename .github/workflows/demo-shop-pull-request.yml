@@ -93,10 +93,6 @@ jobs:
           extensions: ctype, iconv, pdo, pdo_pgsql
           coverage: none
 
-      - name: Install backend dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
-        working-directory: ./backend
-
       - name: Setup backend environment
         run: |
           cp .env.example .env
@@ -106,6 +102,10 @@ jobs:
           DATABASE_URL=postgresql://builder:builder@localhost:5432/builder_test?serverVersion=16&charset=utf8
           CORS_ALLOW_ORIGIN=.*
           EOF
+        working-directory: ./backend
+
+      - name: Install backend dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
         working-directory: ./backend
 
       - name: Run database migrations
