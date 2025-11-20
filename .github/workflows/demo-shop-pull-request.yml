@@ -103,11 +103,21 @@ jobs:
           DATABASE_URL=postgresql://builder:builder@localhost:5432/builder_test?serverVersion=16&charset=utf8
           CORS_ALLOW_ORIGIN=.*
           EOF
+          # Create .env.test.local to override .env.test for CI (gitignored file)
+          cat > .env.test.local << EOF
+          # CI overrides for test environment
+          DATABASE_URL=postgresql://builder:builder@localhost:5432/builder_test?serverVersion=16&charset=utf8
+          EOF
+          echo "=== Created .env files ==="
+          echo "Contents of .env.test.local:"
+          cat .env.test.local
         working-directory: ./backend
 
       - name: Install backend dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
         working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://builder:builder@localhost:5432/builder_test
 
       - name: Generate JWT keys
         run: |
@@ -116,6 +126,14 @@ jobs:
           openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
           chmod 644 config/jwt/private.pem config/jwt/public.pem
         working-directory: ./backend
+
+      - name: Clear Symfony cache
+        run: php bin/console cache:clear --env=test
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://builder:builder@localhost:5432/builder_test
+          APP_ENV: test
+          APP_DEBUG: 1
 
       - name: Create Phinx config for CI
         run: |
@@ -247,6 +265,22 @@ jobs:
 
           echo "All services are ready!"
 
+      - name: Test backend API manually
+        run: |
+          echo "=== Checking .env files in backend ==="
+          ls -la backend/.env* || true
+          echo ""
+          echo "=== Contents of .env.test.local ==="
+          cat backend/.env.test.local || echo ".env.test.local not found"
+          echo ""
+          echo "=== Testing health endpoint ==="
+          curl -v http://localhost:8000/health || true
+          echo ""
+          echo "=== Testing login endpoint ==="
+          curl -v -X POST http://localhost:8000/api/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"demo@example.com","password":"test123"}' || true
+
       - name: Run Playwright tests
         run: npx playwright test
         env:
@@ -263,6 +297,9 @@ jobs:
           if [ -f backend/backend.pid ]; then
             ps -p $(cat backend/backend.pid) || echo "Backend process not running"
           fi
+          echo ""
+          echo "=== Last 50 lines of backend log ==="
+          tail -50 backend/backend.log || echo "Could not read backend logs"
 
       - name: Upload Playwright report
         if: always()
