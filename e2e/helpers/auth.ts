@@ -21,7 +21,15 @@ export async function createTestJWT(): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to login: ${response.status} ${response.statusText}`);
+    // Try to get detailed error message from response body
+    let errorDetails = '';
+    try {
+      const errorBody = await response.text();
+      errorDetails = errorBody ? `\nResponse body: ${errorBody}` : '';
+    } catch (e) {
+      errorDetails = '\nCould not read response body';
+    }
+    throw new Error(`Failed to login: ${response.status} ${response.statusText}${errorDetails}`);
   }
 
   const data = await response.json();
