@@ -1,0 +1,85 @@
+name: Demo Shop - Deploy to Cloudflare Workers
+
+# Manual deployment workflow
+# Required GitHub Secrets:
+#   - CLOUDFLARE_API_TOKEN: Your Cloudflare API token with Workers/Pages permissions
+#   - CLOUDFLARE_ACCOUNT_ID: Your Cloudflare account ID
+#   - VITE_API_URL: (Optional) Production API URL (defaults to http://localhost:8000)
+#
+# To add secrets: Settings > Secrets and variables > Actions > New repository secret
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+        default: 'production'
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Workers
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    defaults:
+      run:
+        working-directory: ./demo-shop
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Read Node version from .nvmrc
+        id: node-version
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+        working-directory: ./demo-shop
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ steps.node-version.outputs.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            demo-shop/package-lock.json
+            shared/package-lock.json
+
+      - name: Install shared dependencies
+        run: npm ci
+        working-directory: ./shared
+
+      - name: Install demo-shop dependencies
+        run: npm ci
+
+      - name: Create .env file
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL || 'http://localhost:8000' }}" > .env
+
+      - name: Run TypeScript type checking
+        run: npm run typecheck
+
+      - name: Build demo-shop
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./build/client --project-name=demo-shop --branch=${{ github.event.inputs.environment }}
+          workingDirectory: ./demo-shop
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Successful! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check your Cloudflare dashboard for the deployment URL." >> $GITHUB_STEP_SUMMARY

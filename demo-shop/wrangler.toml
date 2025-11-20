@@ -1,0 +1,18 @@
+name = "demo-shop"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages configuration for React Router SSR
+pages_build_output_dir = "./build/client"
+
+# Environment variables (can be overridden via GitHub secrets)
+[vars]
+# VITE_API_URL will be set during build via GitHub Actions
+
+# Production environment configuration
+[env.production]
+name = "demo-shop-production"
+
+# Development/staging environment (optional)
+[env.staging]
+name = "demo-shop-staging"
