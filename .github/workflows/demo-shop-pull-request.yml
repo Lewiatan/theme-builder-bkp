@@ -35,10 +35,6 @@ jobs:
             demo-shop/package-lock.json
             shared/package-lock.json
 
-      - name: Install shared dependencies
-        run: npm ci
-        working-directory: ./shared
-
       - name: Install demo-shop dependencies
         run: npm ci
 
@@ -114,25 +110,86 @@ jobs:
         run: npm ci
 
       - name: Run unit tests with coverage
-        run: npm run test -- --coverage
+        run: npm run test
         env:
           CI: true
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v5
-        if: always()
+  e2e-test:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Read Node version from .nvmrc
+        id: node-version
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+        working-directory: ./demo-shop
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          files: ./demo-shop/coverage/coverage-final.json
-          flags: demo-shop-unit
-          name: demo-shop-unit-coverage
-          fail_ci_if_error: false
+          node-version: ${{ steps.node-version.outputs.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            demo-shop/package-lock.json
+            shared/package-lock.json
+            theme-builder/package-lock.json
+            package-lock.json
+
+      - name: Install root dependencies (Playwright)
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Create .env file
+        run: |
+          cp .env.example .env
+          echo "APP_SECRET=test-secret-for-ci" >> .env
+
+      - name: Start Docker services
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          APP_SECRET: test-secret-for-ci
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for backend to be ready..."
+          timeout 120 bash -c 'until curl -f http://localhost:8000/api/health 2>/dev/null; do sleep 2; done' || true
+          echo "Waiting for theme-builder to be ready..."
+          timeout 120 bash -c 'until curl -f http://localhost:5173 2>/dev/null; do sleep 2; done'
+          echo "Waiting for demo-shop to be ready..."
+          timeout 120 bash -c 'until curl -f http://localhost:5174 2>/dev/null; do sleep 2; done'
+
+      - name: Setup test database
+        run: |
+          docker compose exec -T backend vendor/bin/phinx migrate -e testing
+          docker compose exec -T backend vendor/bin/phinx seed:run -e testing
+
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          CI: true
+          VITE_API_URL: http://localhost:8000
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Stop Docker services
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml down -v
 
   status-comment:
     name: PR Status Comment
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, unit-test]
+    needs: [lint, typecheck, unit-test, e2e-test]
     if: always()
     permissions:
       pull-requests: write
@@ -143,7 +200,8 @@ jobs:
         run: |
           if [ "${{ needs.lint.result }}" == "success" ] && \
              [ "${{ needs.typecheck.result }}" == "success" ] && \
-             [ "${{ needs.unit-test.result }}" == "success" ]; then
+             [ "${{ needs.unit-test.result }}" == "success" ] && \
+             [ "${{ needs.e2e-test.result }}" == "success" ]; then
             echo "status=success" >> $GITHUB_OUTPUT
             echo "emoji=✅" >> $GITHUB_OUTPUT
             echo "message=All checks passed successfully!" >> $GITHUB_OUTPUT
@@ -171,6 +229,7 @@ jobs:
             | Lint | ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }} |
             | Type Check | ${{ needs.typecheck.result == 'success' && '✅ Passed' || '❌ Failed' }} |
             | Unit Tests | ${{ needs.unit-test.result == 'success' && '✅ Passed' || '❌ Failed' }} |
+            | E2E Tests | ${{ needs.e2e-test.result == 'success' && '✅ Passed' || '❌ Failed' }} |
 
             **Commit:** ${{ github.event.pull_request.head.sha }}
             **Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
