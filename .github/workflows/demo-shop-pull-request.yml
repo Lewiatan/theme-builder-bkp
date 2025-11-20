@@ -108,17 +108,40 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
         working-directory: ./backend
 
-      - name: Run database migrations
-        run: vendor/bin/phinx migrate -e testing
+      - name: Create Phinx config for CI
+        run: |
+          cat > phinx.ci.php << 'EOF'
+          <?php
+          return [
+              'paths' => [
+                  'migrations' => '%%PHINX_CONFIG_DIR%%/db/migrations',
+                  'seeds' => '%%PHINX_CONFIG_DIR%%/db/seeds'
+              ],
+              'environments' => [
+                  'default_migration_table' => 'phinxlog',
+                  'default_environment' => 'testing',
+                  'testing' => [
+                      'adapter' => 'pgsql',
+                      'host' => 'localhost',
+                      'name' => 'builder_test',
+                      'user' => 'builder',
+                      'pass' => 'builder',
+                      'port' => '5432',
+                      'charset' => 'utf8',
+                  ]
+              ],
+              'version_order' => 'creation'
+          ];
+          EOF
         working-directory: ./backend
-        env:
-          DATABASE_URL: postgresql://builder:builder@localhost:5432/builder_test
+
+      - name: Run database migrations
+        run: vendor/bin/phinx migrate -c phinx.ci.php
+        working-directory: ./backend
 
       - name: Seed test database
-        run: vendor/bin/phinx seed:run -e testing
+        run: vendor/bin/phinx seed:run -c phinx.ci.php
         working-directory: ./backend
-        env:
-          DATABASE_URL: postgresql://builder:builder@localhost:5432/builder_test
 
       - name: Start backend server
         run: php -S localhost:8000 -t public &
