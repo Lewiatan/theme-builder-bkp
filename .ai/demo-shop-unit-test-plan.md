@@ -4,69 +4,13 @@ This document outlines a high‑ROI unit test plan for the `demo-shop/` module, 
 
 ---
 
-## Phase 1 – Core data & validation
-
-**Goal:** Lock down low-level data and validation logic that everything else depends on.
-
-### 1. `app/lib/api.test.ts`
-
-- **Target:** `buildApiUrl`
-- **Why:** Tiny but critical environment-dependent URL builder; regressions break all API calls.
-- **Scenarios:**
-  - Base URL without trailing slash + path with leading slash.
-  - Base URL with trailing slash + path with/without leading slash (no double slashes).
-  - `import.meta.env.VITE_API_URL` defined vs undefined.
-  - (Optional) Simulated server-side mode (no `window`) vs client-side mode.
-
-### 2. `app/lib/validation.test.ts`
-
-- **Target:** `isValidUuid`
-- **Why:** Used by loaders to validate `shopId`; incorrect behavior turns valid links into 400s or lets invalid IDs through.
-- **Scenarios:**
-  - Valid UUID v4 (mixed case).
-  - Invalid length (too short / too long).
-  - Invalid characters.
-  - Wrong version (e.g., version 1 instead of 4).
-
-### 3. `app/lib/api-products.test.ts`
-
-- **Targets:** `fetchProductsByCategory`, `transformProduct`, schemas.
-- **Why:** Zod validation, snake_case→camelCase mapping, and nuanced error handling are high-value and cheap to test with mocked `fetch`.
-- **Scenarios:**
-  - Happy path: valid API response (single and multiple products), transformation correctness.
-  - 404 response: throws error mentioning missing category ID.
-  - 500+ / non-OK response: generic failure message including status code.
-  - Invalid response shape: Zod validation failure → throws user-friendly error.
-  - Network/unknown error: logs context and rethrows a stable Error.
-
-### 4. `app/lib/api-categories.test.ts`
-
-- **Target:** `fetchCategories`, schemas.
-- **Why:** Same as products; categories feed filters in multiple UI components.
-- **Scenarios:**
-  - Happy path with valid categories array.
-  - Non-OK HTTP response → generic error with status.
-  - Invalid response shape → Zod error logged, generic error thrown.
-  - Network/unknown error → generic “unexpected error” with log.
+## Phase 1 – Core data & validation (completed)
 
 ---
 
 ## Phase 2 – Hooks (async state + URL coupling)
 
 **Goal:** Ensure hooks correctly orchestrate async flows, URL parameters, and loading/error state.
-
-### 5. `app/hooks/useProducts.test.tsx`
-
-- **Target:** `useProducts`
-- **Why:** Encodes how `?category=` drives product fetching and error/loading semantics.
-- **Setup:** Render inside a test router (MemoryRouter) or mock `useSearchParams`; use MSW or `vi.spyOn(global, 'fetch')`.
-- **Scenarios:**
-  - No `category` param → calls “all products” endpoint, `categoryId` is `null`.
-  - Valid numeric `category` param → calls category-specific endpoint, `categoryId` matches.
-  - Invalid `category` param (e.g. `abc`) → treated as `null`, falls back to all products.
-  - Successful fetch: `products` populated, `isLoading` toggles `true → false`, `error` is `null`.
-  - Failing fetch: `error` set, `isLoading` toggles correctly, `products` remains empty.
-  - `refetch` uses the same category context and triggers a new request.
 
 ### 6. `app/hooks/useCategories.test.tsx`
 
@@ -204,4 +148,3 @@ This document outlines a high‑ROI unit test plan for the `demo-shop/` module, 
 - **Environment:** `vitest.config.ts` is already configured for `jsdom`, React, and `tsconfig` paths.
 - **Network mocking:** Prefer MSW (`app/test/mocks`) for route-level tests; use `vi.spyOn(global, 'fetch')` for ultra-focused unit tests where MSW is unnecessary.
 - **Order of implementation:** Follow phase order (1 → 5). Each phase increases confidence while keeping per-test complexity manageable.
-
