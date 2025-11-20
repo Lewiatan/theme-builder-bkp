@@ -108,6 +108,14 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
         working-directory: ./backend
 
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -out config/jwt/private.pem 4096
+          openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+          chmod 644 config/jwt/private.pem config/jwt/public.pem
+        working-directory: ./backend
+
       - name: Create Phinx config for CI
         run: |
           cat > phinx.ci.php << 'EOF'
