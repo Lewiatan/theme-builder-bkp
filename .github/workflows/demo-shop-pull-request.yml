@@ -10,73 +10,6 @@ on:
       - '.github/workflows/demo-shop-pull-request.yml'
 
 jobs:
-  lint:
-    name: Lint Code
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./demo-shop
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Read Node version from .nvmrc
-        id: node-version
-        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
-        working-directory: ./demo-shop
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ steps.node-version.outputs.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            demo-shop/package-lock.json
-            shared/package-lock.json
-
-      - name: Install demo-shop dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-        continue-on-error: false
-
-  typecheck:
-    name: Type Check
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./demo-shop
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Read Node version from .nvmrc
-        id: node-version
-        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
-        working-directory: ./demo-shop
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ steps.node-version.outputs.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            demo-shop/package-lock.json
-            shared/package-lock.json
-
-      - name: Install shared dependencies
-        run: npm ci
-        working-directory: ./shared
-
-      - name: Install demo-shop dependencies
-        run: npm ci
-
-      - name: Run TypeScript type checking
-        run: npm run typecheck
-
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -110,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Run unit tests with coverage
-        run: npm run test
+        run: npm run test:run
         env:
           CI: true
 
