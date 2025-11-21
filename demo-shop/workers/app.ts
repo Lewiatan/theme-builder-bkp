@@ -1,4 +1,5 @@
 import { createRequestHandler } from "react-router";
+import type { Env } from "./types";
 
 declare module "react-router" {
   export interface AppLoadContext {
