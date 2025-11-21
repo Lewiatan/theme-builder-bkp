@@ -1,13 +1,12 @@
-
 import { useEffect } from "react";
 import { useLoaderData, isRouteErrorResponse } from "react-router";
-import type * as Route from "@react-router/dev/routes";
-import { buildApiUrl } from "../lib/api";
-import { isValidUuid } from "../lib/validation";
-import type { ShopPageLoaderData, PageLayoutData } from "../types/shop";
-import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
-import { Button } from "../components/ui/button";
-import DynamicComponentRenderer from "../components/DynamicComponentRenderer";
+import type { Route } from "./+types/shop.$shopId.contact";
+import { buildApiUrl } from "~/lib/api";
+import { isValidUuid } from "~/lib/validation";
+import type { ShopPageLoaderData, PageLayoutData } from "~/types/shop";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import DynamicComponentRenderer from "~/components/DynamicComponentRenderer";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const { shopId } = params;
@@ -52,7 +51,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   }
 }
 
-export function meta({ data }: Route.MetaArgs<typeof loader>) {
+export function meta({ data }: Route.MetaArgs) {
   if (!data) {
     return [
       { title: "Page Not Found" },

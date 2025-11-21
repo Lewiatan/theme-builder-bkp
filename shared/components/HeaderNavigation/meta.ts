@@ -5,7 +5,7 @@ import type { HeaderNavigationProps } from './types';
  * Metadata for the HeaderNavigation component
  * Used by the theme editor for component configuration UI
  */
-export const meta: ComponentMeta<Omit<HeaderNavigationProps, 'isLoading' | 'error'>> = {
+export const meta: ComponentMeta<Omit<HeaderNavigationProps, 'isLoading' | 'error' | 'shopId'>> = {
   displayName: 'Header/Navigation',
   description: 'Main navigation header with configurable logo and variants',
   editableFields: [
