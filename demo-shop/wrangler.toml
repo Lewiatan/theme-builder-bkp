@@ -8,11 +8,3 @@ pages_build_output_dir = "./build/client"
 # Environment variables (can be overridden via GitHub secrets)
 [vars]
 # VITE_API_URL will be set during build via GitHub Actions
-
-# Production environment configuration
-[env.production]
-name = "demo-shop-production"
-
-# Preview environment (optional)
-[env.preview]
-name = "demo-shop-preview"
