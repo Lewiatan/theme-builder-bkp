@@ -13,6 +13,6 @@ pages_build_output_dir = "./build/client"
 [env.production]
 name = "demo-shop-production"
 
-# Development/staging environment (optional)
-[env.staging]
-name = "demo-shop-staging"
+# Preview environment (optional)
+[env.preview]
+name = "demo-shop-preview"

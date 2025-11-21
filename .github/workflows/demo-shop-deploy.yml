@@ -17,7 +17,7 @@ on:
         type: choice
         options:
           - production
-          - staging
+          - preview
         default: 'production'
 
 jobs:
