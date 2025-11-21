@@ -1,9 +1,10 @@
-name: Demo Shop - Deploy to Cloudflare Workers
+name: Demo Shop - Deploy to Vercel
 
 # Manual deployment workflow
-# Required GitHub Secrets:
-#   - CLOUDFLARE_API_TOKEN: Your Cloudflare API token with Workers/Pages permissions
-#   - CLOUDFLARE_ACCOUNT_ID: Your Cloudflare account ID
+# Required GitHub Secrets (in 'production' environment):
+#   - VERCEL_TOKEN: Your Vercel authentication token
+#   - VERCEL_ORG_ID: Your Vercel organization/team ID
+#   - VERCEL_PROJECT_DEMO_SHOP_ID: The demo-shop project ID in Vercel
 #   - VITE_API_URL: (Optional) Production API URL (defaults to http://localhost:8000)
 #
 # To add secrets: Settings > Secrets and variables > Actions > New repository secret
@@ -11,27 +12,28 @@ name: Demo Shop - Deploy to Cloudflare Workers
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        type: choice
-        options:
-          - production
-          - preview
-        default: 'production'
+      deploy_to_production:
+        description: 'Deploy to production (unchecked = preview)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   deploy:
-    name: Deploy to Cloudflare Workers
+    name: Deploy to Vercel
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: production
     defaults:
       run:
         working-directory: ./demo-shop
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_DEMO_SHOP_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Read Node version from .nvmrc
         id: node-version
@@ -39,7 +41,7 @@ jobs:
         working-directory: ./demo-shop
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ steps.node-version.outputs.NODE_VERSION }}
           cache: 'npm'
@@ -69,20 +71,28 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./build/client --project-name=demo-shop --branch=${{ github.event.inputs.environment }}
-          workingDirectory: ./demo-shop
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=${{ github.event.inputs.deploy_to_production && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build ${{ github.event.inputs.deploy_to_production && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt ${{ github.event.inputs.deploy_to_production && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOY_URL"
 
       - name: Deployment summary
         run: |
-          echo "## Deployment Successful! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Environment:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.event.inputs.deploy_to_production && 'production' || 'preview' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Check your Cloudflare dashboard for the deployment URL." >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment URL:** ${{ steps.deploy.outputs.DEPLOY_URL }}" >> $GITHUB_STEP_SUMMARY
