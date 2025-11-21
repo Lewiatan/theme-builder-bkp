@@ -61,6 +61,9 @@ jobs:
       - name: Run TypeScript type checking
         run: npm run typecheck
 
+      - name: Run unit tests
+        run: npm test
+
       - name: Build demo-shop
         run: npm run build
         env:
