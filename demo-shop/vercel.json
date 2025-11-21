@@ -1,16 +1,4 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "build/client",
-  "framework": null,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/server"
-    }
-  ],
-  "functions": {
-    "api/server.js": {
-      "runtime": "nodejs22.x"
-    }
-  }
+  "outputDirectory": "build/client"
 }
