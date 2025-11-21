@@ -84,8 +84,8 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.email "lewiatan.hpc@gmail.com"
-          git config --global user.name "Maciej Niepieklo"
+          git config user.email "lewiatan.hpc@gmail.com"
+          git config user.name "Maciej Niepieklo"
 
       - name: Deploy to Vercel
         id: deploy
