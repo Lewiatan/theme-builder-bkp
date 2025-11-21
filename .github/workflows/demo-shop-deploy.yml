@@ -87,18 +87,18 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          run: |
-            # Link the project explicitly
-            vercel link --confirm --cwd=./demo-shop --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          # Link the project explicitly
+          vercel link --confirm --cwd=./demo-shop --token=${{ secrets.VERCEL_TOKEN }}
 
-            # Then deploy
-            DEPLOY_URL=$(vercel deploy \
-              ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} \
-              --token=${{ secrets.VERCEL_TOKEN }} \
-              --cwd=./demo-shop \
-              --yes)
-            echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
-            echo "Deployment URL: $DEPLOY_URL"
+          # Then deploy
+          DEPLOY_URL=$(vercel deploy \
+            ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --cwd=./demo-shop \
+            --yes)
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOY_URL"
 
       - name: Deployment summary
         run: |
