@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterAll } from 'vitest';
 import { buildApiUrl } from '~/lib/api';
 
 describe('buildApiUrl', () => {
