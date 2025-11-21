@@ -89,7 +89,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           # Link the project explicitly
-          vercel link --confirm --cwd=./demo-shop --token=${{ secrets.VERCEL_TOKEN }}
+          vercel link --confirm --cwd=${{ github.workspace }}/demo-shop --token=${{ secrets.VERCEL_TOKEN }}
 
           # Then deploy
           DEPLOY_URL=$(vercel deploy \
