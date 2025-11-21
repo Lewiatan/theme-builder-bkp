@@ -95,7 +95,7 @@ jobs:
           DEPLOY_URL=$(vercel deploy \
             ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} \
             --token=${{ secrets.VERCEL_TOKEN }} \
-            --cwd=./demo-shop \
+            --cwd=${{ github.workspace }}/demo-shop \
             --yes)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployment URL: $DEPLOY_URL"
