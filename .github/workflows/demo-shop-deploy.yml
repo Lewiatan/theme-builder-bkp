@@ -10,6 +10,13 @@ name: Demo Shop - Deploy to Vercel
 # To add secrets: Settings > Secrets and variables > Actions > New repository secret
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'demo-shop/**'
+      - 'shared/**'
+      - '.github/workflows/demo-shop-deploy.yml'
   workflow_dispatch:
     inputs:
       deploy_to_production:
@@ -76,13 +83,13 @@ jobs:
         working-directory: .
 
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=${{ github.event.inputs.deploy_to_production && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=./demo-shop
+        run: vercel pull --yes --environment=${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=./demo-shop
         working-directory: .
 
       - name: Deploy to Vercel
         id: deploy
         run: |
-          DEPLOY_URL=$(vercel deploy ${{ github.event.inputs.deploy_to_production && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=./demo-shop)
+          DEPLOY_URL=$(vercel deploy ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=./demo-shop)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployment URL: $DEPLOY_URL"
         working-directory: .
@@ -91,7 +98,7 @@ jobs:
         run: |
           echo "## Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Environment:** ${{ github.event.inputs.deploy_to_production && 'production' || 'preview' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && 'production' || 'preview' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
