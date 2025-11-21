@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
 
 export interface DragState {
   isDragging: boolean;
