@@ -82,17 +82,13 @@ jobs:
         run: npm install --global vercel@latest
         working-directory: .
 
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=./demo-shop
-        working-directory: .
-
       - name: Deploy to Vercel
         id: deploy
+        working-directory: ./demo-shop
         run: |
-          DEPLOY_URL=$(vercel deploy ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=./demo-shop)
+          DEPLOY_URL=$(vercel deploy ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} --yes)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployment URL: $DEPLOY_URL"
-        working-directory: .
 
       - name: Deployment summary
         run: |
