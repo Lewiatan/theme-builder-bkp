@@ -1,7 +1,4 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "demo-shop/build/client",
-  "roots": {
-    "demo-shop": "demo-shop"
-  }
+  "outputDirectory": "demo-shop/build/client"
 }
