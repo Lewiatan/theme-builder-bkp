@@ -8,6 +8,7 @@
 - Tailwind CSS 4 for styling
 - Uses React Router's file-based routing (`app/routes/`)
 - Designed to render saved themes with mock product data
+- Run typecheck after each change to typescript code: `npm run typecheck`
 
 ### Component Registry System
 
