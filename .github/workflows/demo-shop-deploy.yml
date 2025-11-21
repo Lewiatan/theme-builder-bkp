@@ -82,6 +82,11 @@ jobs:
         run: npm install --global vercel@latest
         working-directory: .
 
+      - name: Configure Git
+        run: |
+          git config --global user.email "lewiatan.hpc@gmail.com"
+          git config --global user.name "Maciej Niepieklo"
+
       - name: Deploy to Vercel
         id: deploy
         working-directory: .
@@ -90,7 +95,6 @@ jobs:
             ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} \
             --token=${{ secrets.VERCEL_TOKEN }} \
             --cwd=./demo-shop \
-            --no-git-metadata \
             --yes)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployment URL: $DEPLOY_URL"
