@@ -86,8 +86,11 @@ jobs:
         id: deploy
         working-directory: .
         run: |
-          cd demo-shop
-          DEPLOY_URL=$(vercel deploy ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} --yes)
+          DEPLOY_URL=$(vercel deploy --debug \
+            ${{ (github.event_name == 'push' || github.event.inputs.deploy_to_production) && '--prod' || '' }} \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --cwd=./demo-shop \
+            --yes)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployment URL: $DEPLOY_URL"
 
